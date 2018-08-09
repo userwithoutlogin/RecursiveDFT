@@ -59,11 +59,7 @@ public class NewEmptyJUnitTest {
      
      @Test
      public void output() {
-           
-                    
-        
-        
-        List<Complex> specSamples = generator.getSpectrumSamples();
+         List<Complex> specSamples = generator.getSpectrumSamples();
             specSamples.forEach(sample->{
                 System.out.println(sample+"   ampl: "+sample.amplitude()+"   arg: "+sample.arg());
             });
@@ -73,15 +69,15 @@ public class NewEmptyJUnitTest {
      
      @Test
      public void phaseTest(){
-         assertTrue("complex number with the phase pi/4 exists", phaseIsExists(Math.PI/4));
-         assertTrue("complex number with the phase pi/4 exists", phaseIsExists(Math.PI/8));
+         assertTrue("complex number with the phase pi/4 exists", phaseExists(Math.PI/4));
+         assertTrue("complex number with the phase pi/4 exists", phaseExists(Math.PI/8));
      }
      @Test
      public void amplitudeTest(){
-         assertTrue("complex number with the amplitude 50 exists", phaseIsExists(50));
-         assertTrue("complex number with the amplitude 100 exists", phaseIsExists(100));
+         assertTrue("complex number with the amplitude 50 exists", phaseExists(50));
+         assertTrue("complex number with the amplitude 100 exists", phaseExists(100));
      }
-     public boolean phaseIsExists(double phase){
+     public boolean phaseExists(double phase){
          List<Complex> samples =  generator.getSpectrumSamples();
            
            return samples.stream()
