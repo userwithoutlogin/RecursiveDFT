@@ -42,20 +42,14 @@ public class NewEmptyJUnitTest {
     @Before
     public void setUp() {
        
-         List<Double> d = getf();
-          d.addAll(getf1());
+         
         
         fourierTransform =  new RecoursiveDiscreteTransform(24);
         //sine = new SineFunction( 2.0,60.0,Math.PI);
         spectrumSamples = new ArrayList();
-     //   generator = new Generator(fourierTransform,sine);
-       // generator.start();
-       for(double r:d)
-         spectrumSamples.add(  fourierTransform.direct(r));
-      //  spectrumSamples = generator.getSpectrumSamples();
-//        for(int i=0;i<72;i++)
-//            System.out.println(  i+":  "+d.get(i) +"   "+spectrumSamples.get(i));
-         
+//        generator = new Generator(fourierTransform,sine);
+//        generator.start();
+        
     }
     
     @After
@@ -65,11 +59,15 @@ public class NewEmptyJUnitTest {
      
      @Test
      public void hello() {
-          
-          
+           List<Double> d = getf();
+          d.addAll(getf1());
+          for(int i=0;i<72;i++){
+              Complex c = fourierTransform.direct(d.get(i));
+            System.out.println(  i+":  "+d.get(i) +"   "+c+ "      amp= "+c.amplitude());
+          }
      
          
-        generator.start();
+        //generator.start();
      }
      
      public List<Double> getf(){
