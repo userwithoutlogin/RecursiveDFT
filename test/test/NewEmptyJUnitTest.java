@@ -8,6 +8,7 @@ package test;
 import com.mycompany.fouriert.complex.Complex;
 import com.mycompany.fouriert.ft.FourierTransform;
 import com.mycompany.fouriert.ft.RecoursiveDiscreteTransform;
+import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
 import java.util.ArrayList;
@@ -26,8 +27,10 @@ import static org.junit.Assert.*;
 public class NewEmptyJUnitTest {
      FourierTransform fourierTransform;
      List<Complex> spectrumSamples;
-     Function sine ;
+     Function cosine ;
+     Function cosine1 ;
       Generator generator;
+      double precision = Math.pow(10, -5);
     public NewEmptyJUnitTest() {
     }
     
@@ -41,15 +44,12 @@ public class NewEmptyJUnitTest {
     
     @Before
     public void setUp() {
-       
-         
-        
         fourierTransform =  new RecoursiveDiscreteTransform(24);
-        //sine = new SineFunction( 2.0,60.0,Math.PI);
+        cosine = new CosineFunction(100.0,Math.PI/4 ,1.0 ,0.0);
+        cosine1 = new CosineFunction(50.0,Math.PI/8 ,1.0 ,36.0);
         spectrumSamples = new ArrayList();
-//        generator = new Generator(fourierTransform,sine);
-//        generator.start();
-        
+        generator = new Generator(fourierTransform,cosine,cosine1); 
+         generator.start();
     }
     
     @After
@@ -58,35 +58,35 @@ public class NewEmptyJUnitTest {
     }
      
      @Test
-     public void hello() {
-           List<Double> d = getf();
-          d.addAll(getf1());
-          for(int i=0;i<72;i++){
-              Complex c = fourierTransform.direct(d.get(i));
-            System.out.println(  i+":  "+d.get(i) +"   "+c+ "      amp= "+c.amplitude());
-          }
-     
-         
-        //generator.start();
+     public void output() {
+         List<Complex> specSamples = generator.getSpectrumSamples();
+            specSamples.forEach(sample->{
+                System.out.println(sample+"   ampl: "+sample.amplitude()+"   arg: "+sample.arg());
+            });
+            
      }
      
-     public List<Double> getf(){
-         List<Double> l = new ArrayList();
-         for(int i=0;i<36;i++)
-             l.add(f(i));
-         return l;
+     
+     @Test
+     public void phaseTest(){
+         assertTrue("complex number with the phase pi/4 exists", phaseExists(Math.PI/4));
+         assertTrue("complex number with the phase pi/4 exists", phaseExists(Math.PI/8));
      }
-     public List<Double> getf1(){
-         List<Double> l = new ArrayList();
-         for(int i=36;i<72;i++)
-             l.add(f1(i));
-         return l;
+     @Test
+     public void amplitudeTest(){
+         assertTrue("complex number with the amplitude 50 exists", phaseExists(50));
+         assertTrue("complex number with the amplitude 100 exists", phaseExists(100));
+     }
+     public boolean phaseExists(double phase){
+         List<Complex> samples =  generator.getSpectrumSamples();
+           
+           return samples.stream()
+                    .map(sample->sample.arg())
+                    .anyMatch(arg->compareFPNumbers(arg,phase) );
+     }
+     public boolean compareFPNumbers(double n1,double n2){
+        return Math.abs(n1-n2)<precision;
      }
      
-     public double f(double x){
-         return 100*Math.cos((Math.PI/12)*x+Math.PI/4);
-     }
-     public double f1(double x){
-         return 50*Math.cos(x*(Math.PI/12) + Math.PI/8);
-     }
+      
 }

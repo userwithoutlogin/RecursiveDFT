@@ -19,95 +19,63 @@ import java.util.LinkedList;
  */
 public class RecoursiveDiscreteTransform implements FourierTransform{
       
-     SampleGenerator generator =new SampleGenerator();
+     SampleGenerator sampleGenerator =new SampleGenerator();
      private LinkedList<Double> buffer;
-     boolean r = true;
-      int n = 0;
-     private Integer width; 
-      Complex spectSam = new Complex(0.0,0.0);
-      
+     private  Complex previousSpectrumSample  ; 
+     private Complex spectrumSampleParts   ;
+     int n = 0;
+     private Integer windowWidth; 
+      Complex spectSample = new Complex(0.0,0.0);
+      double normingConstant ;
      
     public RecoursiveDiscreteTransform(Integer width) {                  
-        this.width = width;
-       
-        initBuffer() ;
-       
-        
+        this.windowWidth = width;
+        spectrumSampleParts = new Complex(0.0,0.0);
+        buffer = new LinkedList(); 
+        normingConstant = Math.sqrt(2)/windowWidth;
     }
          
-      public void shift(double timeSample) {  
-            double normalize = Math.sqrt(2)/width;
-             Complex e = Complex.initByEuler(1,- n*Math.PI/12 );
-             
-          if(width-1>buffer.size()){
-             buffer.add(timeSample);
-            
-              n++;
+ 
+      public void updatePhasorEstimate(double newTimeSample) {  
+          if(windowWidth > buffer.size()){
+               buffer.add(newTimeSample);
+             spectrumSampleParts = spectrumSampleParts.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
+ 
           }
           else{
-               Complex addition2 =new Complex(0.0,0.0);
-                
-              if(r){
-                   buffer.add( timeSample); 
-                  addition2 = generator.spectrumSample(buffer.size(), n, buffer).multiply(normalize); 
-                   
-              }
-              else{
-                   double deletedSample = buffer.remove(0);
-                 buffer.add( timeSample); 
-                  addition2 = e.multiply( timeSample-deletedSample).multiply(normalize); 
-              }
-              r=false;
-          
-       
-        
-        
-        
-        
-          
 
-          
-         //spectSam = addition1.add(addition2);
-         spectSam =  spectSam.add(addition2) ;
-         n++;
-       }
+                double deletedSample = shiftWindow(newTimeSample);
+                if(previousSpectrumSample == null)
+                    spectSample =  spectSample.add(spectrumSampleParts) ;  
+                updateSpectrumSample(newTimeSample, deletedSample);
+          }
+          n++;
+ 
     }
  
-    
-    public Complex getSample(){
-//        double normalize = Math.sqrt(2)/width;
-////        Complex n_1 = generator.spectrumSample(buffer.size(), n, buffer);
-//       // n_1 = n_1.multiply(normalize);
-//        
-//        Complex addition = Complex.initByEuler(1,-2*Math.PI).multiply(
-//              buffer.getLast()-buffer.getFirst()
-//        );
-//        addition = addition.multiply(normalize);
-        
-//        Complex sample = new Complex(0.0,0.0);
-//        
-//        for (Complex b : buffer) 
-//            sample = sample.add(b);
-//        
-//        if(prevSpecSample!= null)
-//            sample.add(prevSpecSample);
-//       prevSpecSample = sample;  
-        return spectSam;        
+      
+    public double shiftWindow(double newTimeSample){
+       double removedTimeSample = buffer.remove(0);
+                 buffer.add(newTimeSample);
+       return removedTimeSample;          
+    }  
+    public void updateSpectrumSample(double timeSampleNew,double timeSampleOld){
+        previousSpectrumSample = getExp().multiply( timeSampleNew-timeSampleOld).multiply(normingConstant); 
+              spectSample =  spectSample.add(previousSpectrumSample) ;
+    }
+    public Complex getExp( ){
+        return Complex.initByEuler(1,- n*2*Math.PI/windowWidth );
     }
     
-    
-     @Override
+      
+    public Complex getSample(){
+          return spectSample;        
+    }
+    @Override
     public Complex direct(Double timeSample) {
         Complex spectrumSample = new Complex(0.0,0.0);
-        shift(timeSample);
+        updatePhasorEstimate(timeSample);
         return spectrumSample.add( getSample());  
     }
     
-    public void initBuffer(){
-//        Complex spectrumSample = new Complex(0.0,0.0);
-        buffer = new LinkedList();
-//        for(int k=0;k<width;k++){
-//           buffer.add(0.0);                
-//        }
-    }
 }

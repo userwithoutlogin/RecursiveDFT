@@ -8,6 +8,8 @@ package com.mycompany.fouriert.functions;
 import com.mycompany.fouriert.complex.Complex;
 import com.mycompany.fouriert.ft.FourierTransform;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -21,23 +23,34 @@ import java.util.stream.Stream;
 public class Generator {
      
      private final FourierTransform fourierTransform;
-     List<Complex> spectrumSamples;
+     LinkedList<Complex> spectrumSamples;
      Stream generator ;
-     Function sine ;
+     Function[] functions ;
 
-    public Generator(FourierTransform fourierTransform, Function sine) {
+    public Generator(FourierTransform fourierTransform, Function ...  functions) {
         this.fourierTransform = fourierTransform;
-        this.sine = sine;
-        spectrumSamples = new ArrayList();
+        this.functions = functions;
+        spectrumSamples = new LinkedList();
     }
     
     public void start(){
+//         Stream <Double> stream = Stream.generate(()->{
+//            return func.calc();
+//         });
+      Arrays.stream(functions).forEach(function->{
          Stream.generate(()->{
-            return sine.calc();
-         }).limit(25).forEach(timeSample->{ 
-             System.out.println("sine "+timeSample);
-                spectrumSamples.add(fourierTransform.direct(timeSample));             
+            return function.calc();
+         }).limit(36).forEach(timeSample->{ 
+                spectrumSamples.add(fourierTransform.direct(timeSample));
          });
+      });
+//          stream.limit(36).
+//                  forEach(timeSample->{ 
+//              spectrumSamples.add(fourierTransform.direct(timeSample));
+//              System.out.println(timeSample+ "    "+ spectrumSamples.getLast());
+//         });
+
+         
     }
 
     public List<Complex> getSpectrumSamples() {

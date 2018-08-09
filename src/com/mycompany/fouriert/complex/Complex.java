@@ -19,9 +19,7 @@ public class Complex {
         this.im = im;
     }
 
-    public Complex() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
     
      public Double arg(){
         return calculateArgOnQuarter();
