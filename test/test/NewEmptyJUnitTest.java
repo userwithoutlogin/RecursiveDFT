@@ -30,6 +30,7 @@ public class NewEmptyJUnitTest {
      Function cosine ;
      Function cosine1 ;
       Generator generator;
+      double precision = Math.pow(10, -5);
     public NewEmptyJUnitTest() {
     }
     
@@ -47,6 +48,8 @@ public class NewEmptyJUnitTest {
         cosine = new CosineFunction(100.0,Math.PI/4 ,1.0 ,0.0);
         cosine1 = new CosineFunction(50.0,Math.PI/8 ,1.0 ,36.0);
         spectrumSamples = new ArrayList();
+        generator = new Generator(fourierTransform,cosine,cosine1); 
+         generator.start();
     }
     
     @After
@@ -55,16 +58,39 @@ public class NewEmptyJUnitTest {
     }
      
      @Test
-     public void hello() {
+     public void output() {
            
-        generator = new Generator(fourierTransform,cosine,cosine1);            
-        generator.start();
+                    
+        
         
         List<Complex> specSamples = generator.getSpectrumSamples();
             specSamples.forEach(sample->{
                 System.out.println(sample+"   ampl: "+sample.amplitude()+"   arg: "+sample.arg());
             });
+            
      }
      
      
+     @Test
+     public void phaseTest(){
+         assertTrue("complex number with the phase pi/4 exists", phaseIsExists(Math.PI/4));
+         assertTrue("complex number with the phase pi/4 exists", phaseIsExists(Math.PI/8));
+     }
+     @Test
+     public void amplitudeTest(){
+         assertTrue("complex number with the amplitude 50 exists", phaseIsExists(50));
+         assertTrue("complex number with the amplitude 100 exists", phaseIsExists(100));
+     }
+     public boolean phaseIsExists(double phase){
+         List<Complex> samples =  generator.getSpectrumSamples();
+           
+           return samples.stream()
+                    .map(sample->sample.arg())
+                    .anyMatch(arg->compareFPNumbers(arg,phase) );
+     }
+     public boolean compareFPNumbers(double n1,double n2){
+        return Math.abs(n1-n2)<precision;
+     }
+     
+      
 }
