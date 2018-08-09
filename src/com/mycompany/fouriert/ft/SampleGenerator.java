@@ -29,7 +29,6 @@ public class SampleGenerator {
         Complex spectrumSample = new Complex(0.0,0.0);
         buffer = new ArrayList();
         for(int k=0;k<samplesCount;k++){
-//                Complex temp = Complex.initByEuler(1,-2*Math.PI*k*n/samplesCount);
                 Complex temp = Complex.initByEuler(1,-2*Math.PI*k/samplesCount);
                 spectrumSample = spectrumSample.add( temp.multiply(samples.get(k) ));
             }

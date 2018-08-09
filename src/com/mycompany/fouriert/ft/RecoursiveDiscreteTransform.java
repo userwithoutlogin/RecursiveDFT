@@ -41,8 +41,7 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
              
           if(width-1>buffer.size()){
              buffer.add(timeSample);
-             System.out.println(  (n+1)+":  "+timeSample +"   "+spectSam);
-              n++;
+             n++;
           }
           else{
                Complex addition2 =new Complex(0.0,0.0);
@@ -58,22 +57,9 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
                   addition2 = e.multiply( timeSample-deletedSample).multiply(normalize); 
               }
               r=false;
-          
-        //////// 
-         // Complex addition1= generator.spectrumSample(buffer.size(), n, buffer);
-         // addition1 = addition1.multiply(normalize);
-          /////////
-        
-        
-        
-        
-          
-
-          
-         //spectSam = addition1.add(addition2);
+           
          spectSam =  spectSam.add(addition2) ;
-         System.out.println(  (n+1)+":  "+timeSample +"   "+spectSam+" amp "+(spectSam.amplitude() )+"ph "+spectSam.arg());
-         n++;
+          n++;
        }
     }
  
