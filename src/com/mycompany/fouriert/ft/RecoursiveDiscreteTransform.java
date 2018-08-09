@@ -21,53 +21,55 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
       
      SampleGenerator sampleGenerator =new SampleGenerator();
      private LinkedList<Double> buffer;
-     private  Complex previousSpectrumSample  ; 
-     private Complex spectrumSampleParts   ;
+     private  Complex newSpectrumSample  ; 
+     private Complex firstSpectrumSample   ;
      int n = 0;
      private Integer windowWidth; 
-      Complex spectSample = new Complex(0.0,0.0);
-      double normingConstant ;
+     Complex spectSample = new Complex(0.0,0.0);
+     double normingConstant ;
      
     public RecoursiveDiscreteTransform(Integer width) {                  
         this.windowWidth = width;
-        spectrumSampleParts = new Complex(0.0,0.0);
+        firstSpectrumSample = new Complex(0.0,0.0);
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
     }
          
  
-      public void updatePhasorEstimate(double newTimeSample) {  
+    public void updatePhasorEstimate(double newTimeSample) {  
           if(windowWidth > buffer.size()){
-               buffer.add(newTimeSample);
-             spectrumSampleParts = spectrumSampleParts.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
- 
+              accumulateFirstSpectrumSample(newTimeSample);
           }
           else{
-
                 double deletedSample = shiftWindow(newTimeSample);
-                if(previousSpectrumSample == null)
-                    spectSample =  spectSample.add(spectrumSampleParts) ;  
+                if(newSpectrumSample == null)
+                    spectSample =  spectSample.add(firstSpectrumSample) ;  
                 updateSpectrumSample(newTimeSample, deletedSample);
           }
-          n++;
- 
+          n++; 
     }
- 
-      
+    
     public double shiftWindow(double newTimeSample){
        double removedTimeSample = buffer.remove(0);
-                 buffer.add(newTimeSample);
+       buffer.add(newTimeSample);
        return removedTimeSample;          
     }  
     public void updateSpectrumSample(double timeSampleNew,double timeSampleOld){
-        previousSpectrumSample = getExp().multiply( timeSampleNew-timeSampleOld).multiply(normingConstant); 
-              spectSample =  spectSample.add(previousSpectrumSample) ;
+        newSpectrumSample = getExp().multiply( timeSampleNew-timeSampleOld).multiply(normingConstant); 
+              spectSample =  spectSample.add(newSpectrumSample) ;
     }
     public Complex getExp( ){
         return Complex.initByEuler(1,- n*2*Math.PI/windowWidth );
     }
+    public void accumulateFirstSpectrumSample(double newTimeSample){
+           buffer.add(newTimeSample);
+//     forms the first spectrum sample while buffer fills
+             firstSpectrumSample = firstSpectrumSample.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
+    }
+     
     
-      
+    
+    
     public Complex getSample(){
           return spectSample;        
     }

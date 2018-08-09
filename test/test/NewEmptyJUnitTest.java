@@ -62,8 +62,7 @@ public class NewEmptyJUnitTest {
          List<Complex> specSamples = generator.getSpectrumSamples();
             specSamples.forEach(sample->{
                 System.out.println(sample+"   ampl: "+sample.amplitude()+"   arg: "+sample.arg());
-            });
-            
+            });            
      }
      
      
@@ -79,8 +78,7 @@ public class NewEmptyJUnitTest {
      }
      public boolean phaseExists(double phase){
          List<Complex> samples =  generator.getSpectrumSamples();
-           
-           return samples.stream()
+         return samples.stream()
                     .map(sample->sample.arg())
                     .anyMatch(arg->compareFPNumbers(arg,phase) );
      }
