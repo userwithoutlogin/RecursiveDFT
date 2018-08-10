@@ -6,6 +6,7 @@
 package com.mycompany.fouriert.ft;
 
 import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.LinkedList;
  *
  * @author root
  */
-public class RecoursiveDiscreteTransform implements FourierTransform{
-      
+public class RecursiveDiscreteTransform implements FourierTransform{
+      TransientMonitor monitor ; 
      SampleGenerator sampleGenerator =new SampleGenerator();
      private LinkedList<Double> buffer;
      private  Complex newSpectrumSample  ; 
@@ -28,7 +29,7 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
      Complex spectSample = new Complex(0.0,0.0);
      double normingConstant ;
      
-    public RecoursiveDiscreteTransform(Integer width) {                  
+    public RecursiveDiscreteTransform(Integer width) {                  
         this.windowWidth = width;
         firstSpectrumSample = new Complex(0.0,0.0);
         buffer = new LinkedList(); 
@@ -79,6 +80,14 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
         Complex spectrumSample = new Complex(0.0,0.0);
         updatePhasorEstimate(timeSample);
         return spectrumSample.add( getSample());  
+    }
+    public double  calculatePhasorEstimateQality(){
+      if(monitor!=null)  return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(buffer) : 0.0;
+      else throw new UnsupportedOperationException();
+    }  
+    
+    public void setMonitor(TransientMonitor monitor) {
+        this.monitor = monitor;
     }
     
 }

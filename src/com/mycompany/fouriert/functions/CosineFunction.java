@@ -29,9 +29,17 @@ public class CosineFunction implements Function {
         x = x0;
     }   
     
+    public CosineFunction(double amplitude, double phase,double f,double delta,double x0) {
+        this.a = amplitude;
+       this.delta = delta;
+        this.fi = phase;
+        x = x0;
+    }   
+    
     
         @Override
     public Double calc( ) {        
+//        double cos  =  a * Math.cos(x*2.0*Math.PI/24 + fi);    
         double cos  =  a * Math.cos(x*2.0*Math.PI/24 + fi);    
         x+= delta;
         return cos;

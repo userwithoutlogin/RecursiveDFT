@@ -7,7 +7,7 @@ package test;
 
 import com.mycompany.fouriert.complex.Complex;
 import com.mycompany.fouriert.ft.FourierTransform;
-import com.mycompany.fouriert.ft.RecoursiveDiscreteTransform;
+import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
@@ -44,7 +44,7 @@ public class NewEmptyJUnitTest {
     
     @Before
     public void setUp() {
-        fourierTransform =  new RecoursiveDiscreteTransform(24);
+        fourierTransform =  new RecursiveDiscreteTransform(24);
         cosine = new CosineFunction(100.0,Math.PI/4 ,1.0 ,0.0);
         cosine1 = new CosineFunction(50.0,Math.PI/8 ,1.0 ,36.0);
         spectrumSamples = new ArrayList();
