@@ -41,10 +41,11 @@ public class RecoursiveDiscreteTransform implements FourierTransform{
               accumulateFirstSpectrumSample(newTimeSample);
           }
           else{
-                double deletedSample = shiftWindow(newTimeSample);
-                if(newSpectrumSample == null)
-                    spectSample =  spectSample.add(firstSpectrumSample) ;  
-                updateSpectrumSample(newTimeSample, deletedSample);
+               if(newSpectrumSample == null)
+                    spectSample =  spectSample.add(firstSpectrumSample) ; 
+               
+               double deletedSample = shiftWindow(newTimeSample);                 
+               updateSpectrumSample(newTimeSample, deletedSample);
           }
           n++; 
     }
