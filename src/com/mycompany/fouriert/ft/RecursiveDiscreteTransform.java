@@ -19,11 +19,9 @@ import java.util.LinkedList;
  * @author root
  */
 public class RecursiveDiscreteTransform implements FourierTransform{
-      TransientMonitor monitor ; 
+     TransientMonitor monitor ; 
      SampleGenerator sampleGenerator =new SampleGenerator();
      private LinkedList<Double> buffer;
-     private  Complex newSpectrumSample  ; 
-     private Complex firstSpectrumSample   ;
      int n = 0;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
@@ -31,7 +29,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      
     public RecursiveDiscreteTransform(Integer width) {                  
         this.windowWidth = width;
-        firstSpectrumSample = new Complex(0.0,0.0);
+         
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
     }
@@ -42,11 +40,8 @@ public class RecursiveDiscreteTransform implements FourierTransform{
               accumulateFirstSpectrumSample(newTimeSample);
           }
           else{
-               if(newSpectrumSample == null)
-                    spectSample =  spectSample.add(firstSpectrumSample) ; 
-               
                double deletedSample = shiftWindow(newTimeSample);                 
-               updateSpectrumSample(newTimeSample, deletedSample);
+               updateSpectrumSample(newTimeSample, deletedSample);                
           }
           n++; 
     }
@@ -57,8 +52,8 @@ public class RecursiveDiscreteTransform implements FourierTransform{
        return removedTimeSample;          
     }  
     public void updateSpectrumSample(double timeSampleNew,double timeSampleOld){
-        newSpectrumSample = getExp().multiply( timeSampleNew-timeSampleOld).multiply(normingConstant); 
-              spectSample =  spectSample.add(newSpectrumSample) ;
+           Complex newSpectrumSample = getExp().multiply( timeSampleNew-timeSampleOld).multiply(normingConstant); 
+           spectSample =  spectSample.add(newSpectrumSample) ;
     }
     public Complex getExp( ){
         return Complex.initByEuler(1,- n*2*Math.PI/windowWidth );
@@ -66,23 +61,22 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     public void accumulateFirstSpectrumSample(double newTimeSample){
            buffer.add(newTimeSample);
 //     forms the first spectrum sample while buffer fills
-             firstSpectrumSample = firstSpectrumSample.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
+             spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
     }
      
-    
-    
-    
     public Complex getSample(){
-          return spectSample;        
+          return windowWidth == buffer.size() ? spectSample : new Complex(0.0,0.0);        
     }
     @Override
     public Complex direct(Double timeSample) {
         Complex spectrumSample = new Complex(0.0,0.0);
         updatePhasorEstimate(timeSample);
+        
         return spectrumSample.add( getSample());  
     }
     public double  calculatePhasorEstimateQality(){
-      if(monitor!=null)  return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(buffer) : 0.0;
+      if(monitor!=null)  
+          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(buffer) : 0.0;
       else throw new UnsupportedOperationException();
     }  
     

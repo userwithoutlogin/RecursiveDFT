@@ -7,6 +7,7 @@ package com.mycompany.fouriert.functions;
 
 import com.mycompany.fouriert.complex.Complex;
 import com.mycompany.fouriert.ft.FourierTransform;
+import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -22,15 +23,18 @@ import java.util.stream.Stream;
  */
 public class Generator {
      
-     private final FourierTransform fourierTransform;
+     private final RecursiveDiscreteTransform fourierTransform;
      LinkedList<Complex> spectrumSamples;
+     LinkedList<Double> estimates;
      Stream generator ;
      Function[] functions ;
+     
 
-    public Generator(FourierTransform fourierTransform, Function ...  functions) {
+    public Generator(RecursiveDiscreteTransform fourierTransform, Function ...  functions) {
         this.fourierTransform = fourierTransform;
         this.functions = functions;
         spectrumSamples = new LinkedList();
+        estimates = new LinkedList();
     }
     
     public void start(){
@@ -41,7 +45,9 @@ public class Generator {
          Stream.generate(()->{
             return function.calc();
          }).limit(36).forEach(timeSample->{ 
+             System.out.println(timeSample);
                 spectrumSamples.add(fourierTransform.direct(timeSample));
+                estimates.add(fourierTransform.calculatePhasorEstimateQality());
          });
       });
 //          stream.limit(36).
@@ -55,6 +61,14 @@ public class Generator {
 
     public List<Complex> getSpectrumSamples() {
         return spectrumSamples;
+    }
+
+    public LinkedList<Double> getEstimates() {
+        return estimates;
+    }
+
+    public Function[] getFunctions() {
+        return functions;
     }
     
     

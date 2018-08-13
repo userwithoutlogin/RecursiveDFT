@@ -5,7 +5,11 @@
  */
 package com.mycompany.fouriert.errorcorrection;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,11 +19,13 @@ import java.util.stream.Stream;
  */
 public class TransientMonitor {
     private double[][] tn ;
+    private double[][] test = new double[24][24];
     private int windowWidth;
     private int k;
+    
     public TransientMonitor(int windowWidth) {
         this.windowWidth = windowWidth;
-        tn = new double[windowWidth][windowWidth];
+        tn = new double[windowWidth][windowWidth]; 
         initMatrix();
     }
     
@@ -30,22 +36,27 @@ public class TransientMonitor {
             for(int j=0 ;j<windowWidth;j++,k++){
              updateIndex();
             
-             
-             tn[i][j] = i ==j ? 1.0-(2.0/windowWidth):
-                     -(2.0/windowWidth)*Math.cos((k*2.0*Math.PI)/windowWidth);
-                   
+             tn[i][j] = i ==j ?1.0-(2.0/windowWidth):
+                    -(2.0/windowWidth)*Math.cos(k*2.0*Math.PI/windowWidth);
+//        
+//             tn[i][j] = i ==j ? (2.0/windowWidth):(2.0/windowWidth)*Math.cos(Math.toRadians(k*2.0*Math.PI));
+ 
+                  
               }
-            
+           
          }
     }
-    public double calculatePhasorEstimateQality(List timeSamples){
-        double [] monitorVector = getMonitorVector(timeSamples);
+    public double calculatePhasorEstimateQality(List samples){
+         
+        double [] monitorVector = getMonitorVector(samples);
+        
 //        return Arrays.stream(monitorVector)
 //                .reduce(0.0,(v1,v2)->Math.abs(v1 + v2));    
         double est =0.0;
-        for(double e : monitorVector)
-            est+=  e ;
-        return Math.abs(est);
+        for(int i = 0;i<samples.size();i++){
+            est+=  Math.abs( monitorVector[i]);
+        }
+        return est;
     }
     private double[] getMonitorVector(List timeSamples){
        double[]  errorVector = new double[windowWidth];
@@ -64,6 +75,8 @@ public class TransientMonitor {
          return k;
     }    
     public static void main(String[] args) {
-        
+//        TransientMonitor monitor = new TransientMonitor(24);
+//       monitor.getMonitorVector(Arrays.asList(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,
+//               1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0));
     }
 }

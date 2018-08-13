@@ -32,8 +32,8 @@ public class Complex {
     }
     public Complex multiply(Complex multiplier){
         
-        return new Complex(amplitude()*multiplier.amplitude()*Math.cos(arg()+multiplier.arg()),
-                            amplitude()*multiplier.amplitude()*Math.sin(arg()+multiplier.arg())
+        return new Complex(amplitude()*multiplier.amplitude()*Math.cos(Math.toRadians(arg()+multiplier.arg())),
+                            amplitude()*multiplier.amplitude()*Math.sin(Math.toRadians(arg()+multiplier.arg()))
         );
     }
     public Complex add(Complex added){

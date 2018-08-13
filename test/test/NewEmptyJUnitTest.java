@@ -6,7 +6,7 @@
 package test;
 
 import com.mycompany.fouriert.complex.Complex;
-import com.mycompany.fouriert.ft.FourierTransform;
+import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
@@ -25,12 +25,13 @@ import static org.junit.Assert.*;
  * @author andrey_pushkarniy
  */
 public class NewEmptyJUnitTest {
-     FourierTransform fourierTransform;
+     RecursiveDiscreteTransform fourierTransform;
      List<Complex> spectrumSamples;
      Function cosine ;
      Function cosine1 ;
       Generator generator;
-      double precision = Math.pow(10, -5);
+      double precision = Math.pow(10, -4);
+      TransientMonitor monitor ;
     public NewEmptyJUnitTest() {
     }
     
@@ -45,6 +46,8 @@ public class NewEmptyJUnitTest {
     @Before
     public void setUp() {
         fourierTransform =  new RecursiveDiscreteTransform(24);
+        monitor = new TransientMonitor(24);
+        fourierTransform.setMonitor(monitor);
         cosine = new CosineFunction(100.0,Math.PI/4 ,1.0 ,0.0);
         cosine1 = new CosineFunction(50.0,Math.PI/8 ,1.0 ,36.0);
         spectrumSamples = new ArrayList();
@@ -60,9 +63,10 @@ public class NewEmptyJUnitTest {
      @Test
      public void output() {
          List<Complex> specSamples = generator.getSpectrumSamples();
-            specSamples.forEach(sample->{
-                System.out.println(sample+"   ampl: "+sample.amplitude()+"   arg: "+sample.arg());
-            });            
+         List<Double> est = generator.getEstimates();
+            for(int i=0;i<specSamples.size();i++){
+                System.out.println((i+1)+": "+specSamples.get(i)+"   ampl: "+specSamples.get(i).amplitude()+"   arg: "+specSamples.get(i).arg()+" Tn: "+est.get(i));
+            }            
      }
      
      
@@ -73,14 +77,20 @@ public class NewEmptyJUnitTest {
      }
      @Test
      public void amplitudeTest(){
-         assertTrue("complex number with the amplitude 50 exists", phaseExists(50));
-         assertTrue("complex number with the amplitude 100 exists", phaseExists(100));
+         assertTrue("complex number with the amplitude 50 exists", amplitudeExists(50/Math.sqrt(2)));
+         assertTrue("complex number with the amplitude 100 exists", amplitudeExists(100/Math.sqrt(2)));
      }
-     public boolean phaseExists(double phase){
+     public boolean phaseExists(double value){
          List<Complex> samples =  generator.getSpectrumSamples();
          return samples.stream()
                     .map(sample->sample.arg())
-                    .anyMatch(arg->compareFPNumbers(arg,phase) );
+                    .anyMatch(arg->compareFPNumbers(arg,value) );
+     }
+     public boolean amplitudeExists(double value){
+         List<Complex> samples =  generator.getSpectrumSamples();
+         return samples.stream()
+                    .map(sample->sample.amplitude())
+                    .anyMatch(arg->compareFPNumbers(arg,value) );
      }
      public boolean compareFPNumbers(double n1,double n2){
         return Math.abs(n1-n2)<precision;
