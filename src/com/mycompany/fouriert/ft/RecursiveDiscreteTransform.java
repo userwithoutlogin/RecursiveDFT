@@ -62,6 +62,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
            buffer.add(newTimeSample);
 //     forms the first spectrum sample while buffer fills
              spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
+            
     }
      
     public Complex getSample(){
@@ -76,12 +77,13 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     }
     public double  calculatePhasorEstimateQality(){
       if(monitor!=null)  
-          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(buffer) : 0.0;
+          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample,n,buffer ) : 0.0;
       else throw new UnsupportedOperationException();
     }  
     
     public void setMonitor(TransientMonitor monitor) {
         this.monitor = monitor;
+        
     }
     
 }

@@ -45,7 +45,7 @@ public class Generator {
          Stream.generate(()->{
             return function.calc();
          }).limit(36).forEach(timeSample->{ 
-             System.out.println(timeSample);
+            // System.out.println(timeSample);
                 spectrumSamples.add(fourierTransform.direct(timeSample));
                 estimates.add(fourierTransform.calculatePhasorEstimateQality());
          });
