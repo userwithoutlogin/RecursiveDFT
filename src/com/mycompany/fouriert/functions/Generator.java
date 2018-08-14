@@ -28,39 +28,32 @@ import java.util.stream.Stream;
 public class Generator {
      
      private final RecursiveDiscreteTransform fourierTransform;
-     LinkedList<Complex> spectrumSamples;
-     LinkedList<Double> estimates;
-     
+     List<Complex> spectrumSamples;
+      List<Double> estimates;
      Function[] functions ;
-     
-     private List<Double> frequencyDeviations  ; 
-      
-   
-    public void initFreqDeviations(double start,double end,double delta){
-           for(double d = start;d<=end;d+=delta)
-               frequencyDeviations.add(d);
-            
-    }
+     double df;
+ 
      
 
-    public Generator(RecursiveDiscreteTransform fourierTransform, Function ...  functions) {
+    public Generator(RecursiveDiscreteTransform fourierTransform,double df,Function ...  functions) {
         this.fourierTransform = fourierTransform;
         this.functions = functions;
-        spectrumSamples = new LinkedList();
-        estimates = new LinkedList();
-       frequencyDeviations = new ArrayList(); 
+        spectrumSamples = new ArrayList();
+        estimates = new ArrayList();
+        this.df = df;
     }
     
-    public void start(){
+    public void start(  ){
  
          Arrays.stream(functions).forEach(function->{
          Stream.generate(()->{
               
-            double df = !frequencyDeviations.isEmpty() ? frequencyDeviations.get(ThreadLocalRandom.current().nextInt(0, frequencyDeviations.size() )):0.0; 
+//            double df = !frequencyDeviations.isEmpty() ? frequencyDeviations.get(ThreadLocalRandom.current().nextInt(0, frequencyDeviations.size() )):0.0; 
             return function.calc( df);
          }).limit(36).forEach(timeSample->{ 
              spectrumSamples.add(fourierTransform.direct(timeSample));
-             estimates.add(fourierTransform.calculatePhasorEstimateQality());
+             if(fourierTransform.getMonitor()!=null)
+                 estimates.add(fourierTransform.calculatePhasorEstimateQality()); 
          });
       });
  
@@ -71,7 +64,7 @@ public class Generator {
         return spectrumSamples;
     }
 
-    public LinkedList<Double> getEstimates() {
+    public List<Double> getEstimates() {
         return estimates;
     }
 

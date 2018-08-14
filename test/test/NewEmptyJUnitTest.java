@@ -50,13 +50,13 @@ public class NewEmptyJUnitTest {
         monitor = new TransientMonitor(24);
         fourierTransform.setMonitor(monitor);
         //                            A     fi          fnom  deta   x0
-        cosine = new CosineFunction(100.0,Math.PI/4  ,   60.0, 1.0  ,0.0 );
-        cosine1 = new CosineFunction(50.0,Math.PI/8  ,  60.0, 1.0  ,36.0);
+//        cosine = new CosineFunction(100.0,Math.PI/4  ,   60.0, 1.0  ,0.0 );
+//        cosine1 = new CosineFunction(50.0,Math.PI/8  ,  60.0, 1.0  ,36.0);
         spectrumSamples = new ArrayList();
-        generator = new Generator(fourierTransform,cosine,cosine1); 
+//        generator = new Generator(fourierTransform,cosine,cosine1); 
 //                                    start end   delta       
-        generator.initFreqDeviations(-0.5, 0.5, 0.05 );
-        generator.start();
+//        generator.initFreqDeviations(-0.5, 0.5, 0.05 );
+//        generator.start();
          
     }
     

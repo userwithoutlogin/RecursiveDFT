@@ -75,7 +75,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         updatePhasorEstimate(timeSample);
         return spectrumSample.add( getSample());  
     }
-    public double  calculatePhasorEstimateQality(){
+    public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
       if(monitor!=null)  
           return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample,n,buffer ) : 0.0;
       else throw new UnsupportedOperationException();
@@ -84,6 +84,10 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     public void setMonitor(TransientMonitor monitor) {
         this.monitor = monitor;
         
+    }
+
+    public TransientMonitor getMonitor() {
+        return monitor;
     }
     
 }

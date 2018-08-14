@@ -21,27 +21,29 @@ public class CosineFunction implements Function {
         private Double x = 0.0;
         private Double delta;
         private Double freqNom;
-        
+        private Integer windowWidth;
 
-    public CosineFunction(double amplitude, double phase,double delta, double x0) {
+    public CosineFunction(double amplitude, double phase,double delta, double x0,int windowWidth) {
         this.a = amplitude;
       this.delta = delta;
         this.fi = phase;
         x = x0;
+        this.windowWidth =  windowWidth;
     }   
     
-    public CosineFunction(double amplitude, double phase,double freqNom,double delta, double x0) {
+    public CosineFunction(double amplitude, double phase,double freqNom,double delta, double x0,int windowWidth) {
         this.a = amplitude;
        this.delta = delta;
         this.fi = phase;
         this.freqNom = freqNom;
         x = x0;
+         this.windowWidth =  windowWidth;
     }   
     
     
         @Override
     public Double calc(  double df) {    
-        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/24 + fi);    
+        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi);    
         x+= delta;
         return cos;
     }
