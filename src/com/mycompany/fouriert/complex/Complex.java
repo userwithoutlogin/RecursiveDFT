@@ -21,7 +21,7 @@ public class Complex {
 
     
     
-     public Double arg(){
+    public Double arg(){
         return calculateArgOnQuarter();
      }
     public Double amplitude(){
@@ -39,14 +39,16 @@ public class Complex {
     public Complex add(Complex added){
         return new Complex(re+added.getRe(),im+added.getIm());
     }
-   public Complex sub(Complex deleted){
+    public Complex sub(Complex deleted){
         return new Complex(re-deleted.getRe(),im-deleted.getIm());
     }
     //инициализция и возврат комлексного числа по формуле Эйлера
     public static Complex initByEuler(double module,double arg){
         return new Complex(module*Math.cos(arg),module*Math.sin(arg));
     }
-    
+    public Complex conjugate(){
+        return new Complex(re,-im);
+    }
     
     public Double getRe() {
         return re;

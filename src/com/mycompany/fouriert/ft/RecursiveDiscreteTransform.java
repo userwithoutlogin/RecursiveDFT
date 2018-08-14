@@ -22,14 +22,17 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      TransientMonitor monitor ; 
      SampleGenerator sampleGenerator =new SampleGenerator();
      private LinkedList<Double> buffer;
-     int n = 0;
+     private ArrayList<Complex> spectrumSamples;
+     private ArrayList<Complex> samplesOfNominalFrequency;
+     private int n = 0;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
      double normingConstant ;
+     double fNom;
      
-    public RecursiveDiscreteTransform(Integer width) {                  
+    public RecursiveDiscreteTransform(Integer width,double fNom) {                  
         this.windowWidth = width;
-         
+         this.fNom = fNom;
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
     }
@@ -61,18 +64,17 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     public void accumulateFirstSpectrumSample(double newTimeSample){
            buffer.add(newTimeSample);
 //     forms the first spectrum sample while buffer fills
-             spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant)); 
-            
+             spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant));              
     }
      
     public Complex getSample(){
           return windowWidth == buffer.size() ? spectSample : new Complex(0.0,0.0);        
     }
+ 
     @Override
     public Complex direct(Double timeSample) {
         Complex spectrumSample = new Complex(0.0,0.0);
         updatePhasorEstimate(timeSample);
-        
         return spectrumSample.add( getSample());  
     }
     public double  calculatePhasorEstimateQality(){
