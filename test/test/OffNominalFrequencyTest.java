@@ -26,10 +26,9 @@ import static org.junit.Assert.*;
  */
 public class OffNominalFrequencyTest {
       List<Complex> samples; 
-      List<Double> errors; 
       double precision = Math.pow(10, -3);
       int windowWidth = 10;
-      TransientMonitor monitor;
+      
     public OffNominalFrequencyTest() {
         double fNom = 50.0;
         double amplitude = 100.0;
@@ -38,23 +37,15 @@ public class OffNominalFrequencyTest {
         double sartPoint = 0.0;
         double frequencyDeviation = 0.00;
         samples = new ArrayList();
-        monitor = new TransientMonitor(windowWidth);
+       
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(windowWidth, fNom);
-        fourierTransform.setMonitor(monitor);
         Function cosine = new CosineFunction(amplitude,phase  ,    fNom,  delta  ,sartPoint,windowWidth );
         Generator generator = new Generator(fourierTransform,frequencyDeviation,cosine ); 
         generator.start( );    
         samples = generator.getSpectrumSamples();
-        errors = generator.getEstimates();
-       for(int i=0;i<samples.size();i++)
-            System.out.println(samples.get(i)+" amp: "+samples.get(i).amplitude()+"  arg: "+samples.get(i).arg()+" error: "+errors.get(i));           
+         
         
-        System.out.println("-------------------------------------");
     }
-    
-     
-     
- 
      
      @Test
      public void phaseTest(){
