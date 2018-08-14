@@ -13,6 +13,7 @@ import java.util.Iterator;
  * @author andrey_pushkarniy
  */
 public interface Function {
-    public Double calc(  );
+    public Double calc( double df  );
+    
 //    public Iterator getIterator();
 }

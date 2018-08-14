@@ -45,14 +45,19 @@ public class NewEmptyJUnitTest {
     
     @Before
     public void setUp() {
-        fourierTransform =  new RecursiveDiscreteTransform(24);
+        //                                             windowWidth , f nominal        
+        fourierTransform =  new RecursiveDiscreteTransform(24,       60.0);
         monitor = new TransientMonitor(24);
         fourierTransform.setMonitor(monitor);
-        cosine = new CosineFunction(100.0,Math.PI/4 ,1.0 ,0.0);
-        cosine1 = new CosineFunction(50.0,Math.PI/8 ,1.0 ,36.0);
+        //                            A     fi          fnom  deta   x0
+        cosine = new CosineFunction(100.0,Math.PI/4  ,   60.0, 1.0  ,0.0 );
+        cosine1 = new CosineFunction(50.0,Math.PI/8  ,  60.0, 1.0  ,36.0);
         spectrumSamples = new ArrayList();
         generator = new Generator(fourierTransform,cosine,cosine1); 
-         generator.start();
+//                                    start end   delta       
+        generator.initFreqDeviations(-0.5, 0.5, 0.05 );
+        generator.start();
+         
     }
     
     @After
@@ -60,14 +65,14 @@ public class NewEmptyJUnitTest {
         
     }
      
-     @Test
-     public void output() {
-         List<Complex> specSamples = generator.getSpectrumSamples();
-         List<Double> est = generator.getEstimates();
-            for(int i=0;i<specSamples.size();i++){
-                System.out.println((i+1)+": "+specSamples.get(i)+"   ampl: "+specSamples.get(i).amplitude()+"   arg: "+specSamples.get(i).arg()+" Tn: "+est.get(i));
-            }            
-     }
+//     @Test
+//     public void output() {
+//         List<Complex> specSamples = generator.getSpectrumSamples();
+//         List<Double> est = generator.getEstimates();
+//            for(int i=0;i<specSamples.size();i++){
+//                System.out.println((i+1)+": "+specSamples.get(i)+"   ampl: "+specSamples.get(i).amplitude()+"   arg: "+specSamples.get(i).arg()+" Tn: "+est.get(i));
+//            }            
+//     }
      
      
      @Test

@@ -12,9 +12,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -26,8 +30,17 @@ public class Generator {
      private final RecursiveDiscreteTransform fourierTransform;
      LinkedList<Complex> spectrumSamples;
      LinkedList<Double> estimates;
-     Stream generator ;
+     
      Function[] functions ;
+     
+     private List<Double> frequencyDeviations  ; 
+      
+   
+    public void initFreqDeviations(double start,double end,double delta){
+           for(double d = start;d<=end;d+=delta)
+               frequencyDeviations.add(d);
+            
+    }
      
 
     public Generator(RecursiveDiscreteTransform fourierTransform, Function ...  functions) {
@@ -35,27 +48,22 @@ public class Generator {
         this.functions = functions;
         spectrumSamples = new LinkedList();
         estimates = new LinkedList();
+       frequencyDeviations = new ArrayList(); 
     }
     
     public void start(){
-//         Stream <Double> stream = Stream.generate(()->{
-//            return func.calc();
-//         });
-      Arrays.stream(functions).forEach(function->{
+ 
+         Arrays.stream(functions).forEach(function->{
          Stream.generate(()->{
-            return function.calc();
+              
+            double df = !frequencyDeviations.isEmpty() ? frequencyDeviations.get(ThreadLocalRandom.current().nextInt(0, frequencyDeviations.size() )):0.0; 
+            return function.calc( df);
          }).limit(36).forEach(timeSample->{ 
-            // System.out.println(timeSample);
-                spectrumSamples.add(fourierTransform.direct(timeSample));
-                estimates.add(fourierTransform.calculatePhasorEstimateQality());
+             spectrumSamples.add(fourierTransform.direct(timeSample));
+             estimates.add(fourierTransform.calculatePhasorEstimateQality());
          });
       });
-//          stream.limit(36).
-//                  forEach(timeSample->{ 
-//              spectrumSamples.add(fourierTransform.direct(timeSample));
-//              System.out.println(timeSample+ "    "+ spectrumSamples.getLast());
-//         });
-
+ 
          
     }
 
