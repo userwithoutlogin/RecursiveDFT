@@ -30,8 +30,7 @@ public class PhasorTest {
          WINDOW_WIDTH     - размер окна фазора 
          NOMINAL_FREQUECY - номинальная частота
       */
-      final int    WINDOW_WIDTH = 24;
-      
+      final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUECY = 50.0;   
       
       
@@ -70,13 +69,19 @@ public class PhasorTest {
      
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
-         /** Фазы всех спектральных отсчетов (spectrumSamples) должны быть постоянными и совпадать со значением (phase) с заданной точностью  (precision) */  
+         /* 
+           Фазы всех спектральных отсчетов (spectrumSamples) должны быть постоянными и
+           совпадать со значением (phase) с заданной точностью  (precision) 
+         */  
          return spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()).stream()
                     .map(sample->sample.arg())
                     .allMatch(arg->compareFPNumbers(arg,phase,precision) );
      }
      public boolean isAmplitudeConstant(double amplitude,List<Complex> spectrumSamples,double precision){
-       /** Амплитуды всех спектральных отсчетов (spectrumSamples) должны быть постоянными и совпадать со значением (amplitude) с заданной точностью  (precision) */  
+       /* 
+         Амплитуды всех спектральных отсчетов (spectrumSamples) должны быть постоянными и
+         совпадать со значением (amplitude) с заданной точностью  (precision) 
+       */  
          return spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()).stream()
                     .map(sample->sample.amplitude())
                     .allMatch(arg->compareFPNumbers(arg,amplitude,precision) );
