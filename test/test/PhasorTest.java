@@ -35,7 +35,7 @@ public class PhasorTest {
       
       
      @Test
-     public void constantPhasorRepresentationOnNominalFrequency(){
+     public void  PhasorRepresentationMustBeConstantOnNominalFrequency(){
         /*
           precision          - точность, в пределах которой 2 амплитуды(фазы) могут считаться равными
           frequencyDeviation - отклонение частоты от номинального значения
