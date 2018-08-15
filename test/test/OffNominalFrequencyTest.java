@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  */
 public class OffNominalFrequencyTest {
       List<Complex> samples; 
-      double precision = Math.pow(10, -3);
+      double precision = Math.pow(10, -5);
       int windowWidth = 10;
       
     public OffNominalFrequencyTest() {
@@ -35,16 +35,17 @@ public class OffNominalFrequencyTest {
         double phase = Math.PI/4;
         double delta = 1.0;
         double sartPoint = 0.0;
-        double frequencyDeviation = 0.00;
+        double df = 0.00;
         samples = new ArrayList();
        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(windowWidth, fNom);
         Function cosine = new CosineFunction(amplitude,phase  ,    fNom,  delta  ,sartPoint,windowWidth );
-        Generator generator = new Generator(fourierTransform,frequencyDeviation,cosine ); 
+        Generator generator = new Generator(fourierTransform,df,fNom,cosine ); 
         generator.start( );    
         samples = generator.getSpectrumSamples();
          
-        
+        for(int i=0;i<samples.size();i++)
+            System.out.println("amp: "+samples.get(i).amplitude()+" arg: "+samples.get(i).arg()+"   "+samples.get(i));
     }
      
      @Test

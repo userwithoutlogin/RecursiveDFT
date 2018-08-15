@@ -32,15 +32,17 @@ public class Generator {
       List<Double> estimates;
      Function[] functions ;
      double df;
+     double fNom;
  
      
 
-    public Generator(RecursiveDiscreteTransform fourierTransform,double df,Function ...  functions) {
+    public Generator(RecursiveDiscreteTransform fourierTransform,double df,double fNom,Function ...  functions) {
         this.fourierTransform = fourierTransform;
         this.functions = functions;
         spectrumSamples = new ArrayList();
         estimates = new ArrayList();
         this.df = df;
+        this.fNom = fNom;
     }
     
     public void start(  ){
@@ -54,6 +56,7 @@ public class Generator {
              spectrumSamples.add(fourierTransform.direct(timeSample));
              if(fourierTransform.getMonitor()!=null)
                  estimates.add(fourierTransform.calculatePhasorEstimateQality()); 
+             fourierTransform.phasorEstimateOffNominalF(df, fNom);
          });
       });
  
