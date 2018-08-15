@@ -19,26 +19,19 @@ public class CosineFunction implements Function {
         
         private final Double fi;
         private Double x = 0.0;
-        private Double delta;
-        private Double freqNom;
+        private Double delta = 1.0;
+        private Double freqNom = 50.0;
         private Integer windowWidth;
 
-    public CosineFunction(double amplitude, double phase,double delta, double x0,int windowWidth) {
+    public CosineFunction(double amplitude, double phase,int windowWidth,double freqNom) {
         this.a = amplitude;
       this.delta = delta;
         this.fi = phase;
-        x = x0;
+         this.freqNom = freqNom;
         this.windowWidth =  windowWidth;
     }   
     
-    public CosineFunction(double amplitude, double phase,double freqNom,double delta, double x0,int windowWidth) {
-        this.a = amplitude;
-       this.delta = delta;
-        this.fi = phase;
-        this.freqNom = freqNom;
-        x = x0;
-         this.windowWidth =  windowWidth;
-    }   
+      
     
     
         @Override
@@ -47,6 +40,18 @@ public class CosineFunction implements Function {
         x+= delta;
         return cos;
     }
+
+    public void setX(Double x) {
+        this.x = x;
+    }
+
+    public void setDelta(Double delta) {
+        this.delta = delta;
+    }
+
+    public void setFreqNom(Double freqNom) {
+        this.freqNom = freqNom;
+    }
     
- 
+    
 }
