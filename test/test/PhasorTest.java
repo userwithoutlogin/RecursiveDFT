@@ -45,18 +45,20 @@ public class PhasorTest {
           cosine             - функция, задающая тестовый сигнал
           generator          - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
+          limitPointNubers   - количество точекб подсчитываемое генератором
         */
                  
         double precision = 1e-13;
-        double frequencyDeviation = 0.0;
+        double frequencyDeviation = 1.0;
         double amplitude = 100.0;
         double phase = Math.PI/4;
+        int limitPointNubers = 36;
         List<Complex> spectrumSamples  = new ArrayList();
        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
         Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
         Generator generator = new Generator(fourierTransform,frequencyDeviation,NOMINAL_FREQUECY,cosine ); 
-        generator.start();    
+        generator.start(limitPointNubers);    
         spectrumSamples = generator.getSpectrumSamples();
         
         assertTrue("Phase is constant and equals to "+phase+" for all samples",         isPhaseConstant(phase  ,  spectrumSamples,   precision));  
@@ -64,8 +66,35 @@ public class PhasorTest {
         
      }
      
-     
-     
+     @Test
+     public void phaseShiftBetweenTwoSignalsMustBeConstantOnNominalFrequency(){
+         
+     }
+     @Test
+     public void corruptedSinusoidLeadsToPhasorEstimateError(){
+        double precision = 1e-13;
+        double frequencyDeviation = 0.0;
+        double amplitude1 = 100.0;
+        double amplitude2 = 50.0;
+        double phase1 = Math.PI/4;
+        double phase2 = Math.PI/8;
+        int limitPointNubers = 36;
+        List<Complex> spectrumSamples  = new ArrayList();
+        List<Double> phasorErrors  = new ArrayList();
+        
+        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
+        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
+        fourierTransform.setMonitor(monitor);
+        Function cosine1 = new CosineFunction(amplitude1,phase1  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        Function cosine2 = new CosineFunction(amplitude2,phase2  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        Generator generator = new Generator(fourierTransform,frequencyDeviation,NOMINAL_FREQUECY,cosine1,cosine2 ); 
+        generator.start(limitPointNubers);    
+        spectrumSamples = generator.getSpectrumSamples();
+        phasorErrors = generator.getErrorEstimates();
+        int n = countOfInconstantSamples( spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()));
+        
+         assertEquals(n, phasorErrors.size());
+     }
      
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
@@ -88,5 +117,13 @@ public class PhasorTest {
      }
      public boolean compareFPNumbers(double n1,double n2,double precision){
        return Math.abs(n1-n2)<precision;
+     }
+     public int countOfInconstantSamples(List<Complex> spectrumSamples){
+         int count=0;
+         for(int i=1;i<spectrumSamples.size();i++){
+             Complex tmp = spectrumSamples.get(i-1);
+             if(!tmp.isEqual(spectrumSamples.get(i)))count++;
+         }
+         return count;        
      }
 }

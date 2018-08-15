@@ -29,7 +29,8 @@ public class Generator {
      
      private final RecursiveDiscreteTransform fourierTransform;
      List<Complex> spectrumSamples;
-      List<Double> estimates;
+      List<Double> errorEstimates;
+      List<Double> x;
      Function[] functions ;
      double df;
      double fNom;
@@ -40,22 +41,23 @@ public class Generator {
         this.fourierTransform = fourierTransform;
         this.functions = functions;
         spectrumSamples = new ArrayList();
-        estimates = new ArrayList();
+        errorEstimates = new ArrayList();
         this.df = df;
         this.fNom = fNom;
     }
     
-    public void start(  ){
+    public void start( int limitPointNubers ){
  
          Arrays.stream(functions).forEach(function->{
          Stream.generate(()->{
               
 //            double df = !frequencyDeviations.isEmpty() ? frequencyDeviations.get(ThreadLocalRandom.current().nextInt(0, frequencyDeviations.size() )):0.0; 
             return function.calc( df);
-         }).limit(36).forEach(timeSample->{ 
+         }).limit(limitPointNubers).forEach(timeSample->{ 
              spectrumSamples.add(fourierTransform.direct(timeSample));
+             System.out.println(timeSample);
              if(fourierTransform.getMonitor()!=null)
-                 estimates.add(fourierTransform.calculatePhasorEstimateQality()); 
+                 errorEstimates.add(fourierTransform.calculatePhasorEstimateQality()); 
              //fourierTransform.phasorEstimateOffNominalF(df, fNom);
          });
       });
@@ -67,8 +69,8 @@ public class Generator {
         return spectrumSamples;
     }
 
-    public List<Double> getEstimates() {
-        return estimates;
+    public List<Double> getErrorEstimates() {
+        return errorEstimates;
     }
 
     public Function[] getFunctions() {

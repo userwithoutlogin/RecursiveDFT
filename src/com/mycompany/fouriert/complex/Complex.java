@@ -9,10 +9,10 @@ package com.mycompany.fouriert.complex;
  *
  * @author root
  */
-public class Complex {
+public class Complex  {
     private final Double re;
     private final Double im;
-   private Integer precision = 2;
+   private Double precision = 1e-10;
    
     public Complex(double re, double im) {
         this.re = re;
@@ -84,4 +84,12 @@ public class Complex {
         return     String.format("%."+precision+"f",re) + 
                 sign +"j"+  String.format("%."+precision+"f",Math.abs(im))  ;
     } 
+
+    public boolean isEqual(Complex c){
+      boolean reEq = Math.abs(re-c.re)<precision;
+      boolean imEq = Math.abs(im-c.im)<precision;
+      return reEq&&imEq;
+    }   
+    
+    
 }
