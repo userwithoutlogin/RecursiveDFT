@@ -56,7 +56,7 @@ public class Generator {
              spectrumSamples.add(fourierTransform.direct(timeSample));
              if(fourierTransform.getMonitor()!=null)
                  estimates.add(fourierTransform.calculatePhasorEstimateQality()); 
-             fourierTransform.phasorEstimateOffNominalF(df, fNom);
+             //fourierTransform.phasorEstimateOffNominalF(df, fNom);
          });
       });
  

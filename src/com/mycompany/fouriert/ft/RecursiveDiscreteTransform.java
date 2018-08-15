@@ -28,7 +28,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      double normingConstant ;
      
      
-    public RecursiveDiscreteTransform(Integer width,double fNom) {                  
+    public RecursiveDiscreteTransform(Integer width ) {                  
         this.windowWidth = width;
         
         buffer = new LinkedList(); 
@@ -76,33 +76,33 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         return spectrumSample.add( getSample());  
     }
     
-    public void phasorEstimateOffNominalF(double df,double fNom){
-      Complex newSample = null;
-        if(buffer.size()==windowWidth){
-        double sinP = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*(df/(2.0*fNom)))/
-                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*(df/(2.0*fNom))));
-        Complex p = Complex.initByEuler(1, (2.0*Math.PI/windowWidth)*(df/(fNom))*((windowWidth-1.0)/2.0))
-                .multiply(sinP);
-        
-        double sinQ = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*((2.0*fNom+df)/(2.0*fNom)))/
-                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(2.0*fNom))));
-        Complex q = Complex.initByEuler(1, -(2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(fNom))*((windowWidth-1)/2))
-                .multiply(sinQ);
-         
-         newSample = spectSample.
-                                multiply(p).
-                                multiply(Complex.initByEuler(1, (2*Math.PI/windowWidth)*(df/fNom)*n)).add(
-                                    spectSample.
-                                         conjugate().
-                                         multiply(q).
-                                         multiply(Complex.initByEuler(1, -(2*Math.PI/windowWidth)*((2*fNom+df)/fNom)*n))
-                                );
-       newSample = newSample.multiply(1.0/Math.sqrt(2));
-       //Complex delta = spectSample.sub(newSample);
-       //spectSample = spectSample.sub(delta);
-       }
-                     
-    }
+//    public void phasorEstimateOffNominalF(double df ){
+//      Complex newSample = null;
+//        if(buffer.size()==windowWidth){
+//        double sinP = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*(df/(2.0*fNom)))/
+//                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*(df/(2.0*fNom))));
+//        Complex p = Complex.initByEuler(1, (2.0*Math.PI/windowWidth)*(df/(fNom))*((windowWidth-1.0)/2.0))
+//                .multiply(sinP);
+//        
+//        double sinQ = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*((2.0*fNom+df)/(2.0*fNom)))/
+//                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(2.0*fNom))));
+//        Complex q = Complex.initByEuler(1, -(2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(fNom))*((windowWidth-1)/2))
+//                .multiply(sinQ);
+//         
+//         newSample = spectSample.
+//                                multiply(p).
+//                                multiply(Complex.initByEuler(1, (2*Math.PI/windowWidth)*(df/fNom)*n)).add(
+//                                    spectSample.
+//                                         conjugate().
+//                                         multiply(q).
+//                                         multiply(Complex.initByEuler(1, -(2*Math.PI/windowWidth)*((2*fNom+df)/fNom)*n))
+//                                );
+//       newSample = newSample.multiply(1.0/Math.sqrt(2));
+//       //Complex delta = spectSample.sub(newSample);
+//       //spectSample = spectSample.sub(delta);
+//       }
+//                     
+//    }
     
     public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
       if(monitor!=null)  

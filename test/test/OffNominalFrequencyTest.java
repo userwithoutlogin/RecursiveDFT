@@ -38,7 +38,7 @@ public class OffNominalFrequencyTest {
         double df = 0.00;
         samples = new ArrayList();
        
-        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(windowWidth, fNom);
+        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(windowWidth);
         Function cosine = new CosineFunction(amplitude,phase  ,    fNom,  delta  ,sartPoint,windowWidth );
         Generator generator = new Generator(fourierTransform,df,fNom,cosine ); 
         generator.start( );    
