@@ -34,20 +34,25 @@ public class PhasorTest {
       
      @Test
      public void constantPhasorRepresentationOnNominalFrequency(){
-        /** Точность, в пределах которой 2 амплитуды(фазы) могут считаться равными */
+        /*
+          precision - точность, в пределах которой 2 амплитуды(фазы) могут считаться равными
+          frequencyDeviation - отклонение частоты от номинального значения
+          amplitude - амплитуда тестируемого сигнала
+          phase - фазовый сдвиг тестируемого сигнала
+          fourierTransform - фазер с рекурсивным обновлением оценки, расширяющий дискретное преобразование Фурье(ДПФ)
+          cosine - функция, задающая тестовый сигнал
+          generator - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
+          spectrumSamples - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
+        */
+                 
         double precision = 1e-13;
-        /** Отклонение частоты от номинального значения*/
         double frequencyDeviation = 0.0;
-        /** Амплитуда тестируемого сигнала */
         double amplitude = 100.0;
-        /** Фазовый сдвиг тестируемого сигнала */
         double phase = Math.PI/4;
-        /** Спектральные отсчеты, получаемые после дискретного преобразования Фурье(ДПФ) над значениями тестируемого сигнала*/  
         List<Complex> spectrumSamples  = new ArrayList();
        
-        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);
+        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
         Generator generator = new Generator(fourierTransform,frequencyDeviation,NOMINAL_FREQUECY,cosine ); 
         generator.start();    
         spectrumSamples = generator.getSpectrumSamples();
