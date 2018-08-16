@@ -39,7 +39,7 @@ public class PhasorTest {
      @Test
      public void  phasorRepresentationsOnNominalFrequency(){
         /*
-          precision          - точность, в пределах которой 2 амплитуды(фазы) могут считаться равными
+          precision          - погрешность, до которой  2 амплитуды(фазы) могут считаться равными
           frequencyDeviation - отклонение частоты от номинального значения
           amplitude          - амплитуда тестируемого сигнала
           phase              - фазовый сдвиг тестируемого сигнала
@@ -62,7 +62,7 @@ public class PhasorTest {
         generator.start(limitPointNumbers);    
         List<Complex> spectrumSamples = generator.getSpectrumSamples();
         
-        /* Амплитуда и фаза составляют представление фазора */
+        // Амплитуда и фаза составляют представление фазора 
         assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency",
                 isPhaseConstant(phase  ,  spectrumSamples,   precision)
         );  
@@ -75,7 +75,7 @@ public class PhasorTest {
      @Test
      public void phaseShiftBetweenSignalsOnNominalFrequency(){
         /*
-          precision                             - точность, в пределах которой 2 фазы могут считаться равными
+          precision                             - погрешность, до которой 2 фазы могут считаться равными
           frequencyDeviation                    - отклонение частоты от номинального значения
           amplitude1(amplitude2)                - амплитуда первого(второго) тестируемого сигнала
           phase1(phase2)                        - фазовый сдвиг первого(второго) тестируемого сигнала
@@ -146,7 +146,7 @@ public class PhasorTest {
      public List<Double> phaseShiftsBetweenPhasorRepresentations(List<Complex> spectrumSamples1,List<Complex> spectrumSamples2){
         /*
           phasesCosine1(phasesCosine1)  - значения фазы первого(второго) сигнала, полученные от фазора 
-          phaseShifts                 - значения фазового сдвига между cosine1 и cosine2
+          phaseShifts                   - значения фазового сдвига между cosine1 и cosine2
          */
           List<Double> phaseShifts = new ArrayList();
           List<Double> phasesCosine1 = spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size())
