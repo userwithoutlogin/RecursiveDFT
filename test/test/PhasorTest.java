@@ -46,20 +46,20 @@ public class PhasorTest {
           cosine             - функция, задающая тестовый сигнал
           generator          - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
-          limitPointNubers   - количество точек, подсчитываемое генератором
+          limitPointNumbers   - количество точек, подсчитываемое генератором
         */
                  
         double precision = 1e-13;
         double frequencyDeviation = 1.0;
         double amplitude = 100.0;
         double phase = Math.PI/4;
-        int limitPointNubers = 36;
+        int limitPointNumbers = 36;
         List<Complex> spectrumSamples  = new ArrayList();
        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
         Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
         Generator generator = new Generator(fourierTransform,frequencyDeviation,NOMINAL_FREQUECY,cosine ); 
-        generator.start(limitPointNubers);    
+        generator.start(limitPointNumbers);    
         spectrumSamples = generator.getSpectrumSamples();
         
         assertTrue("Phase is constant and equals to pi/4 for all samples",         isPhaseConstant(phase  ,  spectrumSamples,   precision));  
