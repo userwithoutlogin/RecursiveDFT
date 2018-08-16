@@ -55,7 +55,7 @@ public class Generator {
             return function.calc( df);
          }).limit(limitPointNubers).forEach(timeSample->{ 
              spectrumSamples.add(fourierTransform.direct(timeSample));
-             System.out.println(timeSample);
+             //System.out.println(timeSample);
              if(fourierTransform.getMonitor()!=null)
                  errorEstimates.add(fourierTransform.calculatePhasorEstimateQality()); 
              //fourierTransform.phasorEstimateOffNominalF(df, fNom);
