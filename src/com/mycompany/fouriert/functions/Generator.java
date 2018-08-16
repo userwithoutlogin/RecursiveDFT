@@ -33,17 +33,17 @@ public class Generator {
       List<Double> x;
      Function[] functions ;
      double df;
-     double fNom;
+   
  
      
 
-    public Generator(RecursiveDiscreteTransform fourierTransform,double df,double fNom,Function ...  functions) {
+    public Generator(RecursiveDiscreteTransform fourierTransform,double df,Function ...  functions) {
         this.fourierTransform = fourierTransform;
         this.functions = functions;
         spectrumSamples = new ArrayList();
         errorEstimates = new ArrayList();
         this.df = df;
-        this.fNom = fNom;
+         
     }
     
     public void start( int limitPointNubers ){
