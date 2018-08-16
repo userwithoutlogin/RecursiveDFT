@@ -12,7 +12,7 @@ package com.mycompany.fouriert.complex;
 public class Complex  {
     private final Double re;
     private final Double im;
-   private Double precision = 1e-17;
+   private Double precision = 1e-13;
    
     public Complex(double re, double im) {
         this.re = re;

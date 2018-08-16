@@ -22,7 +22,7 @@ public class CosineFunction implements Function {
         private Double delta = 1.0;
         private Double freqNom = 50.0;
         private Integer windowWidth;
-
+         
     public CosineFunction(double amplitude, double phase,int windowWidth,double freqNom) {
         this.a = amplitude;
       this.delta = delta;

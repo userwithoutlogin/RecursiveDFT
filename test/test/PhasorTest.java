@@ -14,6 +14,7 @@ import com.mycompany.fouriert.functions.Generator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
  
 import org.junit.After;
 import org.junit.AfterClass;
@@ -37,7 +38,7 @@ public class PhasorTest {
       
       
      @Test
-     public void  phasorRepresentationsOnNominalFrequency(){
+     public void phasorRepresentationsOnNominalFrequency(){
         /*
           precision          - погрешность, до которой  2 амплитуды(фазы) могут считаться равными
           frequencyDeviation - отклонение частоты от номинального значения
@@ -48,8 +49,7 @@ public class PhasorTest {
           generator          - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
           limitPointNumbers  - количество точек, подсчитываемое генератором
-        */
-                 
+        */                 
         double precision = 1e-13;
         double frequencyDeviation = 0.0;
         double amplitude = 100.0;
@@ -68,8 +68,7 @@ public class PhasorTest {
         );  
         assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency",
                 isAmplitudeConstant(100/Math.sqrt(2),  spectrumSamples,  precision)
-        );
-        
+        );        
      }
      
      @Test
@@ -113,6 +112,49 @@ public class PhasorTest {
           assertTrue("phase shift between cosine1 and cosine2 must be constant and equals pi/6 on nominal frequency", isPhaseShiftConstant(phaseShifts,Math.PI/6,precision));
      }
      
+     @Test
+     public void findErrorsInPhasorRepresentation (){        
+        /*
+          precision          - погрешность, до которой оценку фазора можно считать равной 0
+          frequencyDeviation - отклонение частоты от номинального значения
+          amplitude          - амплитуда   тестируемого сигнала
+          phase              - фазовый сдвиг  тестируемого сигнала
+          fourierTransform   - фазер с рекурсивным обновлением оценки, расширяющий дискретное преобразование Фурье(ДПФ)  
+          cosine             - функция, задающая  тестовый сигнал
+          generator          - генерирует отсчеты  исследуемого сигнала и передает их фазеру для формирования спектра сигнала
+          spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями  тестового сигнала
+          monitor            - класс , который вычисляет величину ошибки фазора
+          limitPointNumbers  - количество точек, подсчитываемое генератором  
+          phasorErrors       - список значений, показывабщих на сколько ошибся фазор при выполнении оценки
+          countErrors        - число оценок фазора, в которых он допустил ошибку 
+        */
+        double precision = 1e-10;
+        double frequencyDeviation = 1.0;
+        double amplitude = 100.0;
+        double phase = Math.PI/4;
+        int limitPointNubers = 30;
+        List<Double> phasorErrors  = new ArrayList();
+        
+        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
+       
+        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
+        fourierTransform.setMonitor(monitor);
+        Function cosine1 = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine1 ); 
+        generator.start(limitPointNubers);    
+         
+        phasorErrors = generator.getErrorEstimates();
+        int countErrors = phasorErrors.stream().filter(error-> error>precision).collect(Collectors.toList()).size();
+        
+         /*
+            Так как сигнал cosine1 имеет частоту, отличную от номинальной, 
+            все 7 [limitPointNubers - (WINDOW_WIDTH -1) = 30-(24-1) = 6] оценок фазора будут ошибочны
+        */ 
+         assertEquals(7, countErrors);
+     }
+     
+     
+     
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
          /* 
            Фазы всех спектральных отсчетов (spectrumSamples) должны быть постоянными и
@@ -122,6 +164,7 @@ public class PhasorTest {
                     .map(sample->sample.arg())
                     .allMatch(arg->compareFPNumbers(arg,phase,precision) );
      }
+     
      public boolean isAmplitudeConstant(double amplitude,List<Complex> spectrumSamples,double precision){
        /* 
          Амплитуды всех спектральных отсчетов (spectrumSamples) должны быть постоянными и
@@ -162,4 +205,6 @@ public class PhasorTest {
               phaseShifts.add(phasesCosine1.get(i)-phasesCosine2.get(i));
           return phaseShifts;
      }
+
+    
 }
