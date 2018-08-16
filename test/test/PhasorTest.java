@@ -47,7 +47,7 @@ public class PhasorTest {
           cosine             - функция, задающая тестовый сигнал
           generator          - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
-          limitPointNumbers   - количество точек, подсчитываемое генератором
+          limitPointNumbers  - количество точек, подсчитываемое генератором
         */
                  
         double precision = 1e-13;
@@ -74,7 +74,7 @@ public class PhasorTest {
      
      @Test
      public void calculatePhaseShiftBetweenSignals(){
-            /*
+        /*
           precision                             - точность, в пределах которой 2 фазы могут считаться равными
           frequencyDeviation                    - отклонение частоты от номинального значения
           amplitude1(amplitude2)                - амплитуда первого(второго) тестируемого сигнала
@@ -83,9 +83,7 @@ public class PhasorTest {
           cosine1(cosine2)                      - функция, задающая первый(второй) тестовый сигнал
           generator1(generator2)                - генерирует отсчеты первого(второго) исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples1(spectrumSamples2)    - спектральные отсчеты, получаемые после  ДПФ над значениями первого(второго) тестового сигнала
-          limitPointNumbers                     - количество точек, подсчитываемое генератором
-          arg1(arg2)                            - значения фазы первого(второго) сигнала, полученные от фазора 
-          phaseShifts                           - значения фазового сдвига между cosine1 и cosine2
+          limitPointNumbers                     - количество точек, подсчитываемое генератором          
         */
           
           double precision = 1e-13;
@@ -110,18 +108,7 @@ public class PhasorTest {
           List<Complex> spectrumSamples1  = generator1.getSpectrumSamples() ;
           List<Complex> spectrumSamples2  = generator2.getSpectrumSamples();         
           
-          List<Double> arg1 = spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size())
-                  .stream()
-                  .map(sample->sample.arg() )
-                  .collect(Collectors.toList());
-          List<Double> arg2 = spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
-                  .stream()
-                  .map(sample->sample.arg() )
-                  .collect(Collectors.toList());
-          
-          List<Double> phaseShifts = new ArrayList();
-          for(int i=0;i<arg1.size();i++)
-              phaseShifts.add(arg1.get(i)-arg2.get(i));
+          List<Double> phaseShifts = phaseShiftsBetweenPhasorRepresentations(spectrumSamples1,spectrumSamples2);           
               
           assertTrue("phase shift between cosine1 and cosine2 must be constant and equals pi/6 on nominal frequency", isPhaseShiftConstant(phaseShifts,Math.PI/6,precision));
      }
@@ -144,15 +131,35 @@ public class PhasorTest {
                     .map(sample->sample.amplitude())
                     .allMatch(arg->compareFPNumbers(arg,amplitude,precision) );
      }
-     public boolean compareFPNumbers(double n1,double n2,double precision){
-      //Функция сравнения чисел с плавающей точкой   
-       return Math.abs(n1-n2)<precision;
-     }
      public boolean isPhaseShiftConstant(List<Double> phaseShifts,double shift,double precision){
         /* 
          Фазовые сдвиги между двумя сигналами,найденные из оценок фазоров, должны быть постоянными и
          совпадать со значением (shift) с заданной точностью  (precision) при номинальной частоте сигнала 
        */  
          return phaseShifts.stream().allMatch(arg->compareFPNumbers(arg, shift, precision));
+     }
+     
+     public boolean compareFPNumbers(double n1,double n2,double precision){
+      //Функция сравнения чисел с плавающей точкой   
+       return Math.abs(n1-n2)<precision;
+     }
+     public List<Double> phaseShiftsBetweenPhasorRepresentations(List<Complex> spectrumSamples1,List<Complex> spectrumSamples2){
+        /*
+          phasesCosine1(phasesCosine1)  - значения фазы первого(второго) сигнала, полученные от фазора 
+          phaseShifts                 - значения фазового сдвига между cosine1 и cosine2
+         */
+          List<Double> phaseShifts = new ArrayList();
+          List<Double> phasesCosine1 = spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size())
+                  .stream()
+                  .map(sample->sample.arg() )
+                  .collect(Collectors.toList());
+          List<Double> phasesCosine2 = spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
+                  .stream()
+                  .map(sample->sample.arg() )
+                  .collect(Collectors.toList());
+          
+          for(int i=0;i<phasesCosine1.size();i++)
+              phaseShifts.add(phasesCosine1.get(i)-phasesCosine2.get(i));
+          return phaseShifts;
      }
 }
