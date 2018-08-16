@@ -13,6 +13,7 @@ import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,7 +36,7 @@ public class PhasorTest {
       
       
      @Test
-     public void  phasorRepresentationMustBeConstantOnNominalFrequency(){
+     public void  phasorRepresentationsMustBeConstantOnNominalFrequency(){
         /*
           precision          - точность, в пределах которой 2 амплитуды(фазы) могут считаться равными
           frequencyDeviation - отклонение частоты от номинального значения
@@ -45,11 +46,11 @@ public class PhasorTest {
           cosine             - функция, задающая тестовый сигнал
           generator          - генерирует отсчеты исследуемого сигнала и передает их фазеру для формирования спектра сигнала
           spectrumSamples    - спектральные отсчеты, получаемые после  ДПФ над значениями тестового сигнала
-          limitPointNubers   - количество точекб подсчитываемое генератором
+          limitPointNubers   - количество точек, подсчитываемое генератором
         */
                  
         double precision = 1e-13;
-        double frequencyDeviation = 1.0;
+        double frequencyDeviation = 0.0;
         double amplitude = 100.0;
         double phase = Math.PI/4;
         int limitPointNubers = 36;
@@ -66,18 +67,19 @@ public class PhasorTest {
         
      }
      
+     
      @Test
-     public void phaseShiftBetweenTwoSignalsMustBeConstantOnNominalFrequency(){
+     public void phasorErrorOccuresWherePhasorRepresentationInconstant(){
+        
          
-     }
-     @Test
-     public void corruptedSinusoidLeadsToPhasorEstimateError(){
-        double precision = 1e-13;
-        double frequencyDeviation = 0.0;
+        double precision = 1e-11;
+        double frequencyDeviation = 1.0;
         double amplitude1 = 100.0;
         double amplitude2 = 50.0;
         double phase1 = Math.PI/4;
         double phase2 = Math.PI/8;
+        
+        
         int limitPointNubers = 36;
         List<Complex> spectrumSamples  = new ArrayList();
         List<Double> phasorErrors  = new ArrayList();
@@ -86,14 +88,25 @@ public class PhasorTest {
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
         fourierTransform.setMonitor(monitor);
         Function cosine1 = new CosineFunction(amplitude1,phase1  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
-        Function cosine2 = new CosineFunction(amplitude2,phase2  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        CosineFunction cosine2 = new CosineFunction(amplitude2,phase2  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);
+        //Установка точки отсчета функции
+        cosine2.setX(36.0);
+        /*
+         Генератору передается 2 функции, из которых сформируется единый сигнал. 
+         На х=[0;36) отображается cosine1, на х=[36,72) отображается cosine2
+        */
         Generator generator = new Generator(fourierTransform,frequencyDeviation,NOMINAL_FREQUECY,cosine1,cosine2 ); 
         generator.start(limitPointNubers);    
         spectrumSamples = generator.getSpectrumSamples();
         phasorErrors = generator.getErrorEstimates();
-        int n = countOfInconstantSamples( spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()));
+        int n = countOfInconstantPhases( spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()),precision);
+        int countErrors = phasorErrors.stream().filter(error-> error>precision).collect(Collectors.toList()).size();
         
-         assertEquals(n, phasorErrors.size());
+         /*
+            Сравнение количества ошибок фазора, полученных от TransientMonitor,
+            с количеством фазовых сдвигов, отличающихся от постоянного значения
+        */ 
+         assertEquals(n, countErrors);
      }
      
      
@@ -116,13 +129,15 @@ public class PhasorTest {
                     .allMatch(arg->compareFPNumbers(arg,amplitude,precision) );
      }
      public boolean compareFPNumbers(double n1,double n2,double precision){
+      //Функция сравнения чисел с плавающей точкой   
        return Math.abs(n1-n2)<precision;
      }
-     public int countOfInconstantSamples(List<Complex> spectrumSamples){
-         int count=0;
+     public int countOfInconstantPhases(List<Complex> spectrumSamples,double precision){
+         int count=0;         
          for(int i=1;i<spectrumSamples.size();i++){
-             Complex tmp = spectrumSamples.get(i-1);
-             if(!tmp.isEqual(spectrumSamples.get(i)))count++;
+             double a = spectrumSamples.get(i).arg();
+             double a1 = spectrumSamples.get(i-1).arg();
+             if(compareFPNumbers(spectrumSamples.get(i-1).arg(), spectrumSamples.get(i).arg(), precision))count++;
          }
          return count;        
      }
