@@ -73,7 +73,7 @@ public class PhasorTest {
      }
      
      @Test
-     public void calculatePhaseShiftBetweenSignals(){
+     public void phaseShiftBetweenSignalsOnNominalFrequency(){
         /*
           precision                             - точность, в пределах которой 2 фазы могут считаться равными
           frequencyDeviation                    - отклонение частоты от номинального значения
