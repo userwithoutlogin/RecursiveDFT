@@ -136,7 +136,8 @@ public class PhasorTest {
                                                   map(phase->Math.abs(phase-30.0)).
                                                   collect(Collectors.toList());           
           
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 2 degree on off-nominal frequency 53.6Hz", 
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 2 degree"
+                  + " on off-nominal frequency 53.6Hz", 
                   deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 2.0 )
           );
      }
