@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.functions;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import java.util.Iterator;
 
 /**

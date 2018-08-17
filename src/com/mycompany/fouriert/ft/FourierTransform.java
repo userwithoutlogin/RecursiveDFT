@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.ft;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import java.util.List;
 
 /**

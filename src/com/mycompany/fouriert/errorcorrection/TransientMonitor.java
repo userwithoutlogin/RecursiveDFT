@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.errorcorrection;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;

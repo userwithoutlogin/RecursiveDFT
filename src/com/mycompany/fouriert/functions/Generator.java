@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.functions;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.ft.FourierTransform;
 import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ public class Generator {
      private final RecursiveDiscreteTransform fourierTransform;
      List<Complex> spectrumSamples;
       List<Double> errorEstimates;
+      List<Double> timeSamples;
       List<Double> x;
      Function[] functions ;
      double df;
@@ -42,6 +43,7 @@ public class Generator {
         this.functions = functions;
         spectrumSamples = new ArrayList();
         errorEstimates = new ArrayList();
+        timeSamples = new ArrayList();
         this.df = df;
          
     }
@@ -55,6 +57,7 @@ public class Generator {
             return function.calc( df);
          }).limit(limitPointNubers).forEach(timeSample->{ 
              spectrumSamples.add(fourierTransform.direct(timeSample));
+             timeSamples.add(timeSample);
              //System.out.println(timeSample);
              if(fourierTransform.getMonitor()!=null)
                  errorEstimates.add(fourierTransform.calculatePhasorEstimateQality()); 
@@ -75,6 +78,10 @@ public class Generator {
 
     public Function[] getFunctions() {
         return functions;
+    }
+
+    public List<Double> getTimeSamples() {
+        return timeSamples;
     }
     
     

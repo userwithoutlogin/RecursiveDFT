@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.functions;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +36,7 @@ public class CosineFunction implements Function {
     
         @Override
     public Double calc(  double df) {    
-        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi);    
+        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi)  ;    
         x+= delta;
         return cos;
     }

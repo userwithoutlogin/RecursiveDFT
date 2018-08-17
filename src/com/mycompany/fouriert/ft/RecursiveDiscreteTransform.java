@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.ft;
 
-import com.mycompany.fouriert.complex.Complex;
+import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import java.util.ArrayList;
 import java.util.Arrays;
