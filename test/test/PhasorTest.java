@@ -66,50 +66,9 @@ public class PhasorTest {
         assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency",
                 isPhaseConstant(phase  ,  spectrumSamples,   precision)
         );  
-        assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency",
+        assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency 50Hz",
                 isAmplitudeConstant(100/Math.sqrt(2),  spectrumSamples,  precision)
         );        
-     }
-     
-     @Test
-     public void phaseShiftBetweenSignalsOnNominalFrequency(){
-        /*
-          precision                             - погрешность, до которой 2 фазы могут считаться равными
-          frequencyDeviation                    - отклонение частоты от номинального значения
-          amplitude1(amplitude2)                - амплитуда первого(второго) тестируемого сигнала
-          phase1(phase2)                        - фазовый сдвиг первого(второго) тестируемого сигнала
-          fourierTransform1(fourierTransform2)  - фазер с рекурсивным обновлением оценки, расширяющий дискретное преобразование Фурье(ДПФ) для первого(второго) сигнала
-          cosine1(cosine2)                      - функция, задающая первый(второй) тестовый сигнал
-          generator1(generator2)                - генерирует отсчеты первого(второго) исследуемого сигнала и передает их фазору для формирования спектра сигнала
-          spectrumSamples1(spectrumSamples2)    - спектральные отсчеты, получаемые после  ДПФ над значениями первого(второго) тестового сигнала
-          limitPointNumbers                     - количество точек, подсчитываемое генератором          
-        */
-          
-          double precision = 1e-13;
-          double frequencyDeviation = 2.0;
-          double amplitude = 100.0;
-          double phase1 = Math.PI/3;
-          double phase2 = Math.PI/6;
-          int limitPointNumbers = 36;
-          
-          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUECY);
-          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUECY);
-         
-          RecursiveDiscreteTransform fourierTransform1 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          RecursiveDiscreteTransform fourierTransform2 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          
-          Generator generator1 = new Generator(fourierTransform1, frequencyDeviation,cosine1 );
-          Generator generator2 = new Generator(fourierTransform2, frequencyDeviation,cosine2 );
-          
-          generator1.start(limitPointNumbers);
-          generator2.start(limitPointNumbers);
-          
-          List<Complex> spectrumSamples1  = generator1.getSpectrumSamples() ;
-          List<Complex> spectrumSamples2  = generator2.getSpectrumSamples();         
-          
-          List<Double> phaseShifts = phaseShiftsBetweenPhasorRepresentations(spectrumSamples1,spectrumSamples2);           
-              
-          assertTrue("phase shift between cosine1 and cosine2 must be constant and equals pi/6 on nominal frequency", isPhaseShiftConstant(phaseShifts,Math.PI/6,precision));
      }
      
      @Test
@@ -153,6 +112,33 @@ public class PhasorTest {
          assertEquals(7, countErrors);
      }
      
+     @Test
+     public void phaseShiftBetweenSignalsOnNominalFrequency(){
+        /* 
+           precision - погрешность, до которой  2  фазы могут считаться равными
+        */
+          double precision = 1e-13;   
+          List<Double> phaseShifts = phaseShiftsBetweenSignals(0.0);           
+          
+          assertTrue("phase shift between two signals must be constant and equals 30 degree on nominal frequency 50Hz", isPhaseShiftConstant(phaseShifts,30.0,precision));
+     }
+     @Test
+     public void phaseShiftBetweenSignalsOnOffNominalFrequency(){
+          /*
+            deviationFromPhaseShifts - отклонение значений фазового сдвига мажду двумя функциями от 30 градусов
+            frequencyDeviation       - отклонение частоты от номинального значения
+         */
+          double frequencyDeviation = 3.6;
+          List<Double> deviationFromPhaseShifts = phaseShiftsBetweenSignals(frequencyDeviation).
+                                                  stream().
+                                                  map(phase->Math.abs(phase-30.0)).
+                                                  collect(Collectors.toList());           
+          
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 2 degree on off-nominal frequency 53.6Hz", 
+                  deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 2.0 )
+          );
+     }
+     
      
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
@@ -186,11 +172,43 @@ public class PhasorTest {
       //Функция сравнения чисел с плавающей точкой   
        return Math.abs(n1-n2)<precision;
      }
-     public List<Double> phaseShiftsBetweenPhasorRepresentations(List<Complex> spectrumSamples1,List<Complex> spectrumSamples2){
-        /*
-          phasesCosine1(phasesCosine1)  - значения фазы первого(второго) сигнала, полученные от фазора 
-          phaseShifts                   - значения фазового сдвига между cosine1 и cosine2
-        */
+     public List<Double> phaseShiftsBetweenSignals(double frequencyDeviation){
+        
+         /*
+          precision                             - погрешность, до которой 2 фазы могут считаться равными
+          frequencyDeviation                    - отклонение частоты от номинального значения
+          amplitude1(amplitude2)                - амплитуда первого(второго) тестируемого сигнала
+          phase1(phase2)                        - фазовый сдвиг первого(второго) тестируемого сигнала
+          fourierTransform1(fourierTransform2)  - фазер с рекурсивным обновлением оценки, расширяющий дискретное преобразование Фурье(ДПФ) для первого(второго) сигнала
+          cosine1(cosine2)                      - функция, задающая первый(второй) тестовый сигнал
+          generator1(generator2)                - генерирует отсчеты первого(второго) исследуемого сигнала и передает их фазору для формирования спектра сигнала
+          spectrumSamples1(spectrumSamples2)    - спектральные отсчеты, получаемые после  ДПФ над значениями первого(второго) тестового сигнала
+          limitPointNumbers                     - количество точек, подсчитываемое генератором        
+          phasesCosine1(phasesCosine1)          - значения фазы первого(второго) сигнала, полученные от фазора 
+          phasesCosine1(phasesCosine2)          - значения фазового сдвига функции cosine1(cosine2)
+          phaseShifts                           - значения фазового сдвига между функциями cosine1(cosine2)
+       */          
+          double amplitude = 100.0;
+          double phase1 = Math.PI/3;
+          double phase2 = Math.PI/6;
+          int limitPointNumbers = 36;
+          
+          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUECY);
+          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUECY);
+         
+          RecursiveDiscreteTransform fourierTransform1 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
+          RecursiveDiscreteTransform fourierTransform2 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
+          
+          Generator generator1 = new Generator(fourierTransform1, frequencyDeviation,cosine1 );
+          Generator generator2 = new Generator(fourierTransform2, frequencyDeviation,cosine2 );
+          
+          generator1.start(limitPointNumbers);
+          generator2.start(limitPointNumbers);
+          
+          List<Complex> spectrumSamples1  = generator1.getSpectrumSamples() ;
+          List<Complex> spectrumSamples2  = generator2.getSpectrumSamples();  
+          
+           
           List<Double> phaseShifts = new ArrayList();
           List<Double> phasesCosine1 = spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size())
                   .stream()
@@ -200,11 +218,14 @@ public class PhasorTest {
                   .stream()
                   .map(sample->sample.arg() )
                   .collect(Collectors.toList());
-          
+           
           for(int i=0;i<phasesCosine1.size();i++)
-              phaseShifts.add(phasesCosine1.get(i)-phasesCosine2.get(i));
+              phaseShifts.add((phasesCosine1.get(i)-phasesCosine2.get(i))*180/Math.PI);
+          
           return phaseShifts;
      }
+
+     
 
     
 }
