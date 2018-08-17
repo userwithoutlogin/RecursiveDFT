@@ -28,7 +28,7 @@ public class PhaseShiftsBetweenPhasors {
                   .collect(Collectors.toList());
            
           for(int i=0;i<phasesCosine1.size();i++)
-              phaseShifts.add((phasesCosine1.get(i)-phasesCosine2.get(i))*180/Math.PI);
+              phaseShifts.add(Math.toDegrees(phasesCosine1.get(i)-phasesCosine2.get(i)) );
           return phaseShifts;
     }
     
