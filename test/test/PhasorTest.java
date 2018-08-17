@@ -63,7 +63,7 @@ public class PhasorTest {
         List<Complex> spectrumSamples = generator.getSpectrumSamples();
         
         // Амплитуда и фаза составляют представление фазора 
-        assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency",
+        assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency 50Hz",
                 isPhaseConstant(phase  ,  spectrumSamples,   precision)
         );  
         assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency 50Hz",
