@@ -5,6 +5,8 @@
  */
 package test;
 
+ 
+import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.complex.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
@@ -211,20 +213,11 @@ public class PhasorTest {
           List<Complex> spectrumSamples1  = generator1.getSpectrumSamples() ;
           List<Complex> spectrumSamples2  = generator2.getSpectrumSamples();  
           
-           
-          List<Double> phaseShifts = new ArrayList();
-          List<Double> phasesCosine1 = spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size())
-                  .stream()
-                  .map(sample->sample.arg() )
-                  .collect(Collectors.toList());
-          List<Double> phasesCosine2 = spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
-                  .stream()
-                  .map(sample->sample.arg() )
-                  .collect(Collectors.toList());
-           
-          for(int i=0;i<phasesCosine1.size();i++)
-              phaseShifts.add((phasesCosine1.get(i)-phasesCosine2.get(i))*180/Math.PI);
-          
+          //Для подсчета фазового сдвига выбираем записи где ошенка фазора существует
+          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+                  spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
+                  spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
+          );
           return phaseShifts;
      }
 
