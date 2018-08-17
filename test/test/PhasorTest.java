@@ -120,7 +120,9 @@ public class PhasorTest {
           double precision = 1e-13;   
           List<Double> phaseShifts = phaseShiftsBetweenSignals(0.0);           
           
-          assertTrue("phase shift between two signals must be constant and equals 30 degree on nominal frequency 50Hz", isPhaseShiftConstant(phaseShifts,30.0,precision));
+          assertTrue("phase shift between two signals must be constant and equals 30 degree on nominal frequency 50Hz", 
+                  isPhaseShiftConstant(phaseShifts,30.0,precision)
+          );
      }
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequency(){
