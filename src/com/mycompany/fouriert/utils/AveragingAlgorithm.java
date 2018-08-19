@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  *
  * @author andrey_pushkarniy
  */
-public class AverageAlgorithm {
+public class AveragingAlgorithm {
     public static List<Double> threePoint(List<Double> points){
         List<Double> averagedPoints = new ArrayList();
         IntStream.range(0, points.size()).forEach(i->{

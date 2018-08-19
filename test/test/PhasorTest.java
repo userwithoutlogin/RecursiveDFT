@@ -13,8 +13,10 @@ import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
-import com.mycompany.fouriert.utils.AverageAlgorithm;
+import com.mycompany.fouriert.utils.AveragingAlgorithm;
+import com.mycompany.fouriert.utils.ResamplingFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -121,7 +123,18 @@ public class PhasorTest {
            precision - погрешность, до которой  2  фазы могут считаться равными
         */
           double precision = 1e-13;   
-          List<Double> phaseShifts = phaseShiftsBetweenSignals(0.0);           
+          double frequencyDeviation = 0.0;
+          
+          List<Generator> generators = phaseShiftsBetweenSignals(frequencyDeviation);
+          
+          List<Complex> spectrumSamples1  = generators.get(0).getSpectrumSamples() ;
+          List<Complex> spectrumSamples2  = generators.get(1).getSpectrumSamples();  
+          
+          //Для подсчета фазового сдвига выбираем записи где оценка фазора существует
+          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+                  spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
+                  spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
+          );       
           
           assertTrue("phase shift between two signals must be constant and equals 30 degree on nominal frequency 50Hz", 
                   isPhaseShiftConstant(phaseShifts,30.0,precision)
@@ -135,35 +148,120 @@ public class PhasorTest {
             frequencyDeviation       - отклонение частоты от номинального значения
          */
           double frequencyDeviation = 1.8;
-          List<Double> deviationFromPhaseShifts = phaseShiftsBetweenSignals(frequencyDeviation).
+          
+          List<Generator> generators = phaseShiftsBetweenSignals(frequencyDeviation);
+          
+          List<Complex> spectrumSamples1  = generators.get(0).getSpectrumSamples() ;
+          List<Complex> spectrumSamples2  = generators.get(1).getSpectrumSamples();  
+          
+          //Для подсчета фазового сдвига выбираем записи где оценка фазора существует
+          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+                  spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
+                  spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
+          );
+          
+          List<Double> deviationFromPhaseShifts = phaseShifts.
                                                   stream().
                                                   map(phase->Math.abs(phase-30.0)).
                                                   collect(Collectors.toList());           
-          
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 2 degree"
+//          phaseShifts.forEach(phase->{
+//                System.out.println(phase);
+//            });
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 1.05 degree"
                   + " on off-nominal frequency 53.6Hz", 
-                  deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 2.0 )
+                  deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 1.05 )
           );
      }
+//     @Ignore(value = "true")
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithThreePointAveraging(){
           /*
             deviationFromPhaseShifts - отклонение значений фазового сдвига мажду двумя функциями от 30 градусов
             frequencyDeviation       - отклонение частоты от номинального значения
+            averagedPhaseShifts      - отклонение значений фазового сдвига мажду двумя функциями от 30 градусов
+                                       усредненные по алгоритму "three point averages" 
          */
           double frequencyDeviation = 1.8;
-          List<Double> deviationFromPhaseShifts = phaseShiftsBetweenSignals(frequencyDeviation);           
-          List<Double> averagedPhaseShifts = AverageAlgorithm.threePoint(deviationFromPhaseShifts);
-          averagedPhaseShifts.stream().forEach(sam->
-          { System.out.println(sam);}
+          List<Generator> generators = phaseShiftsBetweenSignals(frequencyDeviation);
+          
+          List<Complex> spectrumSamples1  = generators.get(0).getSpectrumSamples() ;
+          List<Complex> spectrumSamples2  = generators.get(1).getSpectrumSamples();  
+          
+          //Для подсчета фазового сдвига выбираем записи где ошенка фазора существует
+          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+                  spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
+                  spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
           );
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 2 degree"
+                      
+          List<Double> averagedDeviationPhaseShifts = AveragingAlgorithm.threePoint(phaseShifts)
+                                                .stream()
+                                                .map(shifted->Math.abs(shifted-30.0))
+                                                .collect(Collectors.toList());
+          List<Double> aver = AveragingAlgorithm.threePoint(phaseShifts);
+            aver.forEach(phase->{
+                System.out.println(phase);
+            });
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.94 degree"
                   + " on off-nominal frequency 53.6Hz", 
-                  deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 2.0 )
+                  averagedDeviationPhaseShifts.stream().allMatch(deviation->   deviation < 0.94 )
           );
      }
-     
-     
+     @Ignore(value = "true")
+     @Test 
+     public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithResamplingFilter(){
+         /*
+            deviationFromPhaseShifts - отклонение значений фазового сдвига мажду двумя функциями от 30 градусов
+            frequencyDeviation       - отклонение частоты от номинального значения
+         */
+          double frequencyDeviation = 1.8;
+          double actualFrequency = NOMINAL_FREQUECY+frequencyDeviation;
+          RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+          RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+          
+          List<Generator> generators = phaseShiftsBetweenSignals(frequencyDeviation);
+          
+          List<Double> cosine1 = generators.get(0).getTimeSamples();
+          List<Double> cosine2 = generators.get(1).getTimeSamples();
+          
+          List<Complex> cosine1Spectrum = new ArrayList();
+          List<Complex> cosine2Spectrum = new ArrayList();
+          List<Double> phaseShiftBetween = new ArrayList();
+          
+          List<Double> cosine1Resampled = ResamplingFilter.resample(cosine1,
+                                                                    WINDOW_WIDTH,
+                                                                    NOMINAL_FREQUECY,
+                                                                    actualFrequency);
+          List<Double> cosine2Resampled = ResamplingFilter.resample(cosine2,
+                                                                    WINDOW_WIDTH,
+                                                                    NOMINAL_FREQUECY,
+                                                                    actualFrequency);
+          
+          for(int i=0;i<cosine1Resampled.size();i++){
+              cosine1Spectrum.add(transform1.direct(cosine1Resampled.get(i)));
+              cosine2Spectrum.add(transform2.direct(cosine2Resampled.get(i)));
+          }
+          
+//          List<Double> phase1 = cosine1Spectrum.stream()
+//                                    .map(spectrumSample->Math.toDegrees(spectrumSample.arg()))
+//                                    .collect(Collectors.toList());
+//          List<Double> phase2 = cosine2Spectrum.stream()
+//                                    .map(spectrumSample->Math.toDegrees(spectrumSample.arg()))
+//                                    .collect(Collectors.toList());
+           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+                  cosine1Spectrum.subList(WINDOW_WIDTH, cosine1Spectrum.size()),
+                  cosine2Spectrum.subList(WINDOW_WIDTH, cosine2Spectrum.size())
+          );
+          List<Double> deviationPhaseShift = phaseShifts.stream()
+                                             .map(shift->shift-30.0)
+                                              .collect(Collectors.toList());
+//          phaseShifts.forEach(shift->{
+//              System.out.println(shift);
+//          });
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.94 degree"
+                  + " on off-nominal frequency 53.6Hz",
+                  deviationPhaseShift.stream().allMatch(shift->shift<0.1)
+          );
+     }
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
          /* 
@@ -196,7 +294,8 @@ public class PhasorTest {
       //Функция сравнения чисел с плавающей точкой   
        return Math.abs(n1-n2)<precision;
      }
-     public List<Double> phaseShiftsBetweenSignals(double frequencyDeviation){
+      
+     public List<Generator> phaseShiftsBetweenSignals(double frequencyDeviation){
         
          /*
           precision                             - погрешность, до которой 2 фазы могут считаться равными
@@ -215,7 +314,7 @@ public class PhasorTest {
           double amplitude = 100.0;
           double phase1 = Math.PI/3;
           double phase2 = Math.PI/6;
-          int limitPointNumbers = 48;
+          int limitPointNumbers = 1000;
           
           Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUECY);
           Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUECY);
@@ -228,17 +327,8 @@ public class PhasorTest {
           
           generator1.start(limitPointNumbers);
           generator2.start(limitPointNumbers);
-          
-          List<Complex> spectrumSamples1  = generator1.getSpectrumSamples() ;
-          List<Complex> spectrumSamples2  = generator2.getSpectrumSamples();  
-          
-          //Для подсчета фазового сдвига выбираем записи где ошенка фазора существует
-          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
-                  spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
-                  spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
-          );
-           
-          return phaseShifts;
+
+          return Arrays.asList(generator1,generator2);
      }
 
      
