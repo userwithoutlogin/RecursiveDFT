@@ -292,13 +292,16 @@ public class PhasorTest {
      public List<Generator> getGenerators(double frequencyDeviation){
         
          /*
-          precision                             - two phase  are considered as equals, if their difference not greater than precision 
+          precision                             - two phase  are considered as equals, if their difference 
+                                                  not greater than precision 
           frequencyDeviation                    - frequency deviation off nominal  frequency
           amplitude1(amplitude2)                - amplitude of tested signal
           phase1(phase2)                        - phase shift of tested signal
-          fourierTransform1(fourierTransform2)  - phasor performing discrete Fourier transform(DFT) with recursive update of estimation 
+          fourierTransform1(fourierTransform2)  - phasor performing discrete Fourier transform(DFT) with 
+                                                  recursive update of estimation 
           cosine1(cosine2)                      - representation of test signal
-          generator1(generator2)                - generates test signal samples and send it to phasor for signal spectrum forming
+          generator1(generator2)                - generates test signal samples and send it to phasor for 
+                                                  signal spectrum forming
           spectrumSamples1(spectrumSamples2)    - spectrum samples obtained from DFT over values of test signal
           limitPointNumbers                     - quantity of test signal samples        
           
