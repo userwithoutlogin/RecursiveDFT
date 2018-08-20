@@ -14,26 +14,39 @@ import java.util.List;
  */
 public class ResamplingFilter {
 
-    public static List<Double> resample(List<Double> timeSamples,int windowWidth,double f,double f0) {
-        double theta = 2*Math.PI/windowWidth;
+    /**
+     * Function which performs recalculate time samples for decrease error of
+     * phasor estimation
+     * @param timeSamples - list with values of tested signal
+     * @param windowWidth - phasors window width
+     * @param f - off-nominal frequency
+     * @param f0 - nominal frequency
+     */
+    public static List<Double> resample(List<Double> timeSamples, int windowWidth, double f, double f0) {
+        /**
+         * theta      - this is the angle between two neighbour time samples  
+         * gamma      - this is the angle between the current time sample and recalculated time sample
+         * deltaGamma - value on which gamma  angle changes when  jump to a new time sample
+         * resampled  - list containing resampled time samples
+         * xres       - resampled time sample
+         */
+        double theta = 2.0 * Math.PI / (double)windowWidth;
         double gamma = theta;
-        double deltaGamma =Math.abs(2*Math.PI*f/(windowWidth*f0) - gamma);
-        List<Double> resampled = new ArrayList();
-        
-        for(int i=0;i<timeSamples.size()-1;i++){
-            if(i==0){
-                resampled.add(timeSamples.get(i));
-                gamma-=deltaGamma;
-            }
-                 double xres = timeSamples.get(i)*(Math.sin(theta-gamma)/Math.sin(theta))+
-                            timeSamples.get(i+1)*(Math.sin(gamma)/Math.sin(theta));
-                 resampled.add(xres);
-                 gamma -=deltaGamma;
-            
-            
+        double deltaGamma = Math.abs(2.0 * Math.PI * f / ((double)windowWidth * f0) - gamma);
+        List<Double> resampled = new ArrayList(timeSamples.size());
+       
+        //adds first time sample without changes because gamma angle equals to theta angle
+        resampled.add(timeSamples.get(0));
+        gamma -= deltaGamma;
+
+        for (int i = 0; i < timeSamples.size() - 1; i++) {
+            double xres = timeSamples.get(i) * (Math.sin(theta - gamma) / Math.sin(theta))
+                    + timeSamples.get(i + 1) * (Math.sin(gamma) / Math.sin(theta));
+            resampled.add(xres);
+            gamma -= deltaGamma;
         }
-            
-       return resampled;
+
+        return resampled;
     }
-    
+
 }
