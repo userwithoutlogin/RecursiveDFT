@@ -121,6 +121,10 @@ public class PhasorTest {
      public void phaseShiftBetweenSignalsOnNominalFrequency(){
         /* 
            precision - two phase  are considered as equals, if their difference not greater than precision 
+           phasesCosine1(phasesCosine2)          - значения фазового сдвига функции cosine1(cosine2)
+           spectrumSamples1(spectrumSamples2)    - spectrum samples obtained from DFT over values of test signal
+           generators                            - list containing two generators for generate test signal samples 
+                                                   and send their to phasor for signal spectrum forming
         */
           double precision = 1e-13;   
           double frequencyDeviation = 0.0;
@@ -130,7 +134,7 @@ public class PhasorTest {
           List<Complex> spectrumSamples1  = generators.get(0).getSpectrumSamples() ;
           List<Complex> spectrumSamples2  = generators.get(1).getSpectrumSamples();  
           
-          //it chooses entries of list where phasor estimate exists for calculate phase shift 
+          //it chooses entries of list where phasor estimate exists and calculate phase shift between signals
           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
                   spectrumSamples1.subList(WINDOW_WIDTH, spectrumSamples1.size()),
                   spectrumSamples2.subList(WINDOW_WIDTH, spectrumSamples2.size())
@@ -290,16 +294,14 @@ public class PhasorTest {
          /*
           precision                             - two phase  are considered as equals, if their difference not greater than precision 
           frequencyDeviation                    - frequency deviation off nominal  frequency
-          amplitude1(amplitude2)                - амплитуда первого(второго) тестируемого сигнала
-          phase1(phase2)                        - фазовый сдвиг первого(второго) тестируемого сигнала
-          fourierTransform1(fourierTransform2)  - фазер с рекурсивным обновлением оценки, расширяющий дискретное преобразование Фурье(ДПФ) для первого(второго) сигнала
-          cosine1(cosine2)                      - функция, задающая первый(второй) тестовый сигнал
-          generator1(generator2)                - генерирует отсчеты первого(второго) исследуемого сигнала и передает их фазору для формирования спектра сигнала
-          spectrumSamples1(spectrumSamples2)    - спектральные отсчеты, получаемые после  ДПФ над значениями первого(второго) тестового сигнала
-          limitPointNumbers                     - количество точек, подсчитываемое генератором        
-          phasesCosine1(phasesCosine1)          - значения фазы первого(второго) сигнала, полученные от фазора 
-          phasesCosine1(phasesCosine2)          - значения фазового сдвига функции cosine1(cosine2)
-          phaseShifts                           - значения фазового сдвига между функциями cosine1(cosine2)
+          amplitude1(amplitude2)                - amplitude of tested signal
+          phase1(phase2)                        - phase shift of tested signal
+          fourierTransform1(fourierTransform2)  - phasor performing discrete Fourier transform(DFT) with recursive update of estimation 
+          cosine1(cosine2)                      - representation of test signal
+          generator1(generator2)                - generates test signal samples and send it to phasor for signal spectrum forming
+          spectrumSamples1(spectrumSamples2)    - spectrum samples obtained from DFT over values of test signal
+          limitPointNumbers                     - quantity of test signal samples        
+          
        */          
           double amplitude = 100.0;
           double phase1 = Math.PI/3;
