@@ -11,23 +11,24 @@ import java.util.List;
 /**
  *
  * @author root
+ * 
  */
 public class ResamplingFilter {
 
     /**
-     * Function which performs recalculate time samples for decrease error of
-     * phasor estimation
+     * Function which performs recalculate time samples, changing distanse between them, 
+     * thanks to it all of this samples will be place into a  period of off-nominal frequency
      * @param timeSamples - list with values of tested signal
      * @param windowWidth - phasors window width
      * @param f           - off-nominal frequency
      * @param f0          - nominal frequency
+     * @return            - list containing resampled time samples
      */
     public static List<Double> resample(List<Double> timeSamples, int windowWidth, double f, double f0) {
         /**
          * theta      - this is the angle between two neighbour time samples  
          * gamma      - this is the angle between the current time sample and recalculated time sample
          * deltaGamma - value on which gamma  angle changes when  jump to a new time sample
-         * resampled  - list containing resampled time samples
          * xres       - resampled time sample
          */
         double theta = 2.0 * Math.PI / (double)windowWidth;
