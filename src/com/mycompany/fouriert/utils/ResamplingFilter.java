@@ -19,8 +19,8 @@ public class ResamplingFilter {
      * phasor estimation
      * @param timeSamples - list with values of tested signal
      * @param windowWidth - phasors window width
-     * @param f - off-nominal frequency
-     * @param f0 - nominal frequency
+     * @param f           - off-nominal frequency
+     * @param f0          - nominal frequency
      */
     public static List<Double> resample(List<Double> timeSamples, int windowWidth, double f, double f0) {
         /**
