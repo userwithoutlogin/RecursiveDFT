@@ -22,7 +22,7 @@ public class ResamplingFilter {
      * @param windowWidth - phasors window width
      * @param f           - off-nominal frequency
      * @param f0          - nominal frequency
-     * @return            - list containing resampled time samples
+     * @return resampled  - list containing resampled time samples
      */
     public static List<Double> resample(List<Double> timeSamples, int windowWidth, double f, double f0) {
         /**
