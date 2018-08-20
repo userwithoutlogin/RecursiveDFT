@@ -148,8 +148,11 @@ public class PhasorTest {
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequency(){
           /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 functions 
-            frequencyDeviation       - frequency deviation off nominal  frequency
+            deviationFromPhaseShifts              - deviation of values of phase shift  from 30 degrees  between 2 functions 
+            frequencyDeviation                    - frequency deviation off nominal  frequency
+            spectrumSamples1(spectrumSamples2)    - spectrum samples obtained from DFT over values of test signal
+            generators                            - list containing two generators for generate test signal samples 
+                                                    and send their to phasor for signal spectrum forming
          */
           double frequencyDeviation = 1.8;
           
@@ -174,14 +177,17 @@ public class PhasorTest {
                   deviationFromPhaseShifts.stream().allMatch(deviation->   deviation < 1.05 )
           );
      }
-//     @Ignore(value = "true")
+     @Ignore(value = "true")
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithThreePointAveraging(){
           /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
-            frequencyDeviation       - frequency deviation off nominal  frequency
-            averagedPhaseShifts      - deviations of values of phase shift from 30 degrees between 2 function, 
-                                       where their values averaged on three-point algorithm
+            frequencyDeviation                    - frequency deviation off nominal  frequency
+            averagedPhaseShifts                   - deviations of values of phase shift from 30 degrees between 2 function, 
+                                                    where their values averaged on three-point algorithm
+            spectrumSamples1(spectrumSamples2)    - spectrum samples obtained from DFT over values of test signal
+            generators                            - list containing two generators for generate test signal samples 
+                                                    and send their to phasor for signal spectrum forming
+            averagedDeviationPhaseShifts          - averaged deviation of phase shift from 30 degrees between two signals 
          */
           double frequencyDeviation = 1.8;
           List<Generator> generators = getGenerators(frequencyDeviation);
@@ -199,21 +205,20 @@ public class PhasorTest {
                                                 .stream()
                                                 .map(shifted->Math.abs(shifted-30.0))
                                                 .collect(Collectors.toList());
-          List<Double> aver = AveragingAlgorithm.threePoint(phaseShifts);
-            aver.forEach(phase->{
-                System.out.println(phase);
-            });
+          
           assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.94 degree"
                   + " on off-nominal frequency 53.6Hz", 
                   averagedDeviationPhaseShifts.stream().allMatch(deviation->   deviation < 0.94 )
           );
      }
-     @Ignore(value = "true")
+      
      @Test 
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithResamplingFilter(){
          /*
             deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
+            actualFrequency          - nominal frequency plus frequency deviation
             frequencyDeviation       - frequency deviation off nominal  frequency
+            transform1(transform2)   - phasor performing discrete Fourier transform(DFT) with recursive update of estimation  
          */
           double frequencyDeviation = 1.8;
           double actualFrequency = NOMINAL_FREQUECY+frequencyDeviation;
@@ -251,9 +256,9 @@ public class PhasorTest {
                                              .map(shift->shift-30.0)
                                               .collect(Collectors.toList());
 //         
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.94 degree"
+          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.06 degree"
                   + " on off-nominal frequency 53.6Hz",
-                  deviationPhaseShift.stream().allMatch(shift->shift<0.1)
+                  deviationPhaseShift.stream().allMatch(shift->shift<0.08)
           );
      }
      
@@ -309,7 +314,7 @@ public class PhasorTest {
           double amplitude = 100.0;
           double phase1 = Math.PI/3;
           double phase2 = Math.PI/6;
-          int limitPointNumbers = 1000;
+          int limitPointNumbers = 48;
           
           Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUECY);
           Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUECY);
