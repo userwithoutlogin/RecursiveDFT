@@ -15,11 +15,25 @@ import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
 import com.mycompany.fouriert.utils.AveragingAlgorithm;
 import com.mycompany.fouriert.utils.ResamplingFilter;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javafx.scene.shape.Path;
  
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,7 +55,7 @@ public class PhasorTest {
       final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUECY = 50.0;   
       
-      @Ignore(value = "true")
+     @Ignore(value = "true")
      @Test
      public void phasorRepresentationsOnNominalFrequency(){
         /*
@@ -144,7 +158,7 @@ public class PhasorTest {
                   isPhaseShiftConstant(phaseShifts,30.0,precision)
           );
      }
-    @Ignore(value = "true")
+     @Ignore(value = "true")
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequency(){
           /*
@@ -211,7 +225,7 @@ public class PhasorTest {
                   averagedDeviationPhaseShifts.stream().allMatch(deviation->   deviation < 0.94 )
           );
      }
-      
+     @Ignore(value = "true")
      @Test 
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithResamplingFilter(){
          /*
@@ -262,6 +276,59 @@ public class PhasorTest {
           );
      }
      
+     @Test
+     public void testRealSignals(){
+         List<Double> shift12 = new ArrayList();
+         List<Double> shift23 = new ArrayList();
+         List<Double> error1 = new ArrayList();
+         List<Double> error2 = new ArrayList();
+         List<Double> error3 = new ArrayList();
+         List<Double> timeSample1 = new ArrayList();
+         List<Double> timeSample2 = new ArrayList();
+         List<Double> timeSample3 = new ArrayList();
+         
+        
+         
+         TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
+         
+         RecursiveDiscreteTransform  transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+         RecursiveDiscreteTransform  transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+         RecursiveDiscreteTransform  transform3 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+      
+         transform1.setMonitor(monitor1);
+         transform2.setMonitor(monitor2);
+         transform3.setMonitor(monitor3);
+         
+         List<Complex> spectrum1 = new ArrayList();
+         List<Complex> spectrum2 = new ArrayList();
+         List<Complex> spectrum3 = new ArrayList();
+          try {
+              Files.lines(Paths.get("C:/realsine.txt"), StandardCharsets.UTF_8).forEach(str->{
+                        String[] values = str.split(",");
+                         timeSample1.add(new Double(values[2]));
+                         timeSample2.add(new Double(values[3]));
+                         timeSample3.add(new Double(values[4]));
+              });
+              
+              for(int i=0;i<timeSample1.size();i++){
+                  spectrum1.add(transform1.direct(timeSample1.get(i)));
+                  spectrum2.add(transform2.direct(timeSample2.get(i)));
+                  spectrum3.add(transform3.direct(timeSample3.get(i)));
+                  error1.add(transform1.calculatePhasorEstimateQality());
+                  error2.add(transform2.calculatePhasorEstimateQality());
+                  error3.add(transform3.calculatePhasorEstimateQality());
+                  
+              }
+              
+              
+          } catch (IOException ex) {
+              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
+          }
+     } 
+     
+     
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
          /* 
            phases of all spectrum samples(spectrumSamples) must be constant and equal 
@@ -271,7 +338,6 @@ public class PhasorTest {
                     .map(sample->sample.arg())
                     .allMatch(arg->compareFPNumbers(arg,phase,precision) );
      }
-     
      public boolean isAmplitudeConstant(double amplitude,List<Complex> spectrumSamples,double precision){
        /* 
          amplitudes of all spectrum samples(spectrumSamples) must be constant and equal 
@@ -288,12 +354,10 @@ public class PhasorTest {
        */  
          return phaseShifts.stream().allMatch(arg->compareFPNumbers(arg, shift, precision));
      }
-     
      public boolean compareFPNumbers(double n1,double n2,double precision){
       // function of comparison of two floating point numbers   
        return Math.abs(n1-n2)<precision;
      }
-      
      public List<Generator> getGenerators(double frequencyDeviation){
         
          /*

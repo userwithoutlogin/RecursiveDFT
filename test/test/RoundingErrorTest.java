@@ -41,17 +41,18 @@ public class RoundingErrorTest {
              withoutErrorCollect +=  addition;
          }
          withErrorCollect+=compensator.getError();
+         
         /**
          * Is not right to compare double values using '==' operator ,
-         * but in this test '==' uses in order to show that value with compensated error
+         * but in this test '=='  is used in order to show that value with compensated error
          * precisely equals to expected value and value without compensated error
          * not equals to expected value 
          */
          assertTrue("Considering collected error we obtain the value, "
-                 + "which precisely equals to expected value",withErrorCollect == 14000000);
+                 + "which precisely equals to expected value",withErrorCollect == 14000000.0);
          
          assertFalse("Not considering collected error we obtain the value, "
-                 + "which not equals to expected value",withoutErrorCollect == 14000000);
+                 + "which not equals to expected value",withoutErrorCollect == 14000000.0);
      }
      
 }
