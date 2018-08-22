@@ -5,6 +5,7 @@
  */
 package com.mycompany.fouriert.errorcorrection;
 
+import com.mycompany.fouriert.ft.SampleGenerator;
 import com.mycompany.fouriert.utils.Complex;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,21 +21,27 @@ import java.util.stream.Stream;
  * @author andrey_pushkarniy
  */
 public class TransientMonitor {
-   
-     
+    private SampleGenerator generator = new SampleGenerator();
+    private double nominalFrequency; 
+    private double actualFrequency; 
     private int windowWidth;
- 
-    
-    public TransientMonitor(int windowWidth ) {
+
+    public TransientMonitor(double nominalFrequency, double actualFrequency, int windowWidth) {
+        this.nominalFrequency = nominalFrequency;
+        this.actualFrequency = actualFrequency;
         this.windowWidth = windowWidth;
     }
  
-    public double calculatePhasorEstimateQality(Complex sample,int n,List<Double> timeSamples){
+    
+     
+ 
+    public double calculatePhasorEstimateQality( Complex  sample,int n,List<Double> timeSamples){
          List<Double> monitorVector = new ArrayList();
-          int delta =  n - windowWidth;
-          n = delta;
+         int delta =  n - windowWidth;
+         n = delta;
          for(int k=0;k<timeSamples.size();k++,n++){
-            double recalculatedSample = sample.amplitude()*Math.sqrt(2) * Math.cos(n*2.0*Math.PI/windowWidth + sample.arg()); 
+            double recalculatedSample = sample.amplitude()*Math.sqrt(2.0) * Math.cos((n*2.0*Math.PI*(actualFrequency)/(windowWidth*nominalFrequency)) + sample.arg()); 
+//            double recalculatedSample = generator.timeSample(windowWidth,n, sample);
             monitorVector.add( timeSamples.get(k) - recalculatedSample);            
              
         }

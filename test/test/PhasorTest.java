@@ -53,7 +53,7 @@ public class PhasorTest {
          NOMINAL_FREQUECY - nominal frequency
       */
       final int    WINDOW_WIDTH = 24;      
-      final double NOMINAL_FREQUECY = 50.0;   
+      final double NOMINAL_FREQUENCY = 50.0;   
       
      @Ignore(value = "true")
      @Test
@@ -76,7 +76,7 @@ public class PhasorTest {
         int limitPointNumbers = 36;
         
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
         Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine ); 
         generator.start(limitPointNumbers);    
         List<Complex> spectrumSamples = generator.getSpectrumSamples();
@@ -89,7 +89,7 @@ public class PhasorTest {
                 isAmplitudeConstant(100/Math.sqrt(2),  spectrumSamples,  precision)
         );        
      }
-     @Ignore(value = "true")
+        @Ignore("true")
      @Test
      public void findErrorsInPhasorRepresentation (){        
         /*
@@ -113,11 +113,11 @@ public class PhasorTest {
         int limitPointNubers = 30;
         List<Double> phasorErrors  = new ArrayList();
         
-        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
+        TransientMonitor monitor = new TransientMonitor(NOMINAL_FREQUENCY,NOMINAL_FREQUENCY +frequencyDeviation,WINDOW_WIDTH);
        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
         fourierTransform.setMonitor(monitor);
-        Function cosine1 = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
+        Function cosine1 = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
         Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine1 ); 
         generator.start(limitPointNubers);    
          
@@ -225,7 +225,7 @@ public class PhasorTest {
                   averagedDeviationPhaseShifts.stream().allMatch(deviation->   deviation < 0.94 )
           );
      }
-     @Ignore(value = "true")
+      @Ignore("true")
      @Test 
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithResamplingFilter(){
          /*
@@ -235,7 +235,7 @@ public class PhasorTest {
             transform1(transform2)   - phasor performing discrete Fourier transform(DFT) with recursive update of estimation  
          */
           double frequencyDeviation = 1.8;
-          double actualFrequency = NOMINAL_FREQUECY+frequencyDeviation;
+          double actualFrequency = NOMINAL_FREQUENCY+frequencyDeviation;
           RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
           RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
           
@@ -250,11 +250,11 @@ public class PhasorTest {
           
           List<Double> cosine1Resampled = ResamplingFilter.resample(cosine1,
                                                                     WINDOW_WIDTH,
-                                                                    NOMINAL_FREQUECY,
+                                                                    NOMINAL_FREQUENCY,
                                                                     actualFrequency);
           List<Double> cosine2Resampled = ResamplingFilter.resample(cosine2,
                                                                     WINDOW_WIDTH,
-                                                                    NOMINAL_FREQUECY,
+                                                                    NOMINAL_FREQUENCY,
                                                                     actualFrequency);
           
           for(int i=0;i<cosine1Resampled.size();i++){
@@ -276,6 +276,7 @@ public class PhasorTest {
           );
      }
      
+      
      @Test
      public void testRealSignals(){
          List<Double> shift12 = new ArrayList();
@@ -286,12 +287,15 @@ public class PhasorTest {
          List<Double> timeSample1 = new ArrayList();
          List<Double> timeSample2 = new ArrayList();
          List<Double> timeSample3 = new ArrayList();
-         
+         List<Double> timeSampleRes1 = new ArrayList();
+         List<Double> timeSampleRes2 = new ArrayList();
+         List<Double> timeSampleRes3 = new ArrayList();
+         double fDeviation = 1.8;
         
          
-         TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
-         TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
-         TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor1 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
+         TransientMonitor monitor2 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
+         TransientMonitor monitor3 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
          
          RecursiveDiscreteTransform  transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
          RecursiveDiscreteTransform  transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
@@ -307,21 +311,31 @@ public class PhasorTest {
           try {
               Files.lines(Paths.get("C:/realsine.txt"), StandardCharsets.UTF_8).forEach(str->{
                         String[] values = str.split(",");
-                         timeSample1.add(new Double(values[2]));
-                         timeSample2.add(new Double(values[3]));
-                         timeSample3.add(new Double(values[4]));
+                         timeSample1.add((new Double(values[2]) ));
+                         timeSample2.add((new Double(values[3]) ));
+                         timeSample3.add((new Double(values[4]) ));
               });
+              timeSampleRes1 = ResamplingFilter.resample(timeSample1, WINDOW_WIDTH, NOMINAL_FREQUENCY+fDeviation , NOMINAL_FREQUENCY);
+              timeSampleRes2 = ResamplingFilter.resample(timeSample2, WINDOW_WIDTH, NOMINAL_FREQUENCY , NOMINAL_FREQUENCY);
+              timeSampleRes3 = ResamplingFilter.resample(timeSample3, WINDOW_WIDTH, NOMINAL_FREQUENCY , NOMINAL_FREQUENCY);
               
               for(int i=0;i<timeSample1.size();i++){
                   spectrum1.add(transform1.direct(timeSample1.get(i)));
                   spectrum2.add(transform2.direct(timeSample2.get(i)));
                   spectrum3.add(transform3.direct(timeSample3.get(i)));
-                  error1.add(transform1.calculatePhasorEstimateQality());
-                  error2.add(transform2.calculatePhasorEstimateQality());
-                  error3.add(transform3.calculatePhasorEstimateQality());
-                  
+                  error1.add(transform1.calculatePhasorEstimateQality( ));
+                  error2.add(transform2.calculatePhasorEstimateQality( ));
+                  error3.add(transform3.calculatePhasorEstimateQality( ));
+                 // shift12.add(Math.toDegrees(spectrum1.get(i).arg()-spectrum2.get(i).arg()));
+                 String str = new String(""+Math.toDegrees(spectrum3.get(i).arg()));
+                 String str1 = new String(""+(spectrum1.get(i).amplitude()*Math.sqrt(2)));
+//                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ str.replace(".", ","));
+                    double phase2 = Math.toDegrees(spectrum2.get(i).arg());
+                    double phase1 = Math.toDegrees(spectrum1.get(i).arg());
+                    double shift = phase1>phase2?phase1-phase2:phase2-phase1;
+                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ (new String(""+ shift)).replace(".", ","));
               }
-              
+              int y=0;
               
           } catch (IOException ex) {
               Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -380,8 +394,8 @@ public class PhasorTest {
           double phase2 = Math.PI/6;
           int limitPointNumbers = 48;
           
-          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUECY);
-          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUECY);
+          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUENCY);
+          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUENCY);
          
           RecursiveDiscreteTransform fourierTransform1 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
           RecursiveDiscreteTransform fourierTransform2 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);

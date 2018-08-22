@@ -57,7 +57,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
            spectSample =  spectSample.add(newSpectrumSample) ;
     }
     public Complex getExp( ){
-        return Complex.initByEuler(1,- n*2*Math.PI/windowWidth );
+        return Complex.initByEuler(1,-n*2.0*Math.PI/windowWidth );
     }
     public void accumulateFirstSpectrumSample(double newTimeSample){
            buffer.add(newTimeSample);
@@ -75,38 +75,11 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         updatePhasorEstimate(timeSample);
         return spectrumSample.add( getSample());  
     }
-    
-//    public void phasorEstimateOffNominalF(double df ){
-//      Complex newSample = null;
-//        if(buffer.size()==windowWidth){
-//        double sinP = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*(df/(2.0*fNom)))/
-//                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*(df/(2.0*fNom))));
-//        Complex p = Complex.initByEuler(1, (2.0*Math.PI/windowWidth)*(df/(fNom))*((windowWidth-1.0)/2.0))
-//                .multiply(sinP);
-//        
-//        double sinQ = Math.sin((2.0*Math.PI/windowWidth)*windowWidth*((2.0*fNom+df)/(2.0*fNom)))/
-//                (windowWidth*Math.sin((2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(2.0*fNom))));
-//        Complex q = Complex.initByEuler(1, -(2.0*Math.PI/windowWidth)*((2.0*fNom+df)/(fNom))*((windowWidth-1)/2))
-//                .multiply(sinQ);
-//         
-//         newSample = spectSample.
-//                                multiply(p).
-//                                multiply(Complex.initByEuler(1, (2*Math.PI/windowWidth)*(df/fNom)*n)).add(
-//                                    spectSample.
-//                                         conjugate().
-//                                         multiply(q).
-//                                         multiply(Complex.initByEuler(1, -(2*Math.PI/windowWidth)*((2*fNom+df)/fNom)*n))
-//                                );
-//       newSample = newSample.multiply(1.0/Math.sqrt(2));
-//       //Complex delta = spectSample.sub(newSample);
-//       //spectSample = spectSample.sub(delta);
-//       }
-//                     
-//    }
+   
     
     public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
       if(monitor!=null)  
-          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample,n,buffer ) : 0.0;
+          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample, n,buffer ) : 0.0;
       else throw new UnsupportedOperationException();
     }  
     

@@ -16,13 +16,15 @@ import java.util.List;
 public class SampleGenerator {
     private List<Complex> buffer;
     
-    public double timeSample(int samplesCount,int n,List<Complex> samples){
+    public double timeSample(int width,int n,Complex sample){
          double timeSample = 0.0;
-         
-        for(int k=0;k<samplesCount;k++){
-                Complex temp = Complex.initByEuler(1,2*Math.PI*k*n/samplesCount);
-                timeSample += (samples.get(k).multiply(temp)).getRe();
-            }
+         Complex temp = null;
+         //double normingConstant = Math.sqrt(2)/samplesCount;
+        
+                  temp = Complex.initByEuler(1,2.0*Math.PI*(double)n/(double)width);
+                  Complex r = sample.multiply(temp) ;
+                timeSample += (sample.multiply(temp) ).getRe();
+           
         return timeSample;
     }
     public Complex spectrumSample(int samplesCount,int n,List<Double> samples){
