@@ -325,7 +325,7 @@ public class PhasorTest {
                   spectrum3.add(transform3.direct(timeSample3.get(i)));
 //                  error1.add(transform1.calculatePhasorEstimateQality( ));
 //                  error2.add(transform2.calculatePhasorEstimateQality( ));
-                  error3.add(transform3.calculatePhasorEstimateQality( ));
+                 // error3.add(transform3.calculatePhasorEstimateQality( ));
                  // shift12.add(Math.toDegrees(spectrum1.get(i).arg()-spectrum2.get(i).arg()));
                  String str = new String(""+Math.toDegrees(spectrum3.get(i).arg()));
                  String str1 = new String(""+(spectrum1.get(i).amplitude()*Math.sqrt(2)));

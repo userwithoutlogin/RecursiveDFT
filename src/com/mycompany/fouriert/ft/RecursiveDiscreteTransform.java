@@ -20,14 +20,12 @@ import java.util.LinkedList;
  */
 public class RecursiveDiscreteTransform implements FourierTransform{
      TransientMonitor monitor ; 
-     SampleGenerator sampleGenerator =new SampleGenerator();
      private int n ;
      private LinkedList<Double> buffer;
-     private int insuranceInterval;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
      double normingConstant ;
-     
+     boolean fault = false;
      
     public RecursiveDiscreteTransform(Integer width ) {                  
         this.windowWidth = width;
@@ -68,7 +66,16 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      }
      
     public Complex getSample(){
-         return windowWidth == buffer.size() ? spectSample : new Complex(0.0,0.0);        
+              
+         if(windowWidth != buffer.size() )
+             return new Complex(0.0,0.0);
+         else if(monitor==null)
+             return spectSample;
+         else {
+             Complex sample = monitor.getSample(spectSample,n,buffer.getFirst());
+             fault = monitor.getFault
+             return monitor.getSample(spectSample,n,buffer.getFirst());
+         }
     }
  
     @Override
@@ -79,11 +86,11 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     }
    
     
-    public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
-      if(monitor!=null)  
-          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample, n,buffer.getFirst() ) : 0.0;
-      else throw new UnsupportedOperationException();
-    }  
+//    public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
+//      if(monitor!=null)  
+//          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample, n,buffer.getFirst() ) : 0.0;
+//      else throw new UnsupportedOperationException();
+//    }  
     
     public void setMonitor(TransientMonitor monitor) {
         this.monitor = monitor;
