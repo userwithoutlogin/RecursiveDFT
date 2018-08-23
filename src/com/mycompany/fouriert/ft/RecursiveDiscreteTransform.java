@@ -21,8 +21,9 @@ import java.util.LinkedList;
 public class RecursiveDiscreteTransform implements FourierTransform{
      TransientMonitor monitor ; 
      SampleGenerator sampleGenerator =new SampleGenerator();
-     private LinkedList<Double> buffer;
      private int n = 0;
+     private LinkedList<Double> buffer;
+     private LinkedList<Complex> spectrumBuffer;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
      double normingConstant ;
@@ -33,9 +34,17 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
+         initSpectrumBuffer();
     }
-         
- 
+    public void initSpectrumBuffer(){
+        spectrumBuffer = new LinkedList();
+        for(int i=0;i<windowWidth;i++)
+            spectrumBuffer.add(new Complex(0.0,0.0));
+    }     
+    public void updateSpectrumBuffer(){
+        spectrumBuffer.remove(0);
+        spectrumBuffer.addLast(spectSample);
+    }
     public void updatePhasorEstimate(double newTimeSample) {  
           if(windowWidth > buffer.size()){
               accumulateFirstSpectrumSample(newTimeSample);
@@ -62,7 +71,9 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     public void accumulateFirstSpectrumSample(double newTimeSample){
            buffer.add(newTimeSample);
 //     forms the first spectrum sample while buffer fills
-             spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant));              
+             spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant));     
+             if(buffer.size() == windowWidth)
+                 updateSpectrumBuffer();
     }
      
     public Complex getSample(){
@@ -90,6 +101,10 @@ public class RecursiveDiscreteTransform implements FourierTransform{
 
     public TransientMonitor getMonitor() {
         return monitor;
+    }
+
+    public LinkedList<Complex> getSpectrumBuffer() {
+        return spectrumBuffer;
     }
     
 }

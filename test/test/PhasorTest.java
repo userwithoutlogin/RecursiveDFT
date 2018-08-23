@@ -330,12 +330,12 @@ public class PhasorTest {
                  String str = new String(""+Math.toDegrees(spectrum3.get(i).arg()));
                  String str1 = new String(""+(spectrum1.get(i).amplitude()*Math.sqrt(2)));
 //                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ str.replace(".", ","));
+                    double phase3 = Math.toDegrees(spectrum3.get(i).arg());
                     double phase2 = Math.toDegrees(spectrum2.get(i).arg());
-                    double phase1 = Math.toDegrees(spectrum1.get(i).arg());
-                    double shift = phase1>phase2?phase1-phase2:phase2-phase1;
+                    double shift = phase2>phase3?phase2-phase3:phase3-phase2;
                   System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ (new String(""+ shift)).replace(".", ","));
               }
-              int y=0;
+           
               
           } catch (IOException ex) {
               Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
