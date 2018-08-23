@@ -21,9 +21,9 @@ import java.util.LinkedList;
 public class RecursiveDiscreteTransform implements FourierTransform{
      TransientMonitor monitor ; 
      SampleGenerator sampleGenerator =new SampleGenerator();
-     private int n = 0;
+     private int n ;
      private LinkedList<Double> buffer;
-     private LinkedList<Complex> spectrumBuffer;
+     private int insuranceInterval;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
      double normingConstant ;
@@ -34,17 +34,10 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
-         initSpectrumBuffer();
+         
     }
-    public void initSpectrumBuffer(){
-        spectrumBuffer = new LinkedList();
-        for(int i=0;i<windowWidth;i++)
-            spectrumBuffer.add(new Complex(0.0,0.0));
-    }     
-    public void updateSpectrumBuffer(){
-        spectrumBuffer.remove(0);
-        spectrumBuffer.addLast(spectSample);
-    }
+        
+    
     public void updatePhasorEstimate(double newTimeSample) {  
           if(windowWidth > buffer.size()){
               accumulateFirstSpectrumSample(newTimeSample);
@@ -72,12 +65,10 @@ public class RecursiveDiscreteTransform implements FourierTransform{
            buffer.add(newTimeSample);
 //     forms the first spectrum sample while buffer fills
              spectSample = spectSample.add(getExp().multiply(newTimeSample).multiply(normingConstant));     
-             if(buffer.size() == windowWidth)
-                 updateSpectrumBuffer();
-    }
+     }
      
     public Complex getSample(){
-          return windowWidth == buffer.size() ? spectSample : new Complex(0.0,0.0);        
+         return windowWidth == buffer.size() ? spectSample : new Complex(0.0,0.0);        
     }
  
     @Override
@@ -90,7 +81,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     
     public double  calculatePhasorEstimateQality() throws UnsupportedOperationException{
       if(monitor!=null)  
-          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample, n,buffer ) : 0.0;
+          return buffer.size() == windowWidth ? monitor.calculatePhasorEstimateQality(spectSample, n,buffer.getFirst() ) : 0.0;
       else throw new UnsupportedOperationException();
     }  
     
@@ -103,8 +94,6 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         return monitor;
     }
 
-    public LinkedList<Complex> getSpectrumBuffer() {
-        return spectrumBuffer;
-    }
+    
     
 }

@@ -21,33 +21,45 @@ import java.util.stream.Stream;
  * @author andrey_pushkarniy
  */
 public class TransientMonitor {
-    private SampleGenerator generator = new SampleGenerator();
-    private double nominalFrequency; 
-    private double actualFrequency; 
-    private int windowWidth;
+    private int     windowWidth;
+    private double  allowableDeviationPercent = 15;
+    private Double  maximumAmplitude;
+    private boolean faultDetected = false;
 
-    public TransientMonitor(double nominalFrequency, double actualFrequency, int windowWidth) {
-        this.nominalFrequency = nominalFrequency;
-        this.actualFrequency = actualFrequency;
+    public TransientMonitor(int windowWidth) {
         this.windowWidth = windowWidth;
     }
- 
-    
-     
- 
-    public double calculatePhasorEstimateQality( Complex  sample,int n,List<Double> timeSamples){
-         List<Double> monitorVector = new ArrayList();
-         int delta =  n - windowWidth;
-         n = delta;
-         for(int k=0;k<timeSamples.size();k++,n++){
-            double recalculatedSample = sample.amplitude()*Math.sqrt(2.0) * Math.cos((n*2.0*Math.PI*(actualFrequency)/(windowWidth*nominalFrequency)) + sample.arg()); 
-//            double recalculatedSample = generator.timeSample(windowWidth,n, sample);
-            monitorVector.add( timeSamples.get(k) - recalculatedSample);            
-             
+    public boolean calculatePhasorEstimateQality(Complex sample, int n, double timeSample) {
+        if (faultDetected == false) {
+            n -= windowWidth;
+            double amplitude = sample.amplitude();
+            updateMaxAmplitude(amplitude);
+            double error = Math.abs(timeSample - amplitude * Math.sqrt(2.0) * Math.cos((n * 2.0 * Math.PI / windowWidth) + sample.arg()));
+            double percent = (error / maximumAmplitude - 1) * 100;
+            if (percent > allowableDeviationPercent) {
+                faultDetected = true;
+            }
         }
-        
-              
-        return monitorVector.stream().reduce(0.0, (smpl1,smpl2)->Math.abs(smpl1)+Math.abs(smpl2));
+        return faultDetected;
+    }
+    public void updateMaxAmplitude(double amplitude) {
+        double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude - 1) * 100 : 0.0;
+        if (maximumAmplitude == null || (percent < allowableDeviationPercent && amplitude > maximumAmplitude)) {
+            maximumAmplitude = amplitude;
+        }
+    }
+
+    public Complex getSample(Complex sample, int n, double timeSample) {
+        Complex tempSample = sample;
+        calculatePhasorEstimateQality(tempSample, n, timeSample);
+        if (faultDetected) {
+            tempSample = new Complex(0.0, 0.0);
+        }
+        return tempSample;
+    }
+
+    public void setAllowableDeviationPercent(double allowableDeviationPercent) {
+        this.allowableDeviationPercent = allowableDeviationPercent;
     }
   
 }

@@ -113,7 +113,7 @@ public class PhasorTest {
         int limitPointNubers = 30;
         List<Double> phasorErrors  = new ArrayList();
         
-        TransientMonitor monitor = new TransientMonitor(NOMINAL_FREQUENCY,NOMINAL_FREQUENCY +frequencyDeviation,WINDOW_WIDTH);
+        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
        
         RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
         fourierTransform.setMonitor(monitor);
@@ -293,9 +293,9 @@ public class PhasorTest {
          double fDeviation = 1.8;
         
          
-         TransientMonitor monitor1 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
-         TransientMonitor monitor2 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
-         TransientMonitor monitor3 = new TransientMonitor(NOMINAL_FREQUENCY+ fDeviation,NOMINAL_FREQUENCY  ,WINDOW_WIDTH);
+         TransientMonitor monitor1 = new TransientMonitor( WINDOW_WIDTH);
+         TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
          
          RecursiveDiscreteTransform  transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
          RecursiveDiscreteTransform  transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
@@ -323,8 +323,8 @@ public class PhasorTest {
                   spectrum1.add(transform1.direct(timeSample1.get(i)));
                   spectrum2.add(transform2.direct(timeSample2.get(i)));
                   spectrum3.add(transform3.direct(timeSample3.get(i)));
-                  error1.add(transform1.calculatePhasorEstimateQality( ));
-                  error2.add(transform2.calculatePhasorEstimateQality( ));
+//                  error1.add(transform1.calculatePhasorEstimateQality( ));
+//                  error2.add(transform2.calculatePhasorEstimateQality( ));
                   error3.add(transform3.calculatePhasorEstimateQality( ));
                  // shift12.add(Math.toDegrees(spectrum1.get(i).arg()-spectrum2.get(i).arg()));
                  String str = new String(""+Math.toDegrees(spectrum3.get(i).arg()));
@@ -333,9 +333,9 @@ public class PhasorTest {
                     double phase3 = Math.toDegrees(spectrum3.get(i).arg());
                     double phase2 = Math.toDegrees(spectrum2.get(i).arg());
                     double shift = phase2>phase3?phase2-phase3:phase3-phase2;
-                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ (new String(""+ shift)).replace(".", ","));
+//                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ error1.get(i).toString().replace(".", ","));
               }
-           
+           int y = 0;
               
           } catch (IOException ex) {
               Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
