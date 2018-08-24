@@ -19,6 +19,11 @@ import java.util.stream.Stream;
 /**
  *
  * @author andrey_pushkarniy
+ * TransientMonitor compares  error magnitude  with maximum amplitude value,
+ * if percent ,on which error greater than max amplitude,bigger  than desirable  percent , 
+ * monitor returns 0+j0 otherwise monitor returns current spectrum sample.
+ * Maximum amplitude value updates if percent ,on which current amplitude greater than previous max amplitude,
+ * not bigger  than desirable  percent
  */
 public class TransientMonitor {
     private int     windowWidth;
