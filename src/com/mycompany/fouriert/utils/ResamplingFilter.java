@@ -26,7 +26,7 @@ public class ResamplingFilter {
      */
     public static List<Double> resample(List<Double> timeSamples, int windowWidth, double f, double f0) {
         /**
-         * theta      - this is the angle between two neighbour time samples  
+         * theta      - this is the angle between two neighbor time samples  
          * gamma      - this is the angle between the current time sample and recalculated time sample
          * deltaGamma - value on which gamma  angle changes when  jump to a new time sample
          * xres       - resampled time sample

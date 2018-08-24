@@ -61,5 +61,9 @@ public class TransientMonitor {
     public void setAllowableDeviationPercent(double allowableDeviationPercent) {
         this.allowableDeviationPercent = allowableDeviationPercent;
     }
-  
+
+    public boolean isFaultDetected() {
+        return faultDetected;
+    }
+     
 }

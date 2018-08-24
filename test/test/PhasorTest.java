@@ -9,6 +9,7 @@ package test;
 import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
+import com.mycompany.fouriert.ft.FourierTransform;
 import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javafx.scene.shape.Path;
+ 
  
 import org.junit.After;
 import org.junit.AfterClass;
@@ -225,7 +227,7 @@ public class PhasorTest {
                   averagedDeviationPhaseShifts.stream().allMatch(deviation->   deviation < 0.94 )
           );
      }
-      @Ignore("true")
+       @Ignore("true")
      @Test 
      public void phaseShiftBetweenSignalsOnOffNominalFrequencyWithResamplingFilter(){
          /*
@@ -266,6 +268,10 @@ public class PhasorTest {
                   cosine1Spectrum.subList(WINDOW_WIDTH, cosine1Spectrum.size()),
                   cosine2Spectrum.subList(WINDOW_WIDTH, cosine2Spectrum.size())
           );
+           cosine1Spectrum.forEach(phase->{
+               System.out.println(Math.toDegrees(phase.arg()));
+           });
+           
           List<Double> deviationPhaseShift = phaseShifts.stream()
                                              .map(shift->shift-30.0)
                                               .collect(Collectors.toList());
@@ -276,70 +282,58 @@ public class PhasorTest {
           );
      }
      
-      
+       
      @Test
-     public void testRealSignals(){
-         List<Double> shift12 = new ArrayList();
-         List<Double> shift23 = new ArrayList();
-         List<Double> error1 = new ArrayList();
-         List<Double> error2 = new ArrayList();
-         List<Double> error3 = new ArrayList();
-         List<Double> timeSample1 = new ArrayList();
-         List<Double> timeSample2 = new ArrayList();
-         List<Double> timeSample3 = new ArrayList();
-         List<Double> timeSampleRes1 = new ArrayList();
-         List<Double> timeSampleRes2 = new ArrayList();
-         List<Double> timeSampleRes3 = new ArrayList();
-         double fDeviation = 1.8;
-        
+     public void findingFaultSample(){
+         /**
+          * pathToFile                    - path to fille which contains  samples of real sine 
+          * timeSample1(..2,..3)          - list, containing samples read from file
+          * monitor1(..2,..3)             - transient monitor detecting errors of phasors estimate
+          * transform1(..2,..3)           - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
+          * numberOfFaultSample1(..2,..3) - number of sample where sine begins corrupting
+          */
          
-         TransientMonitor monitor1 = new TransientMonitor( WINDOW_WIDTH);
+         Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+
+         List<Double> timeSamples1 = new ArrayList();
+         List<Double> timeSamples2 = new ArrayList();
+         List<Double> timeSamples3 = new ArrayList();
+
+         TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
-         
-         RecursiveDiscreteTransform  transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-         RecursiveDiscreteTransform  transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-         RecursiveDiscreteTransform  transform3 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-      
+
+         RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+         RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+         RecursiveDiscreteTransform transform3 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
+
          transform1.setMonitor(monitor1);
          transform2.setMonitor(monitor2);
          transform3.setMonitor(monitor3);
+
+         int numberOfFaultSample1 = 0;
+         int numberOfFaultSample2 = 0;
+         int numberOfFaultSample3 = 0;
          
-         List<Complex> spectrum1 = new ArrayList();
-         List<Complex> spectrum2 = new ArrayList();
-         List<Complex> spectrum3 = new ArrayList();
-          try {
-              Files.lines(Paths.get("C:/realsine.txt"), StandardCharsets.UTF_8).forEach(str->{
-                        String[] values = str.split(",");
-                         timeSample1.add((new Double(values[2]) ));
-                         timeSample2.add((new Double(values[3]) ));
-                         timeSample3.add((new Double(values[4]) ));
-              });
-              timeSampleRes1 = ResamplingFilter.resample(timeSample1, WINDOW_WIDTH, NOMINAL_FREQUENCY+fDeviation , NOMINAL_FREQUENCY);
-              timeSampleRes2 = ResamplingFilter.resample(timeSample2, WINDOW_WIDTH, NOMINAL_FREQUENCY , NOMINAL_FREQUENCY);
-              timeSampleRes3 = ResamplingFilter.resample(timeSample3, WINDOW_WIDTH, NOMINAL_FREQUENCY , NOMINAL_FREQUENCY);
-              
-              for(int i=0;i<timeSample1.size();i++){
-                  spectrum1.add(transform1.direct(timeSample1.get(i)));
-                  spectrum2.add(transform2.direct(timeSample2.get(i)));
-                  spectrum3.add(transform3.direct(timeSample3.get(i)));
-//                  error1.add(transform1.calculatePhasorEstimateQality( ));
-//                  error2.add(transform2.calculatePhasorEstimateQality( ));
-                 // error3.add(transform3.calculatePhasorEstimateQality( ));
-                 // shift12.add(Math.toDegrees(spectrum1.get(i).arg()-spectrum2.get(i).arg()));
-                 String str = new String(""+Math.toDegrees(spectrum3.get(i).arg()));
-                 String str1 = new String(""+(spectrum1.get(i).amplitude()*Math.sqrt(2)));
-//                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ str.replace(".", ","));
-                    double phase3 = Math.toDegrees(spectrum3.get(i).arg());
-                    double phase2 = Math.toDegrees(spectrum2.get(i).arg());
-                    double shift = phase2>phase3?phase2-phase3:phase3-phase2;
-//                  System.out.println(/*(spectrum1.get(i).amplitude()*Math.sqrt(2))+"  "+*/ error1.get(i).toString().replace(".", ","));
-              }
-           int y = 0;
-              
-          } catch (IOException ex) {
-              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
-          }
+         try {
+             loadDataFromFile(pathToFile, timeSamples1, timeSamples2, timeSamples3);
+         } catch (IOException ex) {
+             Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         
+         if (!timeSamples1.isEmpty()) {
+
+             performDFTOverDataList(timeSamples1, transform1);
+             performDFTOverDataList(timeSamples2, transform2);
+             performDFTOverDataList(timeSamples3, transform3);
+
+             numberOfFaultSample1 = transform1.getN();
+             numberOfFaultSample2 = transform2.getN();
+             numberOfFaultSample3 = transform3.getN();
+           }
+              assertTrue("fault data of the first sine begins from 82 sample", numberOfFaultSample1==82);
+              assertTrue("fault data of the second sine begins from 81 sample", numberOfFaultSample2==81);
+              assertTrue("fault data of the second sine begins from 86 sample", numberOfFaultSample3==86);
      } 
      
      
@@ -392,7 +386,7 @@ public class PhasorTest {
           double amplitude = 100.0;
           double phase1 = Math.PI/3;
           double phase2 = Math.PI/6;
-          int limitPointNumbers = 48;
+          int limitPointNumbers = 10000;
           
           Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUENCY);
           Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUENCY);
@@ -408,8 +402,23 @@ public class PhasorTest {
 
           return Arrays.asList(generator1,generator2);
      }
-
-     
+     public void loadDataFromFile(Path pathToFile,List<Double> ... list1 ) throws IOException{
+          Files.lines(pathToFile, StandardCharsets.UTF_8)
+                      .forEach(str->{
+                        String[] values = str.split(",");
+                        list1[0].add((new Double(values[2]) ));
+                        list1[1].add((new Double(values[3]) ));
+                        list1[2].add((new Double(values[4]) ));
+              });
+     }
+     public void performDFTOverDataList(List<Double> timeSamples,RecursiveDiscreteTransform transform){
+        //When sine begins corrupting, computing DFT is interrupted.
+         for(int i=0;i<timeSamples.size();i++){
+                 transform.direct(timeSamples.get(i));
+                 if(transform.isFault())
+                      return;                  
+              }
+     }
 
     
 }

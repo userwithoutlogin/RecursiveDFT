@@ -59,8 +59,8 @@ public class Generator {
              spectrumSamples.add(fourierTransform.direct(timeSample));
              timeSamples.add(timeSample);
              //System.out.println(timeSample);
-             if(fourierTransform.getMonitor()!=null)
-                 errorEstimates.add(fourierTransform.calculatePhasorEstimateQality()); 
+            // if(fourierTransform.getMonitor()!=null)
+              //   errorEstimates.add(fourierTransform.calculatePhasorEstimateQality()); 
              //fourierTransform.phasorEstimateOffNominalF(df, fNom);
          });
       });

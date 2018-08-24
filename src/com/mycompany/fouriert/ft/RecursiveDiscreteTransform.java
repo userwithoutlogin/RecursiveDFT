@@ -21,6 +21,7 @@ import java.util.LinkedList;
 public class RecursiveDiscreteTransform implements FourierTransform{
      TransientMonitor monitor ; 
      private int n ;
+     
      private LinkedList<Double> buffer;
      private Integer windowWidth; 
      Complex spectSample = new Complex(0.0,0.0);
@@ -73,7 +74,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
              return spectSample;
          else {
              Complex sample = monitor.getSample(spectSample,n,buffer.getFirst());
-             fault = monitor.getFault
+             fault = monitor.isFaultDetected();
              return monitor.getSample(spectSample,n,buffer.getFirst());
          }
     }
@@ -99,6 +100,14 @@ public class RecursiveDiscreteTransform implements FourierTransform{
 
     public TransientMonitor getMonitor() {
         return monitor;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public boolean isFault() {
+        return fault;
     }
 
     
