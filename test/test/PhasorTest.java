@@ -9,21 +9,13 @@ package test;
 import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
-import com.mycompany.fouriert.ft.FourierTransform;
 import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
 import com.mycompany.fouriert.utils.AveragingAlgorithm;
 import com.mycompany.fouriert.utils.ResamplingFilter;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,13 +26,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
- 
- 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
@@ -299,22 +284,19 @@ public class PhasorTest {
          List<Double> timeSamples1 = new ArrayList();
          List<Double> timeSamples2 = new ArrayList();
          List<Double> timeSamples3 = new ArrayList();
-
-         TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
-         TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
-         TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
+         
+         List<Double> timeSamplesRec1 = new ArrayList();
+         List<Double> timeSamplesRec2 = new ArrayList();
+         List<Double> timeSamplesRec3 = new ArrayList();
 
          RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
          RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
          RecursiveDiscreteTransform transform3 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
 
-         transform1.setMonitor(monitor1);
-         transform2.setMonitor(monitor2);
-         transform3.setMonitor(monitor3);
 
-         int numberOfFaultSample1 = 0;
-         int numberOfFaultSample2 = 0;
-         int numberOfFaultSample3 = 0;
+         Integer numberOfFaultSample1 = null;
+         Integer numberOfFaultSample2 = null;
+         Integer numberOfFaultSample3 = null;
          
          try {
              loadDataFromFile(PATH_TO_FILE, timeSamples1, timeSamples2, timeSamples3);
@@ -324,17 +306,18 @@ public class PhasorTest {
          
          if (!timeSamples1.isEmpty()) {
 
+
              performDFTOverDataList(timeSamples1, transform1);
              performDFTOverDataList(timeSamples2, transform2);
              performDFTOverDataList(timeSamples3, transform3);
 
-             numberOfFaultSample1 = transform1.getN();
-             numberOfFaultSample2 = transform2.getN();
-             numberOfFaultSample3 = transform3.getN();
+             numberOfFaultSample1 = transform1.getNumberOfFaultSample();
+             numberOfFaultSample2 = transform2.getNumberOfFaultSample();
+             numberOfFaultSample3 = transform3.getNumberOfFaultSample();
            }
-              assertTrue("fault data of the first   sine lies in range between 78 and 80 samples" , numberOfFaultSample1 > 78 && numberOfFaultSample1 < 90);
-              assertTrue("fault data of the second  sine lies in range between 78 and 80 samples", numberOfFaultSample2 > 78 && numberOfFaultSample2 < 90);
-              assertTrue("fault data of the third   sine lies in range between 78 and 80 samples", numberOfFaultSample3 > 78 && numberOfFaultSample3 < 90);
+              assertTrue("fault sample of the first  sine  has number 81" , numberOfFaultSample1 == 81);
+              assertTrue("fault sample of the second  sine  has number 80", numberOfFaultSample2 == 80);
+              assertTrue("fault sample of the third  sine  has number 80",  numberOfFaultSample3 == 80);
      } 
      
      

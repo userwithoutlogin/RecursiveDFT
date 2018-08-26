@@ -27,7 +27,7 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      * buffer           - phasor's window
      * windowWidth      - phasor's window width
      * spectrumSample   - accumulated phasor's estimation
-     * normingConstant  - norming multiplier of DFT
+     * normingConstant  - normalizing multiplier of DFT
      * fault            - it's set to true if fault in phasor's estimate 
      * has been detected 
      */
@@ -43,11 +43,12 @@ public class RecursiveDiscreteTransform implements FourierTransform{
         this.windowWidth = width;
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
+        monitor = new TransientMonitor(windowWidth);
     }
         
     /**
      * Function accumulate the first spectrum sample while buffer fills 
-     * and then, wih every window shift, a difference between a new coming time sample 
+     * and then, with every window shift, a difference between a new coming time sample 
      * and deleted sample is transformed by DFT and  added to spectrumSample. 
      */
     public void updatePhasorEstimate(double newTimeSample) {  
@@ -89,20 +90,17 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     
     /**
      * While buffer is not filled returns zero complex number.
-     * Else if buffer is fill and monior is not set returns spectrumSample.
      * Otherwise performs a spectrum sample check  with a monitor.
      */
-    public Complex getSample(){
+    private Complex getSample(){
         /*
          * fault - obtain from monitor.It is set to true, if fault is detected.
         */     
          if(windowWidth != buffer.size() )
              return new Complex(0.0,0.0);
-         else if(monitor==null)
-             return spectrumSample;
          else {
              fault = monitor.isFaultDetected();
-             return monitor.validateSample(spectrumSample,n,buffer.getFirst());
+             return monitor.validateSample(spectrumSample,n,buffer);
          }
     }
     /**
@@ -110,9 +108,10 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     */
     @Override
     public Complex direct(Double timeSample) {
-        Complex spectrumSample = new Complex(0.0,0.0);
+        //Complex spectrumSample = new Complex(0.0,0.0);
         updatePhasorEstimate(timeSample);
-        return spectrumSample.add( getSample());  
+//        return spectrumSample.add( getSample());  
+        return  getSample();  
     }
     
     public void setMonitor(TransientMonitor monitor) {
@@ -122,13 +121,13 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     public TransientMonitor getMonitor() {
         return monitor;
     }
-    public int getN() {
-        return n;
-    }
+      
     public boolean isFault() {
         return fault;
     }
-
+    public Integer getNumberOfFaultSample(){
+        return monitor.getNumberOfFaultSample();
+    }
     
     
 }
