@@ -40,64 +40,58 @@ public class TransientMonitor {
     
     
     
-    /**
-     * Obtains a current phasor's estimate and returns one, if 
-     * error has not been detected, otherwise returns zero complex number.
-     * @param  sample          - current phasor's estimate 
-     * @param  n               - umber of current time sample
-     * @param  timeSamples      - time sample which has been deleted from buffer
-     * @return tempSample      - equals to current phasor's estimate ,
-     * if error has not been detected, else equals to zero complex number
-     */
-    public Complex validateSample(Complex sample, int n, List<Double> timeSamples) {
-        Complex tempSample = sample;         
-        if (isEstimateErroneous(tempSample, n, timeSamples))
-            tempSample = new Complex(0.0, 0.0);
-        return tempSample;
-        
-   }
      /**
-     * Function checks, that phasor's estimate is valid , comparing error with maximum amplitude. 
+     * Function checks, that phasor's estimate is valid , comparing error with maximumAmplitude, 
+     * if the fault has not been detected yet. 
+     * At the first time a whole buffer is analyzed
      * @param sample          - current phasor's estimate 
      * @param n               - number of current time sample
-     * @param timeSamples     - time samples from buffer, forming one harmonic
-     * @return faultDetected  - value is set to true, when error of phasor representation 
+     * @param timeSamples     - time samples from phasor window
      */
-    public boolean isEstimateErroneous(Complex sample, int n, List<Double> timeSamples) {
-         
+    public void validateSample(Complex sample, int n, List<Double> timeSamples) {
         if (!faultDetected ) {
-//          number of the current harmonic
+//          number of the first sample in the window
              int k = n - windowWidth;
-              
-            updateMaxAmplitude(sample.amplitude()*Math.sqrt(2.0));
-            /*
-            * If obtained the first harmonic  , then whole buffer is analyzed,
-            * otherwise only last time sample is analyzed.
-            */
-            if(k==0)
-                for (int i = 0; i < timeSamples.size(); i++, k++) 
-                   analizeHarmonic(sample, k, timeSamples.get(i));
-            else
-                analizeHarmonic(sample, n, timeSamples.get(timeSamples.size()-1));
-            
+             updateMaxAmplitude(sample.amplitude()*Math.sqrt(2.0));
+            for (int i = 0; i < timeSamples.size(); i++, k++) 
+                   analyzeTimeSample(sample, k, timeSamples.get(i));
         }
-        return faultDetected;
-    }
+        
+   }
+    /**
+     * Overloaded version of validateSample function, it is used when window has started to move. 
+     * In this case it is necessary  to analyze only last time sample.
+     * @param sample          - current phasor's estimate 
+     * @param n               - number of current time sample
+     * @param timeSample      - last time sample from phasor window
+     */
+    public void validateSample(Complex sample, int n, double timeSample) {
+        if (!faultDetected ) {
+//          number of the first sample in the window
+             int k = n - windowWidth;
+             updateMaxAmplitude(sample.amplitude()*Math.sqrt(2.0));
+            analyzeTimeSample(sample, n, timeSample);
+        }
+        
+   }
+ 
       /**
      * Function sets value for faultDetected. 
      * @param sample          - current phasor's estimate 
      * @param n               - number of current time sample
      * @param timeSample      - time sample from buffer     
      */
-    public void    analizeHarmonic(Complex sample, int n, double timeSample ){
+    private void    analyzeTimeSample(Complex sample, int n, double timeSample ){
          /**
          * error     - fromdeviation recalculated time sample, 
          * obtained with help  phasor's estimate, off obtained time sample
          * percent   - how much error value exceeds the maximum amplitude
          */ 
-        double error = Math.abs(
-                timeSample - sample.amplitude() * Math.sqrt(2.0) * Math.cos(((n - 1) * 2.0 * Math.PI / windowWidth) + sample.arg())
-        );
+         double t= sample.amplitude() * Math.sqrt(2.0) * Math.cos((n  * 2.0 * Math.PI / windowWidth) + sample.arg());
+         double error = Math.abs(
+                timeSample - sample.amplitude() * Math.sqrt(2.0) * Math.cos((n  * 2.0 * Math.PI / windowWidth) + sample.arg())
+         );
+        
 /**
  *      If error greater than  maximumAmplitude by a percentage, which greater than allowableDeviationPercent,
  *      current phasor estimate is considered as faulted.
@@ -115,7 +109,7 @@ public class TransientMonitor {
      *  but less or equals than maximumAmplitude with accounting 'allowableDeviationPercent'.
      *  @param amplitude - amplitude is obtained from current estimate of phasor
      */
-    public void updateMaxAmplitude(double amplitude) {
+    private void updateMaxAmplitude(double amplitude) {
       // percent - percentage by which 'amplitude' is greater than maximumAmplitude
         double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude - 1) * 100 : 0.0;
          

@@ -9,7 +9,7 @@ package test;
 import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
-import com.mycompany.fouriert.ft.RecursiveDiscreteTransform;
+import com.mycompany.fouriert.ft.RecursivePhasor;
 import com.mycompany.fouriert.functions.CosineFunction;
 import com.mycompany.fouriert.functions.Function;
 import com.mycompany.fouriert.functions.Generator;
@@ -44,39 +44,39 @@ public class PhasorTest {
       final double NOMINAL_FREQUENCY = 50.0;   
       Path PATH_TO_FILE = Paths.get("./realsine.txt").toAbsolutePath().normalize();
       
-     @Ignore(value = "true")
+      @Ignore("true")
      @Test
      public void phasorRepresentationsOnNominalFrequency(){
-        /*
-          precision          - two phase (amplitudes) are considered as equals, if their difference not greater than precision  
-          frequencyDeviation - frequency deviation off nominal  frequency
-          amplitude          - amplitude of tested signal
-          phase              - phase shift of tested signal
-          fourierTransform   - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
-          cosine             - representation of test signal
-          generator          - generates test signal samples and send it to phasor for signal spectrum forming
-          spectrumSamples    - spectrum samples obtained from DFT over values of test signal
-          limitPointNumbers  - quantity of test signal samples
-        */                 
-        double precision = 1e-13;
-        double frequencyDeviation = 0.0;
-        double amplitude = 100.0;
-        double phase = Math.PI/4;
-        int limitPointNumbers = 36;
-        
-        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
-        Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine ); 
-        generator.start(limitPointNumbers);    
-        List<Complex> spectrumSamples = generator.getSpectrumSamples();
-        
-        // amplitude and phase consists phasor`s representation
-        assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency 50Hz",
-                isPhaseConstant(phase  ,  spectrumSamples,   precision)
-        );  
-        assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency 50Hz",
-                isAmplitudeConstant(100/Math.sqrt(2),  spectrumSamples,  precision)
-        );        
+//        /*
+//          precision          - two phase (amplitudes) are considered as equals, if their difference not greater than precision  
+//          frequencyDeviation - frequency deviation off nominal  frequency
+//          amplitude          - amplitude of tested signal
+//          phase              - phase shift of tested signal
+//          fourierTransform   - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
+//          cosine             - representation of test signal
+//          generator          - generates test signal samples and send it to phasor for signal spectrum forming
+//          spectrumSamples    - spectrum samples obtained from DFT over values of test signal
+//          limitPointNumbers  - quantity of test signal samples
+//        */                 
+//        double precision = 1e-13;
+//        double frequencyDeviation = 0.0;
+//        double amplitude = 100.0;
+//        double phase = Math.PI/4;
+//        int limitPointNumbers = 36;
+//        
+//        RecursivePhasor fourierTransform =  new RecursivePhasor(WINDOW_WIDTH);
+//        Function cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
+//        Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine ); 
+//        generator.start(limitPointNumbers);    
+//        List<Complex> spectrumSamples = generator.getSpectrumSamples();
+//        
+//        // amplitude and phase consists phasor`s representation
+//        assertTrue("Phase must be constant and equals to pi/4 for all samples on nominal frequency 50Hz",
+//                isPhaseConstant(phase  ,  spectrumSamples,   precision)
+//        );  
+//        assertTrue("Amplitude must be constant and equals to 100/sqrt(2) for all samples on nominal frequency 50Hz",
+//                isAmplitudeConstant(100/Math.sqrt(2),  spectrumSamples,  precision)
+//        );        
      }
      @Ignore("true")
      @Test
@@ -95,29 +95,29 @@ public class PhasorTest {
           phasorErrors       - list of errors of phasor`s estimates
           countErrors        - quantity of estimates in which phasor made error 
         */
-        double precision = 1e-10;
-        double frequencyDeviation = 1.0;
-        double amplitude = 100.0;
-        double phase = Math.PI/4;
-        int limitPointNubers = 30;
-        List<Double> phasorErrors  = new ArrayList();
-        
-        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
-       
-        RecursiveDiscreteTransform fourierTransform =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-        fourierTransform.setMonitor(monitor);
-        Function cosine1 = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
-        Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine1 ); 
-        generator.start(limitPointNubers);    
-         
-        phasorErrors = generator.getErrorEstimates();
-        int countErrors = phasorErrors.stream().filter(error-> error>precision).collect(Collectors.toList()).size();
-        
-         /*
-            because  signal 'cosine1' have frequency not equal nominal value, 
-            all 7 [limitPointNubers - (WINDOW_WIDTH -1) = 30-(24-1) = 6]  estimates will be eroneous            
-        */ 
-         assertEquals(7, countErrors);
+//        double precision = 1e-10;
+//        double frequencyDeviation = 1.0;
+//        double amplitude = 100.0;
+//        double phase = Math.PI/4;
+//        int limitPointNubers = 30;
+//        List<Double> phasorErrors  = new ArrayList();
+//        
+//        TransientMonitor monitor = new TransientMonitor(WINDOW_WIDTH);
+//       
+//        RecursivePhasor fourierTransform =  new RecursivePhasor(WINDOW_WIDTH);
+//        fourierTransform.setMonitor(monitor);
+//        Function cosine1 = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUENCY);        
+//        Generator generator = new Generator(fourierTransform,frequencyDeviation, cosine1 ); 
+//        generator.start(limitPointNubers);    
+//         
+//        phasorErrors = generator.getErrorEstimates();
+//        int countErrors = phasorErrors.stream().filter(error-> error>precision).collect(Collectors.toList()).size();
+//        
+//         /*
+//            because  signal 'cosine1' have frequency not equal nominal value, 
+//            all 7 [limitPointNubers - (WINDOW_WIDTH -1) = 30-(24-1) = 6]  estimates will be eroneous            
+//        */ 
+//         assertEquals(7, countErrors);
      }
      @Ignore(value = "true")
      @Test
@@ -223,99 +223,78 @@ public class PhasorTest {
             frequencyDeviation       - frequency deviation off nominal  frequency
             transform1(transform2)   - phasor performing discrete Fourier transform(DFT) with recursive update of estimation  
          */
-          double frequencyDeviation = 1.8;
-          double actualFrequency = NOMINAL_FREQUENCY+frequencyDeviation;
-          RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          
-          List<Generator> generators = getGenerators(frequencyDeviation);
-          
-          List<Double> cosine1 = generators.get(0).getTimeSamples();
-          List<Double> cosine2 = generators.get(1).getTimeSamples();
-          
-          List<Complex> cosine1Spectrum = new ArrayList();
-          List<Complex> cosine2Spectrum = new ArrayList();
-          List<Double> phaseShiftBetween = new ArrayList();
-          
-          List<Double> cosine1Resampled = ResamplingFilter.resample(cosine1,
-                                                                    WINDOW_WIDTH,
-                                                                    NOMINAL_FREQUENCY,
-                                                                    actualFrequency);
-          List<Double> cosine2Resampled = ResamplingFilter.resample(cosine2,
-                                                                    WINDOW_WIDTH,
-                                                                    NOMINAL_FREQUENCY,
-                                                                    actualFrequency);
-          
-          for(int i=0;i<cosine1Resampled.size();i++){
-              cosine1Spectrum.add(transform1.direct(cosine1Resampled.get(i)));
-              cosine2Spectrum.add(transform2.direct(cosine2Resampled.get(i)));
-          }
-                   
-           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
-                  cosine1Spectrum.subList(WINDOW_WIDTH, cosine1Spectrum.size()),
-                  cosine2Spectrum.subList(WINDOW_WIDTH, cosine2Spectrum.size())
-          );
-           cosine1Spectrum.forEach(phase->{
-               System.out.println(Math.toDegrees(phase.arg()));
-           });
-           
-          List<Double> deviationPhaseShift = phaseShifts.stream()
-                                             .map(shift->shift-30.0)
-                                              .collect(Collectors.toList());
-//         
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.06 degree"
-                  + " on off-nominal frequency 53.6Hz",
-                  deviationPhaseShift.stream().allMatch(shift->shift<0.08)
-          );
+//          double frequencyDeviation = 1.8;
+//          double actualFrequency = NOMINAL_FREQUENCY+frequencyDeviation;
+//          RecursivePhasor transform1 = new RecursivePhasor(WINDOW_WIDTH);
+//          RecursivePhasor transform2 = new RecursivePhasor(WINDOW_WIDTH);
+//          
+//          List<Generator> generators = getGenerators(frequencyDeviation);
+//          
+//          List<Double> cosine1 = generators.get(0).getTimeSamples();
+//          List<Double> cosine2 = generators.get(1).getTimeSamples();
+//          
+//          List<Complex> cosine1Spectrum = new ArrayList();
+//          List<Complex> cosine2Spectrum = new ArrayList();
+//          List<Double> phaseShiftBetween = new ArrayList();
+//          
+//          List<Double> cosine1Resampled = ResamplingFilter.resample(cosine1,
+//                                                                    WINDOW_WIDTH,
+//                                                                    NOMINAL_FREQUENCY,
+//                                                                    actualFrequency);
+//          List<Double> cosine2Resampled = ResamplingFilter.resample(cosine2,
+//                                                                    WINDOW_WIDTH,
+//                                                                    NOMINAL_FREQUENCY,
+//                                                                    actualFrequency);
+//          
+//          for(int i=0;i<cosine1Resampled.size();i++){
+//              cosine1Spectrum.add(transform1.direct(cosine1Resampled.get(i)));
+//              cosine2Spectrum.add(transform2.direct(cosine2Resampled.get(i)));
+//          }
+//                   
+//           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(
+//                  cosine1Spectrum.subList(WINDOW_WIDTH, cosine1Spectrum.size()),
+//                  cosine2Spectrum.subList(WINDOW_WIDTH, cosine2Spectrum.size())
+//          );
+//           cosine1Spectrum.forEach(phase->{
+//               System.out.println(Math.toDegrees(phase.arg()));
+//           });
+//           
+//          List<Double> deviationPhaseShift = phaseShifts.stream()
+//                                             .map(shift->shift-30.0)
+//                                              .collect(Collectors.toList());
+////         
+//          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.06 degree"
+//                  + " on off-nominal frequency 53.6Hz",
+//                  deviationPhaseShift.stream().allMatch(shift->shift<0.08)
+//          );
      }
      
        
      @Test
      public void findingRealSignalFaultSample(){
          /**
-          * timeSample1(..2,..3)          - list, containing samples read from file
-          * monitor1(..2,..3)             - transient monitor detecting errors of phasors estimate
-          * transform1(..2,..3)           - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
-          * numberOfFaultSample1(..2,..3) - number of sample where sine begins corrupting
+          * phasor1(..2,..3) - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
           */
-         
-          
+         TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
+         TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
 
-         List<Double> timeSamples1 = new ArrayList();
-         List<Double> timeSamples2 = new ArrayList();
-         List<Double> timeSamples3 = new ArrayList();
-         
-         List<Double> timeSamplesRec1 = new ArrayList();
-         List<Double> timeSamplesRec2 = new ArrayList();
-         List<Double> timeSamplesRec3 = new ArrayList();
+         RecursivePhasor phasor1 = new RecursivePhasor(WINDOW_WIDTH,monitor1);
+         RecursivePhasor phasor2 = new RecursivePhasor(WINDOW_WIDTH,monitor2);
+         RecursivePhasor phasor3 = new RecursivePhasor(WINDOW_WIDTH,monitor3);
 
-         RecursiveDiscreteTransform transform1 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-         RecursiveDiscreteTransform transform2 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-         RecursiveDiscreteTransform transform3 = new RecursiveDiscreteTransform(WINDOW_WIDTH);
-
-
-         Integer numberOfFaultSample1 = null;
-         Integer numberOfFaultSample2 = null;
-         Integer numberOfFaultSample3 = null;
-         
          try {
-             loadDataFromFile(PATH_TO_FILE, timeSamples1, timeSamples2, timeSamples3);
+            analyzeFileData( PATH_TO_FILE,1, phasor1);
+            analyzeFileData( PATH_TO_FILE,2, phasor2);
+            analyzeFileData( PATH_TO_FILE,3, phasor3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
-         
-         if (!timeSamples1.isEmpty()) {
-             performDFTOverDataList(timeSamples1, transform1);
-             performDFTOverDataList(timeSamples2, transform2);
-             performDFTOverDataList(timeSamples3, transform3);
-
-             numberOfFaultSample1 = transform1.getNumberOfFaultSample();
-             numberOfFaultSample2 = transform2.getNumberOfFaultSample();
-             numberOfFaultSample3 = transform3.getNumberOfFaultSample();
-           }
-              assertTrue("fault sample of the first   sine  has number 81" , numberOfFaultSample1 == 81);
-              assertTrue("fault sample of the second  sine  has number 80", numberOfFaultSample2  == 80);
-              assertTrue("fault sample of the third   sine  has number 80",  numberOfFaultSample3 == 80);
+          
+         assertTrue("fault sample of the first   sine  has number 81" , phasor1.getN()  == 81);
+         assertTrue("fault sample of the second  sine  has number 80" , phasor2.getN()  == 80);
+         assertTrue("fault sample of the third   sine  has number 80" , phasor3.getN()  == 80);
+              
      } 
      
      
@@ -365,42 +344,42 @@ public class PhasorTest {
           limitPointNumbers                     - quantity of test signal samples        
           
        */          
-          double amplitude = 100.0;
-          double phase1 = Math.PI/3;
-          double phase2 = Math.PI/6;
-          int limitPointNumbers = 10000;
-          
-          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUENCY);
-          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUENCY);
-         
-          RecursiveDiscreteTransform fourierTransform1 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          RecursiveDiscreteTransform fourierTransform2 =  new RecursiveDiscreteTransform(WINDOW_WIDTH);
-          
-          Generator generator1 = new Generator(fourierTransform1, frequencyDeviation,cosine1 );
-          Generator generator2 = new Generator(fourierTransform2, frequencyDeviation,cosine2 );
-          
-          generator1.start(limitPointNumbers);
-          generator2.start(limitPointNumbers);
-
-          return Arrays.asList(generator1,generator2);
+//          double amplitude = 100.0;
+//          double phase1 = Math.PI/3;
+//          double phase2 = Math.PI/6;
+//          int limitPointNumbers = 10000;
+//          
+//          Function cosine1 = new CosineFunction(amplitude, phase1, WINDOW_WIDTH, NOMINAL_FREQUENCY);
+//          Function cosine2 = new CosineFunction(amplitude, phase2, WINDOW_WIDTH, NOMINAL_FREQUENCY);
+//         
+////          RecursivePhasor fourierTransform1 =  new RecursivePhasor(WINDOW_WIDTH);
+////          RecursivePhasor fourierTransform2 =  new RecursivePhasor(WINDOW_WIDTH);
+//          
+//          Generator generator1 = new Generator(fourierTransform1, frequencyDeviation,cosine1 );
+//          Generator generator2 = new Generator(fourierTransform2, frequencyDeviation,cosine2 );
+//          
+//          generator1.start(limitPointNumbers);
+//          generator2.start(limitPointNumbers);
+//
+//          return Arrays.asList(generator1,generator2);
+          return null;
      }
-     public void loadDataFromFile(Path pathToFile,List<Double> ... list ) throws IOException{
+     public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor) throws IOException{
+          /**
+           * Snippet chooses value belongs desirable function (function with number functionNumber), 
+           * then it estimates value and if fault is detected stream is stopped.
+           */  
           Files.lines(pathToFile, StandardCharsets.UTF_8)
-                      .forEach(str->{
-                        String[] values = str.split(",");
-                        list[0].add((new Double(values[2]) ));
-                        list[1].add((new Double(values[3]) ));
-                        list[2].add((new Double(values[4]) ));
-              });
+                  .map(line->{
+                      String[] values = line.split(",");
+                      return new Double( values[functionNumber+1] );
+                    })
+                  .map(timeSample ->{ phasor.accept( timeSample);
+                                      return phasor.isFault(); }
+                   )
+                  .anyMatch(fault->fault);
      }
-     public void performDFTOverDataList(List<Double> timeSamples,RecursiveDiscreteTransform transform){
-        //When sine begins corrupting, computing DFT is interrupted.
-         for(int i=0;i<timeSamples.size();i++){
-                 transform.direct(timeSamples.get(i));
-                 if(transform.isFault())
-                      return;                  
-              }
-     }
+ 
 
     
 }

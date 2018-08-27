@@ -7,12 +7,13 @@ package com.mycompany.fouriert.ft;
 
 import com.mycompany.fouriert.utils.Complex;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  *
  * @author root
  */
-public interface FourierTransform {
+public interface FourierTransform extends Consumer{
 // public  Double reverse( Complex  spectrumSample);
     public  Complex direct(Double timeSamples);
 }
