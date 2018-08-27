@@ -38,34 +38,25 @@ public class TransientMonitor {
         this.windowWidth = windowWidth;
     }
     
-     /**
-     * Function sets value for faultDetected. 
-     * @param sample          - current phasor's estimate 
-     * @param n               - number of current time sample
-     * @param timeSample      - time sample from buffer     
-     */
-    public void analizeHarmonic(Complex sample, int n, double timeSample ){
-         /**
-         * error     - fromdeviation recalculated time sample, 
-         * obtained with help  phasor's estimate, off obtained time sample
-         * percent   - how much error value exceeds the maximum amplitude
-         */ 
-        double error = Math.abs(
-                timeSample - sample.amplitude() * Math.sqrt(2.0) * Math.cos(((n - 1) * 2.0 * Math.PI / windowWidth) + sample.arg())
-        );
-/**
- *      If error greater than  maximumAmplitude by a percentage, which greater than allowableDeviationPercent,
- *      current phasor estimate is considered as faulted.
- */
-        if (maximumAmplitude < error) {
-            double percent = (error / maximumAmplitude - 1) * 100;
-            faultDetected = percent > allowableDeviationPercent;
-            numberOfFaultSample = faultDetected ? n : null;
-        }
-  
-    }
+    
     
     /**
+     * Obtains a current phasor's estimate and returns one, if 
+     * error has not been detected, otherwise returns zero complex number.
+     * @param  sample          - current phasor's estimate 
+     * @param  n               - umber of current time sample
+     * @param  timeSamples      - time sample which has been deleted from buffer
+     * @return tempSample      - equals to current phasor's estimate ,
+     * if error has not been detected, else equals to zero complex number
+     */
+    public Complex validateSample(Complex sample, int n, List<Double> timeSamples) {
+        Complex tempSample = sample;         
+        if (isEstimateErroneous(tempSample, n, timeSamples))
+            tempSample = new Complex(0.0, 0.0);
+        return tempSample;
+        
+   }
+     /**
      * Function checks, that phasor's estimate is valid , comparing error with maximum amplitude. 
      * @param sample          - current phasor's estimate 
      * @param n               - number of current time sample
@@ -92,22 +83,32 @@ public class TransientMonitor {
         }
         return faultDetected;
     }
-    /**
-     * Obtains a current phasor's estimate and returns one, if 
-     * error has not been detected, otherwise returns zero complex number.
-     * @param  sample          - current phasor's estimate 
-     * @param  n               - umber of current time sample
-     * @param  timeSamples      - time sample which has been deleted from buffer
-     * @return tempSample      - equals to current phasor's estimate ,
-     * if error has not been detected, else equals to zero complex number
+      /**
+     * Function sets value for faultDetected. 
+     * @param sample          - current phasor's estimate 
+     * @param n               - number of current time sample
+     * @param timeSample      - time sample from buffer     
      */
-    public Complex validateSample(Complex sample, int n, List<Double> timeSamples) {
-        Complex tempSample = sample;         
-        if (isEstimateErroneous(tempSample, n, timeSamples))
-            tempSample = new Complex(0.0, 0.0);
-        return tempSample;
-        
-   }
+    public void    analizeHarmonic(Complex sample, int n, double timeSample ){
+         /**
+         * error     - fromdeviation recalculated time sample, 
+         * obtained with help  phasor's estimate, off obtained time sample
+         * percent   - how much error value exceeds the maximum amplitude
+         */ 
+        double error = Math.abs(
+                timeSample - sample.amplitude() * Math.sqrt(2.0) * Math.cos(((n - 1) * 2.0 * Math.PI / windowWidth) + sample.arg())
+        );
+/**
+ *      If error greater than  maximumAmplitude by a percentage, which greater than allowableDeviationPercent,
+ *      current phasor estimate is considered as faulted.
+ */
+        if (maximumAmplitude < error) {
+            double percent = (error / maximumAmplitude - 1) * 100;
+            faultDetected = percent > allowableDeviationPercent;
+            numberOfFaultSample = faultDetected ? n : null;
+        }
+  
+    }
     
     /**
      *  Function updates maximumAmplitude, if  'amplitude' is greater than maximumAmplitude, 
@@ -128,7 +129,6 @@ public class TransientMonitor {
     public boolean isFaultDetected() {
         return faultDetected;
     }
-
     public Integer getNumberOfFaultSample() {
         return numberOfFaultSample;
     }
