@@ -305,8 +305,6 @@ public class PhasorTest {
          }
          
          if (!timeSamples1.isEmpty()) {
-
-
              performDFTOverDataList(timeSamples1, transform1);
              performDFTOverDataList(timeSamples2, transform2);
              performDFTOverDataList(timeSamples3, transform3);
@@ -315,9 +313,9 @@ public class PhasorTest {
              numberOfFaultSample2 = transform2.getNumberOfFaultSample();
              numberOfFaultSample3 = transform3.getNumberOfFaultSample();
            }
-              assertTrue("fault sample of the first  sine  has number 81" , numberOfFaultSample1 == 81);
-              assertTrue("fault sample of the second  sine  has number 80", numberOfFaultSample2 == 80);
-              assertTrue("fault sample of the third  sine  has number 80",  numberOfFaultSample3 == 80);
+              assertTrue("fault sample of the first   sine  has number 81" , numberOfFaultSample1 == 81);
+              assertTrue("fault sample of the second  sine  has number 80", numberOfFaultSample2  == 80);
+              assertTrue("fault sample of the third   sine  has number 80",  numberOfFaultSample3 == 80);
      } 
      
      

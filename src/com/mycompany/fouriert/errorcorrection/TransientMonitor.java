@@ -38,59 +38,57 @@ public class TransientMonitor {
         this.windowWidth = windowWidth;
     }
     
-    
+     /**
+     * Function sets value for faultDetected. 
+     * @param sample          - current phasor's estimate 
+     * @param n               - number of current time sample
+     * @param timeSample      - time sample from buffer     
+     */
     public void analizeHarmonic(Complex sample, int n, double timeSample ){
-         
-         
-              double  error = Math.abs(
-                        timeSample  - sample.amplitude() * Math.sqrt(2.0) * Math.cos((n * 2.0 * Math.PI / windowWidth) + sample.arg())
-                );
+         /**
+         * error     - fromdeviation recalculated time sample, 
+         * obtained with help  phasor's estimate, off obtained time sample
+         * percent   - how much error value exceeds the maximum amplitude
+         */ 
+        double error = Math.abs(
+                timeSample - sample.amplitude() * Math.sqrt(2.0) * Math.cos(((n - 1) * 2.0 * Math.PI / windowWidth) + sample.arg())
+        );
 /**
- *      If error greater than maximum amplitude by a percentage, which greater than desirable,
+ *      If error greater than  maximumAmplitude by a percentage, which greater than allowableDeviationPercent,
  *      current phasor estimate is considered as faulted.
  */
-                if (maximumAmplitude < error) {
-                    double percent = (error / maximumAmplitude - 1) * 100;
-                    faultDetected = percent > allowableDeviationPercent;
-                    numberOfFaultSample = faultDetected?n+1:null;
-                }
-            
+        if (maximumAmplitude < error) {
+            double percent = (error / maximumAmplitude - 1) * 100;
+            faultDetected = percent > allowableDeviationPercent;
+            numberOfFaultSample = faultDetected ? n : null;
+        }
+  
     }
     
     /**
      * Function checks, that phasor's estimate is valid , comparing error with maximum amplitude. 
      * @param sample          - current phasor's estimate 
      * @param n               - number of current time sample
-     * @param timeSamples     - time sample which has been deleted from buffer
+     * @param timeSamples     - time samples from buffer, forming one harmonic
      * @return faultDetected  - value is set to true, when error of phasor representation 
      */
     public boolean isEstimateErroneous(Complex sample, int n, List<Double> timeSamples) {
-        /**
-         * error     - deviation recalculated time sample from phasor's estimate, 
-         * from obtained time sample
-         * percent   - how much error value exceeds the maximum amplitude
-         */        
-        
+         
         if (!faultDetected ) {
-//          Converts to number of time sample which has been deleted from buffer.
+//          number of the current harmonic
              int k = n - windowWidth;
               
             updateMaxAmplitude(sample.amplitude()*Math.sqrt(2.0));
-            
+            /*
+            * If obtained the first harmonic  , then whole buffer is analyzed,
+            * otherwise only last time sample is analyzed.
+            */
             if(k==0)
-            for (int i = 0; i < timeSamples.size(); i++, k++) 
-//                error = Math.abs(
-//                        timeSample.get(i) - sample.amplitude() * Math.sqrt(2.0) * Math.cos((k * 2.0 * Math.PI / windowWidth) + sample.arg())
-//                );
-//                if (maximumAmplitude < error) {
-//                    double percent = (error / maximumAmplitude - 1) * 100;
-//                    faultDetected = percent > allowableDeviationPercent;
-//                }
-                analizeHarmonic(sample, k, timeSamples.get(i));
-            else{
-                 
-                analizeHarmonic(sample, n-1, timeSamples.get(timeSamples.size()-1));
-            }
+                for (int i = 0; i < timeSamples.size(); i++, k++) 
+                   analizeHarmonic(sample, k, timeSamples.get(i));
+            else
+                analizeHarmonic(sample, n, timeSamples.get(timeSamples.size()-1));
+            
         }
         return faultDetected;
     }
@@ -104,12 +102,9 @@ public class TransientMonitor {
      * if error has not been detected, else equals to zero complex number
      */
     public Complex validateSample(Complex sample, int n, List<Double> timeSamples) {
-        Complex tempSample = sample; 
-        System.out.println("--------------------------- n= "+n);
-        if (isEstimateErroneous(tempSample, n, timeSamples)) {
+        Complex tempSample = sample;         
+        if (isEstimateErroneous(tempSample, n, timeSamples))
             tempSample = new Complex(0.0, 0.0);
-        }
-         
         return tempSample;
         
    }
@@ -120,11 +115,10 @@ public class TransientMonitor {
      *  @param amplitude - amplitude is obtained from current estimate of phasor
      */
     public void updateMaxAmplitude(double amplitude) {
-        double allowableDeviation = 10;
-     // percent - percentage by which 'amplitude' is greater than maximumAmplitude
+      // percent - percentage by which 'amplitude' is greater than maximumAmplitude
         double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude - 1) * 100 : 0.0;
          
-        if (maximumAmplitude == null || (percent < allowableDeviation && amplitude > maximumAmplitude)) {
+        if (maximumAmplitude == null || (percent < allowableDeviationPercent && amplitude > maximumAmplitude)) {
             maximumAmplitude = amplitude;
         }
     }

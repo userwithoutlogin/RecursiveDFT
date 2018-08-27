@@ -52,9 +52,8 @@ public class RecursiveDiscreteTransform implements FourierTransform{
      * and deleted sample is transformed by DFT and  added to spectrumSample. 
      */
     public void updatePhasorEstimate(double newTimeSample) {  
-          if(windowWidth > buffer.size()){
+          if(windowWidth > buffer.size())
                accumulateFirstSpectrumSample(newTimeSample);
-          }
           else{              
                double deletedSample = shiftWindow(newTimeSample);                 
                updateSpectrumSample(newTimeSample, deletedSample);                
@@ -108,10 +107,8 @@ public class RecursiveDiscreteTransform implements FourierTransform{
     */
     @Override
     public Complex direct(Double timeSample) {
-        //Complex spectrumSample = new Complex(0.0,0.0);
-        updatePhasorEstimate(timeSample);
-//        return spectrumSample.add( getSample());  
-        return  getSample();  
+       updatePhasorEstimate(timeSample);
+       return  getSample();  
     }
     
     public void setMonitor(TransientMonitor monitor) {
