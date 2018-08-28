@@ -78,14 +78,14 @@ public class PhasorTest {
            * then it estimates value and if fault is detected stream is stopped.
            */  
 
-           Files.lines(pathToFile, StandardCharsets.UTF_8) 
-                  .map(line->{
-                     return new Double( line.split(",")[functionNumber+1] );
-                   })
-                  .map(phasor)
-                  .map(monitor)
-                  .anyMatch(fault->fault);
-          
+//           Files.lines(pathToFile, StandardCharsets.UTF_8) 
+//                  .map(line->{
+//                     return new Double( line.split(",")[functionNumber+1] );
+//                   })
+//                  .map(phasor)
+//                  //.map(monitor)
+//                  .anyMatch(fault->fault);
+//          
           
 //          
      }

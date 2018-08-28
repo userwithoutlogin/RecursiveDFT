@@ -19,7 +19,7 @@ import java.util.function.Function;
  * transformed 	by the DFT, to accumulated spectrum sample, and deleting old time sample from window.
  * @author root
  */
-public class RecursivePhasor implements Function<Double,RecursivePhasor>{
+public class RecursivePhasor implements Function<Double,Complex>{
     /**
      * n                - number of current time sample
      * buffer           - phasor's window
@@ -29,7 +29,7 @@ public class RecursivePhasor implements Function<Double,RecursivePhasor>{
      * has been detected 
      */
  
-     public int n ;
+     public  int n;
      private LinkedList<Double> buffer;
      private Integer windowWidth; 
      private Complex spectrumSample = new Complex(0.0,0.0);
@@ -104,11 +104,14 @@ public class RecursivePhasor implements Function<Double,RecursivePhasor>{
     }
 
     @Override
-    public RecursivePhasor apply(Double timeSample) {
+    public Complex apply(Double timeSample) {
         updatePhasorEstimate( timeSample);
-         
-//        return windowWidth > buffer.size()?new Complex(0.0,0.0):spectrumSample;
-        return this;
+        return windowWidth > buffer.size()?new Complex(0.0,0.0):spectrumSample;
+
+    }
+
+    public Integer getWindowWidth() {
+        return windowWidth;
     }
     
     

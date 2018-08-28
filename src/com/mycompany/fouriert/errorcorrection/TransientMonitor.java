@@ -18,17 +18,16 @@ import java.util.function.Function;
  *
  * @author andrey_pushkarniy
  */
-public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
+public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
      * windowWidth               - phasor`s window size 
      * allowableDeviationPercent - percent till which sample does not erroneous
      * maximumAmplitude          - maximum amplitude of signal
      */
     private int     windowWidth;
-    private double  allowableDeviationPercent = 115;
-    private Double  maximumAmplitude;
- 
-
+    private int     n;
+    private double allowableDeviationPercent;
+    
     public TransientMonitor(int windowWidth) {
         this.windowWidth = windowWidth;
     }
@@ -44,45 +43,16 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
      */ 
     private Double calcuateError(Complex sample, int n, double timeSample){
         return Math.abs(
-                timeSample - sample.getAmplitude() * Math.sqrt(2.0) * Math.cos((n  * 2.0 * Math.PI / windowWidth) + sample.getArg())
+                timeSample - sample.getAmplitude() * Math.sqrt(2.0) * Math.cos((n++  * 2.0 * Math.PI / windowWidth) + sample.getArg())
                );
     }
     
-    /**
-     * Function compares error value with maximum amplitude value, if error greater than  maximumAmplitude by a percentage, 
-     * which greater than allowableDeviationPercent, current   estimate of phasor is considered as faulted.
-     * @param  error         - error , being difference between timeSample and recalculated time sample 
-     * @return faultDetected - variable points out that estimate of phasor is fault
-     */
-    private boolean isEstimateFault(double error){
-        boolean faultDetected = false;
-        if (maximumAmplitude < error) {
-            double percent = (error / maximumAmplitude ) * 100;
-            faultDetected = percent > allowableDeviationPercent;
-        }
-        return faultDetected;
-    }
-    
-    /**
-     *  Function updates maximumAmplitude, if  'amplitude' is greater than maximumAmplitude, 
-     *  but less or equals than maximumAmplitude with accounting 'allowableDeviationPercent'.
-     *  @param amplitude - amplitude is obtained from current estimate of phasor
-     */
-    private void updateMaxAmplitude(double amplitude) {
-      // percent - percentage by which 'amplitude' is greater than maximumAmplitude
-        double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude) * 100 : 0.0;
-         
-        if (maximumAmplitude == null || (percent < allowableDeviationPercent && amplitude > maximumAmplitude)) {
-            maximumAmplitude = amplitude;
-        }
-    }
-    
-    
+//    
     
     @Override
-    public Boolean apply(RecursivePhasor phasor) {
-         boolean faultDetected = false;
-         int n = phasor.getN();
+    public Double apply(TransientMonitorSource data) {
+         
+        
          Complex spectrumSample = phasor.getSpectrumSample();
          
          /**
@@ -111,6 +81,10 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
                
          }
          return faultDetected;
+         
+          
+        
+//        return calcuateError( data.getSpectrumSample(), n, data.getTimeSample());
     }
     
  
