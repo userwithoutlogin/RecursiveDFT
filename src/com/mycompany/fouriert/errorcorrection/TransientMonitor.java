@@ -70,7 +70,7 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
      */
     private void updateMaxAmplitude(double amplitude) {
       // percent - percentage by which 'amplitude' is greater than maximumAmplitude
-        double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude - 1) * 100 : 0.0;
+        double percent = maximumAmplitude != null ? (amplitude / maximumAmplitude) * 100 : 0.0;
          
         if (maximumAmplitude == null || (percent < allowableDeviationPercent && amplitude > maximumAmplitude)) {
             maximumAmplitude = amplitude;
