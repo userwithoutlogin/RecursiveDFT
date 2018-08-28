@@ -71,7 +71,22 @@ public class PhasorTest {
          assertTrue("fault sample of the third   sine  has number 80" , phasor3.getN()  == 80);
               
      } 
-     
+      public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor) throws IOException{
+          /**
+           * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
+           * then it estimates value and if fault is detected stream is stopped.
+           */  
+          Files.lines(pathToFile, StandardCharsets.UTF_8)
+                  .map(line->{
+                     return new Double( line.split(",")[functionNumber+1] );
+                   })
+                  .map(timeSample ->{ phasor.accept( timeSample);
+                                      return phasor.isFault(); 
+                   })
+                  .anyMatch(fault->fault);
+     }
+ 
+
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
          /* 
@@ -103,22 +118,6 @@ public class PhasorTest {
        return Math.abs(n1-n2)<precision;
      }
      
-     public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor) throws IOException{
-          /**
-           * Snippet chooses value belongs desirable function (function with number functionNumber), 
-           * then it estimates value and if fault is detected stream is stopped.
-           */  
-          Files.lines(pathToFile, StandardCharsets.UTF_8)
-                  .map(line->{
-                      String[] values = line.split(",");
-                      return new Double( values[functionNumber+1] );
-                    })
-                  .map(timeSample ->{ phasor.accept( timeSample);
-                                      return phasor.isFault(); }
-                   )
-                  .anyMatch(fault->fault);
-     }
- 
-
+     
     
 }
