@@ -20,11 +20,11 @@ public class PhaseShiftsBetweenPhasors {
          List<Double> phaseShifts = new ArrayList();
           List<Double> phasesCosine1 = spectrumSamples1 
                   .stream()
-                  .map(sample->sample.arg() )
+                  .map(sample->sample.getArg() )
                   .collect(Collectors.toList());
           List<Double> phasesCosine2 = spectrumSamples2 
                   .stream()
-                  .map(sample->sample.arg() )
+                  .map(sample->sample.getArg() )
                   .collect(Collectors.toList());
            
           for(int i=0;i<phasesCosine1.size();i++)

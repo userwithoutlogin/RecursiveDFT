@@ -23,10 +23,10 @@ public class Complex  {
 
     
     
-    public Double arg(){
+    public Double getArg(){
         return calculateArgOnQuarter();
      }
-    public Double amplitude(){
+    public Double getAmplitude(){
         return Math.sqrt(Math.pow(re,2)+Math.pow(im,2));
     }
     public Complex multiply(double constant){
@@ -34,8 +34,8 @@ public class Complex  {
     }
     public Complex multiply(Complex multiplier){
         
-        return new Complex(amplitude()*multiplier.amplitude()*Math.cos(Math.toRadians(arg()+multiplier.arg())),
-                            amplitude()*multiplier.amplitude()*Math.sin(Math.toRadians(arg()+multiplier.arg()))
+        return new Complex(getAmplitude()*multiplier.getAmplitude()*Math.cos(Math.toRadians(getArg()+multiplier.getArg())),
+                            getAmplitude()*multiplier.getAmplitude()*Math.sin(Math.toRadians(getArg()+multiplier.getArg()))
         );
     }
     public Complex add(Complex added){

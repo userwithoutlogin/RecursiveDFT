@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.management.monitor.Monitor;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
@@ -42,10 +43,10 @@ public class PhasorTest {
       final double NOMINAL_FREQUENCY = 50.0;   
       Path PATH_TO_FILE = Paths.get("./realsine.txt").toAbsolutePath().normalize();
       
- 
+     
        
      @Test
-     public void findingRealSignalFaultSample(){
+     public void findingFaultSampleInRealSignal(){
          /**
           * monitor1(..2,..3) - it detects, when sine begins breaking
           * phasor1(..2,..3)  - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
@@ -54,14 +55,14 @@ public class PhasorTest {
          TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
 
-         RecursivePhasor phasor1 = new RecursivePhasor(WINDOW_WIDTH,monitor1);
-         RecursivePhasor phasor2 = new RecursivePhasor(WINDOW_WIDTH,monitor2);
-         RecursivePhasor phasor3 = new RecursivePhasor(WINDOW_WIDTH,monitor3);
-
+         RecursivePhasor phasor1 = new RecursivePhasor(WINDOW_WIDTH );
+         RecursivePhasor phasor2 = new RecursivePhasor(WINDOW_WIDTH );
+         RecursivePhasor phasor3 = new RecursivePhasor(WINDOW_WIDTH );
+         
          try {
-            analyzeFileData( PATH_TO_FILE,1, phasor1);
-            analyzeFileData( PATH_TO_FILE,2, phasor2);
-            analyzeFileData( PATH_TO_FILE,3, phasor3);
+            analyzeFileData( PATH_TO_FILE,1, phasor1,monitor1);
+            analyzeFileData( PATH_TO_FILE,2, phasor2,monitor2);
+            analyzeFileData( PATH_TO_FILE,3, phasor3,monitor3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -71,30 +72,22 @@ public class PhasorTest {
          assertTrue("fault sample of the third   sine  has number 80" , phasor3.getN()  == 80);
               
      } 
-      public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor) throws IOException{
+      public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor,TransientMonitor monitor) throws IOException{
           /**
            * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
            * then it estimates value and if fault is detected stream is stopped.
            */  
+
            Files.lines(pathToFile, StandardCharsets.UTF_8) 
                   .map(line->{
                      return new Double( line.split(",")[functionNumber+1] );
                    })
-                  .peek(phasor)
-                  .map(timeSample ->{ 
-                           return phasor.isFault(); 
-                   })
-                  .anyMatch(fault->(boolean)fault);
+                  .map(phasor)
+                  .map(monitor)
+                  .anyMatch(fault->fault);
           
           
-//          Files.lines(pathToFile, StandardCharsets.UTF_8)
-//                  .map(line->{
-//                     return new Double( line.split(",")[functionNumber+1] );
-//                   })
-//                  .map(timeSample ->{ phasor.accept( timeSample);
-//                                      return phasor.isFault(); 
-//                   })
-//                  .anyMatch(fault->fault);
+//          
      }
  
 
@@ -105,7 +98,7 @@ public class PhasorTest {
            to value (phase) with setted precision on nominal frequency of signal
          */  
          return spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()).stream()
-                    .map(sample->sample.arg())
+                    .map(sample->sample.getArg())
                     .allMatch(arg->compareFPNumbers(arg,phase,precision) );
      }
      public boolean isAmplitudeConstant(double amplitude,List<Complex> spectrumSamples,double precision){
@@ -114,7 +107,7 @@ public class PhasorTest {
          to value (amplitude) with setted precision on nominal frequency of signal
        */  
          return spectrumSamples.subList(WINDOW_WIDTH, spectrumSamples.size()).stream()
-                    .map(sample->sample.amplitude())
+                    .map(sample->sample.getAmplitude())
                     .allMatch(arg->compareFPNumbers(arg,amplitude,precision) );
      }
      public boolean isPhaseShiftConstant(List<Double> phaseShifts,double shift,double precision){
