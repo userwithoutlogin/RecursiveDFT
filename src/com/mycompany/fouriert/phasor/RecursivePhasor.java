@@ -38,7 +38,7 @@ public class RecursivePhasor implements Phasor{
      private Integer windowWidth; 
      private Complex spectrumSample = new Complex(0.0,0.0);
      private double  normingConstant ;
-     private boolean fault = false;
+      
       
     public RecursivePhasor(Integer width ,TransientMonitor monitor) {                  
         this.windowWidth = width;

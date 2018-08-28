@@ -76,14 +76,25 @@ public class PhasorTest {
            * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
            * then it estimates value and if fault is detected stream is stopped.
            */  
-          Files.lines(pathToFile, StandardCharsets.UTF_8)
+           Files.lines(pathToFile, StandardCharsets.UTF_8) 
                   .map(line->{
                      return new Double( line.split(",")[functionNumber+1] );
                    })
-                  .map(timeSample ->{ phasor.accept( timeSample);
-                                      return phasor.isFault(); 
+                  .peek(phasor)
+                  .map(timeSample ->{ 
+                           return phasor.isFault(); 
                    })
-                  .anyMatch(fault->fault);
+                  .anyMatch(fault->(boolean)fault);
+          
+          
+//          Files.lines(pathToFile, StandardCharsets.UTF_8)
+//                  .map(line->{
+//                     return new Double( line.split(",")[functionNumber+1] );
+//                   })
+//                  .map(timeSample ->{ phasor.accept( timeSample);
+//                                      return phasor.isFault(); 
+//                   })
+//                  .anyMatch(fault->fault);
      }
  
 
