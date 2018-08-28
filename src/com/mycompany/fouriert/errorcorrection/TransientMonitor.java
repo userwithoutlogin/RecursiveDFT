@@ -104,14 +104,16 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
                      break;
                  }
              }
+             int y = 0;
          } 
          /**
           * When window has started to move, snippet  calculates error for only last time sample in a buffer.
           */
          else if (n > 24) {
              updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
-             double error = calcuateError(spectrumSample, n, phasor.getBuffer().getLast());
+             double error = calcuateError(spectrumSample, n-1, phasor.getBuffer().getLast());
              faultDetected = isEstimateFault(error);
+               
          }
          return faultDetected;
     }
