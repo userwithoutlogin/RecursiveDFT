@@ -5,6 +5,8 @@
  */
 package com.mycompany.fouriert.utils;
 
+import com.mycompany.fouriert.utils.*;
+
 /**
  *
  * @author root

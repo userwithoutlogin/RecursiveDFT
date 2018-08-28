@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.errorcorrection;
 
-import com.mycompany.fouriert.ft.SampleGenerator;
+ 
 import com.mycompany.fouriert.utils.Complex;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
  *
  * @author andrey_pushkarniy
  */
-public class TransientMonitor {
+public class TransientMonitor implements Consumer{
     /**
      * windowWidth               - phasor`s window size 
      * allowableDeviationPercent - percent till which sample does not erroneous
@@ -125,6 +126,16 @@ public class TransientMonitor {
     }
     public Integer getNumberOfFaultSample() {
         return numberOfFaultSample;
+    }
+
+    @Override
+    public void accept(Object t) {
+        if(t instanceof DataForMonitor){
+            DataForMonitor dataForMonitor = (DataForMonitor)t;
+            validateSample(dataForMonitor.getSpectrumSample(), dataForMonitor.getN(), dataForMonitor.getTimeSample());
+        }
+        else
+            throw new UnsupportedOperationException("Object passed to accept must be instance of DataForMonitor"); //To change body of generated methods, choose Tools | Templates.
     }
      
 }

@@ -3,17 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.fouriert.functions;
+package com.mycompany.fouriert.phasor;
 
-import com.mycompany.fouriert.utils.Complex;
-import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  *
  * @author andrey_pushkarniy
  */
-public interface Function {
-    public Double calc(  double df  );
-     
-//    public Iterator getIterator();
+public interface Phasor extends Consumer {
+    void updatePhasorEstimate(double newTimeSample);
+    
 }

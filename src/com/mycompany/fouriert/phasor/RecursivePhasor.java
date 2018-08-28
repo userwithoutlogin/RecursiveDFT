@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.fouriert.ft;
+package com.mycompany.fouriert.phasor;
 
+import com.mycompany.fouriert.errorcorrection.DataForMonitor;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import java.util.ArrayList;
@@ -79,7 +80,10 @@ public class RecursivePhasor implements Phasor{
     
     
     
-   
+    /**
+     * Function performs estimation of time sample 
+     * and validates spectrum sample, if buffer has already been filled
+     */
     @Override
     public void accept(Object timeSample) {
         if(timeSample instanceof Double){
@@ -113,7 +117,11 @@ public class RecursivePhasor implements Phasor{
      */
     public void validateSample() throws UnsupportedOperationException{
            if(n == 24) 
-               monitor.validateSample( spectrumSample , n , buffer );
+                IntStream.range(0, buffer.size())
+                         .mapToObj(i->{
+                           DataForMonitor data =  new DataForMonitor(buffer.get(i), i, spectrumSample);
+                           return data;
+                       }).forEach(monitor);
            else if(n > 24) 
                monitor.validateSample( spectrumSample , n , buffer.getLast() );
            
