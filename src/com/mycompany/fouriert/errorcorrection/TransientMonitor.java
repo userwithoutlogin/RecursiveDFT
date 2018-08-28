@@ -8,16 +8,11 @@ package com.mycompany.fouriert.errorcorrection;
  
 import com.mycompany.fouriert.phasor.RecursivePhasor;
 import com.mycompany.fouriert.utils.Complex;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+
 import java.util.List;
-import java.util.function.Consumer;
+
 import java.util.function.Function;
-import java.util.stream.Stream;
+
 
 /**
  *
@@ -91,7 +86,7 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
          Complex spectrumSample = phasor.getSpectrumSample();
          
          /**
-          * After buffer initialization ,snippet  calculates error for each time sample, located in a buffer.
+          * After buffer initialization, snippet  calculates error for each time sample, located in a buffer.
           */
          if (n == 24) {
              List<Double> buffer = phasor.getBuffer();
@@ -104,7 +99,7 @@ public class TransientMonitor  implements Function<RecursivePhasor,Boolean>{
                      break;
                  }
              }
-             int y = 0;
+            
          } 
          /**
           * When window has started to move, snippet  calculates error for only last time sample in a buffer.
