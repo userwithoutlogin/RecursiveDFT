@@ -10,6 +10,8 @@ import com.mycompany.fouriert.errorcorrection.FaultDetection;
 import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
+import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
+ 
 import com.mycompany.fouriert.phasor.RecursivePhasor;
  
  
@@ -20,13 +22,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+ 
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.management.monitor.Monitor;
+ 
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
@@ -39,20 +41,56 @@ public class PhasorTest {
       /* 
          WINDOW_WIDTH     - phasor`s window size 
          NOMINAL_FREQUECY - nominal frequency
-         PATH_TO_FILE     - path to fille which contains  samples of real sine
+         
       */
       final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUENCY = 50.0;   
-      Path PATH_TO_FILE = Paths.get("./realsine.txt").toAbsolutePath().normalize();
-      
-     
        
+      
+     @Test
+     public  void phasorTest(){
+         
+          Function<Double,Complex> phasor = new RecursivePhasor(WINDOW_WIDTH );
+          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+          
+          
+          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
+          Complex sample = samples.get(samples.size()-1);
+          
+          assertTrue("The first spectrum sample, obtained from phasor,when buffer has just been filled,"
+                  + " must be equals 3272.18 -j 1630.63 ", 
+                  sample.equals(new Complex(3272.17832498552,-1630.6305607908655)));           
+     }
+     @Test
+     public void monitorTest(){
+          
+         
+          double precision = 1e-10;
+          Function<Double,Complex> phasor = new RecursivePhasor(WINDOW_WIDTH );
+          Function<TransientMonitorSource,Double> monitor = new TransientMonitor(WINDOW_WIDTH);
+          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+          TransientMonitorSource source = new TransientMonitorSource();
+          
+          
+          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
+          
+          source.setTimeSample(2188.0);
+          source.setSpectrumSample(samples.get(samples.size()-1));
+          double error = monitor.apply(source);
+           
+          assertTrue("The first errro of phasor estimation, "
+                  + "when buffer has just been filled, must be equals 2439.56",
+                  compareFPNumbers(error, 2439.558965697799,precision));
+     }
+     
      @Test
      public void findingFaultSampleInRealSignal(){
          /**
-          * monitor1(..2,..3) - it detects, when sine begins breaking
-          * phasor1(..2,..3)  - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
+          * monitor1(..2,..3)        - it detects, when sine begins breaking
+          * phasor1(..2,..3)         - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
+          * faultDetection1(..2,..3) - it evaluates if the error exceeds allowable limitation
           */
+         Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
          TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
@@ -73,9 +111,9 @@ public class PhasorTest {
          faultDetection3.setMonitor(monitor3);
          faultDetection3.setPhasor(phasor3);
          try {
-            analyzeFileData( PATH_TO_FILE,1, faultDetection1);
-            analyzeFileData( PATH_TO_FILE,2, faultDetection2);
-            analyzeFileData( PATH_TO_FILE,3, faultDetection3);
+            analyzeFileData(pathToFile,1, faultDetection1);
+            analyzeFileData(pathToFile,2, faultDetection2);
+            analyzeFileData(pathToFile,3, faultDetection3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -85,6 +123,9 @@ public class PhasorTest {
          assertTrue("fault sample of the third   sine  has number 80" , phasor3.getN()  == 80);
               
      } 
+      
+      
+      
       public void analyzeFileData( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
            * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
@@ -101,7 +142,26 @@ public class PhasorTest {
           
 //          
      }
- 
+      public List<Complex> obtainSpectrumSampes(Path path,int signalIndex,Function<Double,Complex> phasor){
+          List<Complex> samples = new ArrayList();
+          
+          /**
+           * It loads  first 24 samples, and applying phasor to them
+           */
+          try {
+              samples =  Files.lines(path , StandardCharsets.UTF_8)
+                      .map(line->{
+                          return new Double( line.split(",")[1+signalIndex] );
+                      })
+                      .map(phasor)
+                      .limit(24)
+                      .collect(Collectors.toList());
+                      
+          } catch (IOException ex) {
+              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
+          }
+          return samples;
+      }
 
      
      public boolean isPhaseConstant(double phase,List<Complex> spectrumSamples,double precision){
@@ -130,7 +190,7 @@ public class PhasorTest {
          return phaseShifts.stream().allMatch(arg->compareFPNumbers(arg, shift, precision));
      }
      public boolean compareFPNumbers(double n1,double n2,double precision){
-      // function of comparison of two floating point numbers   
+      // function of comparison of two floating point numbers       
        return Math.abs(n1-n2)<precision;
      }
      

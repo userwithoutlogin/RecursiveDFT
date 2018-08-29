@@ -11,7 +11,7 @@ import com.mycompany.fouriert.utils.Complex;
  *
  * @author andrey_pushkarniy
  */
-class TransientMonitorSource {
+public class TransientMonitorSource {
     
     private double timeSample;
     private Complex spectrumSample;

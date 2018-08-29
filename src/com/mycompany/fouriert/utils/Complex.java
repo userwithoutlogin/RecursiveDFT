@@ -87,11 +87,17 @@ public class Complex  {
                 sign +"j"+  String.format("%."+precision+"f",Math.abs(im))  ;
     } 
 
-    public boolean isEqual(Complex c){
-      boolean reEq = Math.abs(re-c.re)<precision;
-      boolean imEq = Math.abs(im-c.im)<precision;
-      return reEq&&imEq;
-    }   
+//    public boolean isEqual(Complex c){
+//      boolean reEq = Math.abs(re-c.re)<precision;
+//      boolean imEq = Math.abs(im-c.im)<precision;
+//      return reEq&&imEq;
+//    }   
+
+    @Override
+    public boolean equals(Object obj) {
+       Complex complex = (Complex)obj;
+       return (Math.abs(re-complex.re)<precision)&&(Math.abs(im-complex.im)<precision);
+    }
     
     
 }

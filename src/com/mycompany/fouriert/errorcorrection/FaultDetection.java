@@ -21,19 +21,25 @@ public class FaultDetection implements Function<Double,Boolean>{
     private double  allowableDeviationPercent = 115;
     private Double  maximumAmplitude;
     
-    
+    /**
+     * @param  timeSample - time sample of analyzed signal
+     * @return fault      - it is set to true , if error of estimation exeeded allowable limitation 
+     */
     @Override
-    public Boolean apply(Double t) {
+    public Boolean apply(Double timeSample) {
        
-        Complex spectrumSample = phasor.apply(t);
+        Complex spectrumSample = phasor.apply(timeSample);
         monitorSourse.setSpectrumSample(spectrumSample);
-        monitorSourse.setTimeSample(t);
+        monitorSourse.setTimeSample(timeSample);
         
         Boolean fault = false;
         monitorSourse.setSpectrumSample(spectrumSample);
-        
+        /**
+         * If the buffer has just been filled , snippet calculates error of estimation for all time samples,
+         * located in the buffer.
+         */
         if (phasor.getN() == phasor.getWindowWidth()) {
-        updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
+             updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
              List<Double> buffer = phasor.getBuffer();             
              for (int i = 0; i < buffer.size(); i++) {
                  monitorSourse.setTimeSample(buffer.get(i));
@@ -41,14 +47,16 @@ public class FaultDetection implements Function<Double,Boolean>{
                  double error = monitor.apply(monitorSourse);
                  fault = isEstimateFault(error);
                  if (fault) 
-                     break;
-                 
+                     break;                 
              }            
         }
+        /**
+         * When window has started to move, snippet calculates error of estimation for only last time sample,
+         * located in the buffer. 
+         */
         else if(phasor.getN() > phasor.getWindowWidth()){
-        updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
-             monitorSourse.setTimeSample(t);
-            
+             updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
+             monitorSourse.setTimeSample(timeSample);
              double error = monitor.apply(monitorSourse);
              fault = isEstimateFault(error);
              

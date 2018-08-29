@@ -21,13 +21,10 @@ import java.util.function.Function;
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
      * windowWidth               - phasor`s window size 
-     * allowableDeviationPercent - percent till which sample does not erroneous
-     * maximumAmplitude          - maximum amplitude of signal
      */
-    private List<Double> buffer;
     private int     windowWidth;
-    //private int     n;
-    private double allowableDeviationPercent;
+    private int     n;
+ 
     
     public TransientMonitor(int windowWidth) {
         this.windowWidth = windowWidth;
@@ -38,29 +35,21 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * Function calculate error, being difference between timeSample and recalculated time sample, 
      * obtained from phasor representation.
      * @param sample     - spectrum sample obtained from phasor
-     * @param n          - time sample number
      * @param timeSample - time sample from buffer of phasor
      * @return error , being difference between timeSample and recalculated time sample 
      */ 
-    private int n;
-    private Double calcuateError(Complex sample, /*int n, */double timeSample){
+    
+    private Double calcuateError(Complex sample,double timeSample){
         return Math.abs(
                 timeSample - sample.getAmplitude() * Math.sqrt(2.0) * Math.cos((n++  * 2.0 * Math.PI / windowWidth) + sample.getArg())
                );
     }
     
-//    
-    
     @Override
     public Double apply(TransientMonitorSource data) {
-          return calcuateError(data.getSpectrumSample(), /*data.getN(),*/ data.getTimeSample());
+          return calcuateError(data.getSpectrumSample(), data.getTimeSample());
     }
-    
- 
-    
-    public void setAllowableDeviationPercent(double allowableDeviationPercent) {
-        this.allowableDeviationPercent = allowableDeviationPercent;
-    }
+     
      
     
 }
