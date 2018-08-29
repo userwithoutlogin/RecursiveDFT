@@ -45,22 +45,23 @@ public class PhasorTest {
       */
       final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUENCY = 50.0;   
-       
+      final String PATH_TO_FILE = "./realsine.txt"; 
       
      @Test
      public  void phasorTest(){
          
           Function<Double,Complex> phasor = new RecursivePhasor(WINDOW_WIDTH );
-          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           
-          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
-          Complex sample = samples.get(samples.size()-1);
+          List<Complex> samples = launchPhasor(pathToFile,1,phasor);
+          
           
           assertTrue("The first spectrum sample, obtained from phasor,when buffer has just been filled,"
                   + " must be equals 3272.18 -j 1630.63 ", 
-                  sample.equals(new Complex(3272.17832498552,-1630.6305607908655)));           
+                  samples.get(0).equals(new Complex(3272.17832498552,-1630.6305607908655)));           
      }
+      
      @Test
      public void monitorTest(){
           
@@ -68,32 +69,33 @@ public class PhasorTest {
           double precision = 1e-10;
           Function<Double,Complex> phasor = new RecursivePhasor(WINDOW_WIDTH );
           Function<TransientMonitorSource,Double> monitor = new TransientMonitor(WINDOW_WIDTH);
-          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           TransientMonitorSource source = new TransientMonitorSource();
           
           
-          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
+          List<Complex> samples = launchPhasor(pathToFile,1,phasor);
           
           source.setTimeSample(2188.0);
-          source.setSpectrumSample(samples.get(samples.size()-1));
+          source.setSpectrumSample(samples.get(0));
           double error = monitor.apply(source);
            
           assertTrue("The first errro of phasor estimation, "
                   + "when buffer has just been filled, must be equals 2439.56",
                   compareFPNumbers(error, 2439.558965697799,precision));
      }
+      
      @Test
      public void faultDetectionTest(){
           
          RecursivePhasor phasor = new RecursivePhasor(WINDOW_WIDTH);
          Function<TransientMonitorSource, Double> monitor = new TransientMonitor(WINDOW_WIDTH);
-         Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+         Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
 
          double correctTimeSample   = 2118.0;
          double incorrectTimeSample = 21118.0;
       
-         List<Complex> samples = obtainSpectrumSampes(pathToFile, 1, phasor);
+        launchPhasor(pathToFile, 1, phasor);
 
          FaultDetection faultDetection = new FaultDetection();
          faultDetection.setMonitor(monitor);
@@ -107,7 +109,7 @@ public class PhasorTest {
                    
                   
      }
-     
+      
      @Test
      public void findingFaultSampleInRealSignal(){
          /**
@@ -115,7 +117,7 @@ public class PhasorTest {
           * phasor1(..2,..3)         - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
           * faultDetection1(..2,..3) - it evaluates if the error exceeds allowable limitation
           */
-         Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+         Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
          TransientMonitor monitor1 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor2 = new TransientMonitor(WINDOW_WIDTH);
          TransientMonitor monitor3 = new TransientMonitor(WINDOW_WIDTH);
@@ -168,7 +170,7 @@ public class PhasorTest {
           
 //          
      }
-      public List<Complex> obtainSpectrumSampes(Path path,int signalIndex,Function<Double,Complex> phasor){
+      public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> phasor){
           List<Complex> samples = new ArrayList();
           
           /**
@@ -181,6 +183,7 @@ public class PhasorTest {
                       })
                       .map(phasor)
                       .limit(WINDOW_WIDTH)
+                      .filter(spectrumSample->!spectrumSample.equals(new Complex(0.0,0.0)))
                       .collect(Collectors.toList());
                       
           } catch (IOException ex) {

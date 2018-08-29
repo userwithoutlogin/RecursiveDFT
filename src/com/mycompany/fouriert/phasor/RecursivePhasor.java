@@ -15,8 +15,6 @@ import java.util.function.Function;
 
 /**
  * Phasor with recursive update estimation, extending discrete Fourier transform(DFT).
- * Phasor's estimate is obtained by motioning window with adding new time sample ,
- * transformed 	by the DFT, to accumulated spectrum sample, and deleting old time sample from window.
  * @author root
  */
 public class RecursivePhasor implements Function<Double,Complex>{
@@ -83,8 +81,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * Function accumulate the first spectrum sample while buffer fills 
      * and then, with every window shift, a difference between a new coming time sample 
      * and deleted sample is transformed by DFT and  added to spectrumSample. 
-     */
-    
+     */    
     public void updatePhasorEstimate(double newTimeSample) {  
           if(windowWidth > buffer.size())
                accumulateFirstSpectrumSample(newTimeSample);
@@ -105,8 +102,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
 
     @Override
     public Complex apply(Double timeSample) {
-        updatePhasorEstimate( timeSample);
-        return windowWidth > buffer.size()?new Complex(0.0,0.0):spectrumSample;
+        updatePhasorEstimate(timeSample);
+        return windowWidth > buffer.size() ? new Complex(0.0, 0.0) : spectrumSample;
 
     }
 

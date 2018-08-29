@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 
 /**
- *
+ * Calculates absolute value of error between actual time sample and recalculated time sample.
  * @author andrey_pushkarniy
  */
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
