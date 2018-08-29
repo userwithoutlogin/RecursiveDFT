@@ -28,11 +28,13 @@ public class RecursivePhasor implements Function<Double,Complex>{
      */
  
      public  int n;
+     public  int k;
      private LinkedList<Double> buffer;
      private Integer windowWidth; 
      private Complex phasor = new Complex(0.0,0.0);
      private double  normingConstant ;
- 
+     private double [] cosArray;
+     private double [] sinArray;
 
     public LinkedList<Double> getBuffer() {
         return buffer;
@@ -42,7 +44,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
         this.windowWidth = cosArray.length;
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
- 
+        this.cosArray = cosArray;
+        this.sinArray = sinArray;
     }
         
     
@@ -67,7 +70,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * @return - Fourier's complex multiplyer 
      */
     private Complex getExp( ){
-        return Complex.initByEuler(1,-n*2.0*Math.PI/windowWidth );
+//        return Complex.initByEuler(1,-k*2.0*Math.PI/windowWidth );
+        return new Complex(cosArray[k],-sinArray[k]);
     }
     
     private void accumulateFirstPhasor(double newSample){
@@ -88,8 +92,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
                double deletedSample = shiftWindow(newSample);                 
                updatePhasor(newSample, deletedSample);  
           }             
-          n++;
-            
+          updateN();
+            n++;
     }   
      
     public Complex getPhasor() {
@@ -109,6 +113,10 @@ public class RecursivePhasor implements Function<Double,Complex>{
     public Integer getWindowWidth() {
         return windowWidth;
     }
-    
+    private void updateN(){
+        k++;
+        if(k == cosArray.length )
+            k=0;
+    }
     
 }

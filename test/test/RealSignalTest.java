@@ -88,7 +88,7 @@ public class RealSignalTest {
            * Snippet chooses value belongs desirable  signal  (signal with number functionNumber), 
            * then  estimates of value, filters null values  and if fault is detected, stops the stream.
            */  
-
+          int y =0;
            Files.lines(pathToFile, StandardCharsets.UTF_8) 
                   .map(line->{
                      return new Double( line.split(",")[functionNumber+1] );
