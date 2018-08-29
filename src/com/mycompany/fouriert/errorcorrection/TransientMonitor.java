@@ -20,7 +20,7 @@ import java.util.function.Function;
  */
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
-     * n - number of current time sample
+     * n                  - number of current time sample
      * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
      * Because sine(cosine) function is periodic.
      */
@@ -49,7 +49,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     
     private Double calcuateError(Complex phasor,double sample){
         double error = Math.abs(
-                sample - phasor.getAmplitude() * Math.sqrt(2.0) * (cosArray[n] * Math.cos(phasor.getArg()) - sinArray[n] * Math.sin(phasor.getArg()))
+                sample - phasor.getAmplitude() * Math.sqrt(2.0) * ( cosArray[n] * Math.cos(phasor.getArg()) - sinArray[n] * Math.sin(phasor.getArg()))
         );
         updateN();
         return error;
