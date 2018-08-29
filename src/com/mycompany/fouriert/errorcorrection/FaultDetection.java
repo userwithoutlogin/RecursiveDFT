@@ -24,17 +24,20 @@ public class FaultDetection implements Function<Double,Boolean>{
     
     @Override
     public Boolean apply(Double t) {
-        boolean fault = false;
+       
         Complex spectrumSample = phasor.apply(t);
-        int n = phasor.getN();
-        int windowWidth = phasor.getWindowWidth();
         monitorSourse.setSpectrumSample(spectrumSample);
-        updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
+        monitorSourse.setTimeSample(t);
         
-        if (n == 24) {
+        Boolean fault = false;
+        monitorSourse.setSpectrumSample(spectrumSample);
+        
+        if (phasor.getN() == phasor.getWindowWidth()) {
+        updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
              List<Double> buffer = phasor.getBuffer();             
-             for (int i = 0; i < windowWidth; i++) {
+             for (int i = 0; i < buffer.size(); i++) {
                  monitorSourse.setTimeSample(buffer.get(i));
+                 
                  double error = monitor.apply(monitorSourse);
                  fault = isEstimateFault(error);
                  if (fault) 
@@ -42,12 +45,16 @@ public class FaultDetection implements Function<Double,Boolean>{
                  
              }            
         }
-        else if(n>windowWidth){
+        else if(phasor.getN() > phasor.getWindowWidth()){
+        updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
              monitorSourse.setTimeSample(t);
+            
              double error = monitor.apply(monitorSourse);
              fault = isEstimateFault(error);
+             if(phasor.getN() ==81)
+                 System.out.println("");
         } 
-               
+              
         return fault;
     }
 

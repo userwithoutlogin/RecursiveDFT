@@ -6,6 +6,7 @@
 package test;
 
  
+import com.mycompany.fouriert.errorcorrection.FaultDetection;
 import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
 import com.mycompany.fouriert.utils.Complex;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
@@ -21,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -59,10 +61,21 @@ public class PhasorTest {
          RecursivePhasor phasor2 = new RecursivePhasor(WINDOW_WIDTH );
          RecursivePhasor phasor3 = new RecursivePhasor(WINDOW_WIDTH );
          
+         FaultDetection faultDetection1 = new FaultDetection();
+         faultDetection1.setMonitor(monitor1);
+         faultDetection1.setPhasor(phasor1);
+         
+         FaultDetection faultDetection2 = new FaultDetection();
+         faultDetection2.setMonitor(monitor2);
+         faultDetection2.setPhasor(phasor2);
+         
+         FaultDetection faultDetection3 = new FaultDetection();
+         faultDetection3.setMonitor(monitor3);
+         faultDetection3.setPhasor(phasor3);
          try {
-            analyzeFileData( PATH_TO_FILE,1, phasor1,monitor1);
-            analyzeFileData( PATH_TO_FILE,2, phasor2,monitor2);
-            analyzeFileData( PATH_TO_FILE,3, phasor3,monitor3);
+            analyzeFileData( PATH_TO_FILE,1, faultDetection1);
+            analyzeFileData( PATH_TO_FILE,2, faultDetection2);
+            analyzeFileData( PATH_TO_FILE,3, faultDetection3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -72,19 +85,18 @@ public class PhasorTest {
          assertTrue("fault sample of the third   sine  has number 80" , phasor3.getN()  == 80);
               
      } 
-      public void analyzeFileData( Path pathToFile,int functionNumber,RecursivePhasor phasor,TransientMonitor monitor) throws IOException{
+      public void analyzeFileData( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
            * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
            * then it estimates value and if fault is detected stream is stopped.
            */  
 
-//           Files.lines(pathToFile, StandardCharsets.UTF_8) 
-//                  .map(line->{
-//                     return new Double( line.split(",")[functionNumber+1] );
-//                   })
-//                  .map(phasor)
-//                  //.map(monitor)
-//                  .anyMatch(fault->fault);
+           Files.lines(pathToFile, StandardCharsets.UTF_8) 
+                  .map(line->{
+                     return new Double( line.split(",")[functionNumber+1] );
+                   })
+                  .map(faultDetection)
+                  .anyMatch(fault->fault);
 //          
           
 //          

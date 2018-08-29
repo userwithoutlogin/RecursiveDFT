@@ -24,8 +24,9 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * allowableDeviationPercent - percent till which sample does not erroneous
      * maximumAmplitude          - maximum amplitude of signal
      */
+    private List<Double> buffer;
     private int     windowWidth;
-    private int     n;
+    //private int     n;
     private double allowableDeviationPercent;
     
     public TransientMonitor(int windowWidth) {
@@ -41,7 +42,8 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * @param timeSample - time sample from buffer of phasor
      * @return error , being difference between timeSample and recalculated time sample 
      */ 
-    private Double calcuateError(Complex sample, int n, double timeSample){
+    private int n;
+    private Double calcuateError(Complex sample, /*int n, */double timeSample){
         return Math.abs(
                 timeSample - sample.getAmplitude() * Math.sqrt(2.0) * Math.cos((n++  * 2.0 * Math.PI / windowWidth) + sample.getArg())
                );
@@ -51,40 +53,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     
     @Override
     public Double apply(TransientMonitorSource data) {
-         
-        
-         Complex spectrumSample = phasor.getSpectrumSample();
-         
-         /**
-          * After buffer initialization, snippet  calculates error for each time sample, located in a buffer.
-          */
-         if (n == 24) {
-             List<Double> buffer = phasor.getBuffer();
-             
-             for (int i = 0; i < 24; i++) {
-                 updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
-                 double error = calcuateError(spectrumSample, i, buffer.get(i));
-                 if (isEstimateFault(error)) {
-                     faultDetected = true;
-                     break;
-                 }
-             }
-            
-         } 
-         /**
-          * When window has started to move, snippet  calculates error for only last time sample in a buffer.
-          */
-         else if (n > 24) {
-             updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
-             double error = calcuateError(spectrumSample, n-1, phasor.getBuffer().getLast());
-             faultDetected = isEstimateFault(error);
-               
-         }
-         return faultDetected;
-         
-          
-        
-//        return calcuateError( data.getSpectrumSample(), n, data.getTimeSample());
+          return calcuateError(data.getSpectrumSample(), /*data.getN(),*/ data.getTimeSample());
     }
     
  
