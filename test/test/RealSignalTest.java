@@ -78,7 +78,7 @@ public class RealSignalTest {
    public void findErroneousSampe( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
            * Snippet chooses value belongs desirable  signal  (signal with number functionNumber), 
-           * then occures estimation of value, filtering null values  and if fault is detected, stream is stopped.
+           * then  estimates of value, filters null values  and if fault is detected, stops the stream.
            */  
 
            Files.lines(pathToFile, StandardCharsets.UTF_8) 
