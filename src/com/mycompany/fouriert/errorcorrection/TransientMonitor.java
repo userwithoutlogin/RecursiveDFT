@@ -21,6 +21,7 @@ import java.util.function.Function;
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
      * windowWidth               - phasor`s window size 
+     * n                         - number of current time sample
      */
     private int     windowWidth;
     private int     n;
