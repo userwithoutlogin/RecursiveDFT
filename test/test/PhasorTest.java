@@ -85,29 +85,25 @@ public class PhasorTest {
      @Test
      public void faultDetectionTest(){
           
-         
-          double precision = 1e-10;
-          RecursivePhasor phasor = new RecursivePhasor(WINDOW_WIDTH );
-          Function<TransientMonitorSource,Double> monitor = new TransientMonitor(WINDOW_WIDTH);
-          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
-          TransientMonitorSource source = new TransientMonitorSource();
+         RecursivePhasor phasor = new RecursivePhasor(WINDOW_WIDTH);
+         Function<TransientMonitorSource, Double> monitor = new TransientMonitor(WINDOW_WIDTH);
+         Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
           
-          double correctTimeSample = 2118.0;
-          double incorrectTimeSample = 21118.0;
-          
-          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
-         
-            FaultDetection faultDetection = new FaultDetection();
-            faultDetection.setMonitor(monitor);
-            faultDetection.setPhasor(phasor);
-            
-            
-            boolean noError = faultDetection.apply(correctTimeSample);
-            boolean hasError = faultDetection.apply(incorrectTimeSample);
-             
 
-          assertFalse("fault has not been detected ",noError);
-          assertTrue("fault has  been detected ",hasError);
+         double correctTimeSample   = 2118.0;
+         double incorrectTimeSample = 21118.0;
+      
+         List<Complex> samples = obtainSpectrumSampes(pathToFile, 1, phasor);
+
+         FaultDetection faultDetection = new FaultDetection();
+         faultDetection.setMonitor(monitor);
+         faultDetection.setPhasor(phasor);
+
+         boolean noError = faultDetection.apply(correctTimeSample);
+         boolean hasError = faultDetection.apply(incorrectTimeSample);
+
+         assertFalse("fault has not been detected ", noError);
+         assertTrue("fault has  been detected    ",  hasError);
                    
                   
      }
@@ -139,10 +135,11 @@ public class PhasorTest {
          FaultDetection faultDetection3 = new FaultDetection();
          faultDetection3.setMonitor(monitor3);
          faultDetection3.setPhasor(phasor3);
+         
          try {
-            analyzeFileData(pathToFile,1, faultDetection1);
-            analyzeFileData(pathToFile,2, faultDetection2);
-            analyzeFileData(pathToFile,3, faultDetection3);
+            findErroneousSampe(pathToFile,1, faultDetection1);
+            findErroneousSampe(pathToFile,2, faultDetection2);
+            findErroneousSampe(pathToFile,3, faultDetection3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -155,7 +152,7 @@ public class PhasorTest {
       
       
       
-      public void analyzeFileData( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
+      public void findErroneousSampe( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
            * Snippet chooses value belongs desirable function(signal) (function with number functionNumber), 
            * then it estimates value and if fault is detected stream is stopped.
@@ -183,7 +180,7 @@ public class PhasorTest {
                           return new Double( line.split(",")[1+signalIndex] );
                       })
                       .map(phasor)
-                      .limit(24)
+                      .limit(WINDOW_WIDTH)
                       .collect(Collectors.toList());
                       
           } catch (IOException ex) {
