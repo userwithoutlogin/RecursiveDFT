@@ -104,7 +104,7 @@ public class PhasorTest {
             
             boolean noError = faultDetection.apply(correctTimeSample);
             boolean hasError = faultDetection.apply(incorrectTimeSample);
-            faultDetection.apply(incorrectTimeSample);
+             
 
           assertFalse("fault has not been detected ",noError);
           assertTrue("fault has  been detected ",hasError);
