@@ -37,9 +37,9 @@ public class RealSignalTest {
    @Test
    public void findingFaultSampleInRealSignal(){
          /**
-          * monitor1(..2,..3)        - it detects, when sine begins breaking
-          * phasor1(..2,..3)         - phasor performing discrete Fourier transform(DFT) with recursive update of estimation
-          * faultDetection1(..2,..3) - it evaluates if the error exceeds allowable limitation
+          * monitor1(..2,..3)         - it detects, when sine begins breaking
+          * recursivePhasor1(..2,..3) - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * faultDetection1(..2,..3)  - it evaluates if the error exceeds allowable limitation
           */
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
          TransientMonitor monitor1 = new TransientMonitor( );

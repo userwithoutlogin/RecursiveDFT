@@ -28,7 +28,7 @@ public class FaultDetection implements Function<Double,Boolean>{
     @Override
     public Boolean apply(Double sample) {
         Complex phasor = recursivePhasor.apply(sample);
-        
+        System.out.println(sample);
         if (phasor == null) {
             return null;
         } else {
