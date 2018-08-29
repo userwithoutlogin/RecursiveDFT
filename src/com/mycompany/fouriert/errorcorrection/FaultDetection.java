@@ -31,14 +31,15 @@ public class FaultDetection implements Function<Double,Boolean>{
         Complex spectrumSample = phasor.apply(timeSample);
         monitorSourse.setSpectrumSample(spectrumSample);
         monitorSourse.setTimeSample(timeSample);
-        
+        int n = phasor.getN() ;
+        int windowWidth =phasor.getWindowWidth(); 
         Boolean fault = false;
-        monitorSourse.setSpectrumSample(spectrumSample);
+       
         /**
          * If the buffer has just been filled , snippet calculates error of estimation for all time samples,
          * located in the buffer.
          */
-        if (phasor.getN() == phasor.getWindowWidth()) {
+        if (n == windowWidth) {
              updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
              List<Double> buffer = phasor.getBuffer();             
              for (int i = 0; i < buffer.size(); i++) {
@@ -54,7 +55,7 @@ public class FaultDetection implements Function<Double,Boolean>{
          * When window has started to move, snippet calculates error of estimation for only last time sample,
          * located in the buffer. 
          */
-        else if(phasor.getN() > phasor.getWindowWidth()){
+        else if(n > windowWidth){
              updateMaxAmplitude(spectrumSample.getAmplitude() * Math.sqrt(2.0));
              monitorSourse.setTimeSample(timeSample);
              double error = monitor.apply(monitorSourse);
