@@ -93,7 +93,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
             
     }   
      
-    public Complex getSpectrumSample() {
+    public Complex getPhasor() {
         return spectrumSample;
     }
     public int  getN() {
@@ -103,7 +103,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
     @Override
     public Complex apply(Double timeSample) {
         updatePhasorEstimate(timeSample);
-        return windowWidth > buffer.size() ? new Complex(0.0, 0.0) : spectrumSample;
+        return windowWidth > buffer.size() ? null : spectrumSample;
 
     }
 

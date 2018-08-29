@@ -13,25 +13,25 @@ import com.mycompany.fouriert.utils.Complex;
  */
 public class TransientMonitorSource {
     
-    private double timeSample;
-    private Complex spectrumSample;
+    private double sample;
+    private Complex phasor;
     
 
    
-    public double getTimeSample() {
-        return timeSample;
+    public double getSample() {
+        return sample;
     }
 
-    public void setTimeSample(double timeSample) {
-        this.timeSample = timeSample;
+    public void setSample(double sample) {
+        this.sample = sample;
     }
 
-    public Complex getSpectrumSample() {
-        return spectrumSample;
+    public Complex gePhasor() {
+        return phasor;
     }
 
-    public void setSpectrumSample(Complex spectrumSample) {
-        this.spectrumSample = spectrumSample;
+    public void setPhasor(Complex phasor) {
+        this.phasor = phasor;
     }
 
     
