@@ -23,7 +23,7 @@ public class FaultDetection implements Function<Double,Boolean>{
     
     /**
      * @param  timeSample - time sample of analyzed signal
-     * @return fault      - it is set to true , if error of estimation exeeded allowable limitation 
+     * @return fault      - it is set to true , if error of estimation exceeds allowable limitation 
      */
     @Override
     public Boolean apply(Double timeSample) {
