@@ -11,9 +11,11 @@ import com.mycompany.fouriert.utils.*;
  *
  * @author root
  */
-public class Complex  {
-    private final Double re;
-    private final Double im;
+public final class Complex  {
+    private final double re;
+    private final double im;
+    private   Double arg;
+    private   Double amplitude;
    private Double precision = 1e-13;
    
     public Complex(double re, double im) {
@@ -21,28 +23,23 @@ public class Complex  {
         this.im = im;
     }
 
-    
-    
     public Double getArg(){
-        return calculateArgOnQuarter();
+        return arg == null ? calculateArgOnQuarter() : arg;
      }
     public Double getAmplitude(){
-        return Math.sqrt(Math.pow(re,2)+Math.pow(im,2));
+      return amplitude == null ? Math.sqrt(Math.pow(re,2)+Math.pow(im,2)) : amplitude;
     }
     public Complex multiply(double constant){
        return new Complex(re*constant,im*constant);
     }
     public Complex multiply(Complex multiplier){
-        
-        return new Complex(getAmplitude()*multiplier.getAmplitude()*Math.cos(Math.toRadians(getArg()+multiplier.getArg())),
-                            getAmplitude()*multiplier.getAmplitude()*Math.sin(Math.toRadians(getArg()+multiplier.getArg()))
-        );
+        return new Complex(re*multiplier.re - im*multiplier.im, re*multiplier.im + im*multiplier.re);
     }
     public Complex add(Complex added){
-        return new Complex(re+added.getRe(),im+added.getIm());
+        return new Complex(re+added.re,im+added.im);
     }
     public Complex sub(Complex deleted){
-        return new Complex(re-deleted.getRe(),im-deleted.getIm());
+        return new Complex(re-deleted.re,im-deleted.im);
     }
     //инициализция и возврат комлексного числа по формуле Эйлера
     public static Complex initByEuler(double module,double arg){
@@ -61,23 +58,23 @@ public class Complex  {
     //подсчет аргумента компексного числа в зависимости от того,
 //    в какой четверти координатной плоскости находится комплексное число
     private Double calculateArgOnQuarter(){
-        if(re>0 && im==0)
-            return 0.0; 
-        else if(re>0&&im>0)
-            return   Math.atan(im/re); 
-        else if(re==0&&im>0)
-            return Math.PI/2.0; 
-        else if(re<0&&im>0)
-            return Math.atan(im/re)+Math.PI; 
-        else if(re<0&&im==0)
-            return Math.PI; 
-        else if(re<0&&im<0)
-            return Math.atan(im/re)-Math.PI; 
-        else if(re==0&&im<0)
-            return Math.PI+Math.PI/2; 
-        else if(re>0&&im<0)
-            return Math.atan(im/re); 
-         return 0.0;
+        if (re > 0 && im == 0) 
+            return 0.0;
+        else if (re > 0 && im > 0) 
+            return Math.atan(im / re);
+        else if (re == 0 && im > 0) 
+            return Math.PI / 2.0;
+        else if (re < 0 && im > 0) 
+            return Math.atan(im / re) + Math.PI;
+        else if (re < 0 && im == 0) 
+            return Math.PI;
+        else if (re < 0 && im < 0) 
+            return Math.atan(im / re) - Math.PI;
+        else if (re == 0 && im < 0) 
+            return Math.PI + Math.PI / 2;
+        else 
+            return Math.atan(im / re);
+        
     }
     
     @Override
@@ -87,12 +84,7 @@ public class Complex  {
                 sign +"j"+  String.format("%."+precision+"f",Math.abs(im))  ;
     } 
 
-//    public boolean isEqual(Complex c){
-//      boolean reEq = Math.abs(re-c.re)<precision;
-//      boolean imEq = Math.abs(im-c.im)<precision;
-//      return reEq&&imEq;
-//    }   
-
+ 
     @Override
     public boolean equals(Object obj) {
        Complex complex = (Complex)obj;

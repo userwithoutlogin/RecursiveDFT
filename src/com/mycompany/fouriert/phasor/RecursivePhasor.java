@@ -38,8 +38,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
         return buffer;
     }
       
-    public RecursivePhasor(int width ) {                  
-        this.windowWidth = width;
+    public RecursivePhasor(double[] cosArray,double[] sinArray ) {                  
+        this.windowWidth = cosArray.length;
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
  

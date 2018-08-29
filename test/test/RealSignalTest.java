@@ -41,14 +41,22 @@ public class RealSignalTest {
           * recursivePhasor1(..2,..3) - it performa discrete Fourier transform(DFT) with recursive update of estimation
           * faultDetection1(..2,..3)  - it evaluates if the error exceeds allowable limitation
           */
+        double[]  sinArray  = new double[WINDOW_WIDTH];
+        double[]  cosArray  = new double[WINDOW_WIDTH];
+        
+        for(int i=0;i<cosArray.length;i++){
+            cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
+            sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
+        }
+         
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
-         TransientMonitor monitor1 = new TransientMonitor( );
-         TransientMonitor monitor2 = new TransientMonitor( );
-         TransientMonitor monitor3 = new TransientMonitor( );
+         TransientMonitor monitor1 = new TransientMonitor(cosArray,sinArray);
+         TransientMonitor monitor2 = new TransientMonitor(cosArray,sinArray);
+         TransientMonitor monitor3 = new TransientMonitor(cosArray,sinArray);
 
-         RecursivePhasor recursivePhasor1 = new RecursivePhasor(WINDOW_WIDTH );
-         RecursivePhasor recursivePhasor2 = new RecursivePhasor(WINDOW_WIDTH );
-         RecursivePhasor recursivePhasor3 = new RecursivePhasor(WINDOW_WIDTH );
+         RecursivePhasor recursivePhasor1 = new RecursivePhasor(cosArray,sinArray);
+         RecursivePhasor recursivePhasor2 = new RecursivePhasor(cosArray,sinArray );
+         RecursivePhasor recursivePhasor3 = new RecursivePhasor(cosArray,sinArray );
          
          FaultDetection faultDetection1 = new FaultDetection();
          faultDetection1.setMonitor(monitor1);
@@ -90,4 +98,13 @@ public class RealSignalTest {
                   .anyMatch(fault->fault);
         
      }
+    public void initSinCosArrays(double[] sinArray,double[] cosArray ){
+        sinArray  = new double[WINDOW_WIDTH];
+        cosArray  = new double[WINDOW_WIDTH];
+        for(int i=0;i<cosArray.length;i++){
+            cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
+            sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
+        }
+        
+    } 
 }

@@ -29,13 +29,15 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     private double[] cosArray ;
     private double[] sinArray ;
     
-    public TransientMonitor( ) {
-        initSinCosArrays();
+    public TransientMonitor(double[] cosArray,double[] sinArray ) {
+        //initSinCosArrays();
         /**
          * In the first time, calculation of error occurs  
          * using last sample in the first window(n=23 starting from 0) and the first obtained phasor
          */
         n = cosArray.length-1;
+        this.cosArray = cosArray;
+        this.sinArray = sinArray;
     }
    
         
@@ -60,15 +62,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
            return calcuateError(data.gePhasor(), data.getSample());
     }
      
-    public void initSinCosArrays(){
-        sinArray  = new double[24];
-        cosArray = new double[24];
-        for(int i=0;i<cosArray.length;i++){
-            cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
-            sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
-        }
-        
-    } 
+    
     private void updateN(){
         ++n;
         if(n == cosArray.length )
