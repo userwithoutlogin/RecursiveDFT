@@ -51,8 +51,7 @@ public class FaultDetection implements Function<Double,Boolean>{
             
              double error = monitor.apply(monitorSourse);
              fault = isEstimateFault(error);
-             if(phasor.getN() ==81)
-                 System.out.println("");
+             
         } 
               
         return fault;
