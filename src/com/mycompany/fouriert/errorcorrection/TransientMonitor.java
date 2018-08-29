@@ -20,9 +20,11 @@ import java.util.function.Function;
  */
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
-     * n                         - number of current time sample
+     * n - number of current time sample
+     * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+     * Because sine(cosine) function is periodic.
      */
-   
+    
     private int      n;
     private double[] cosArray ;
     private double[] sinArray ;
@@ -30,7 +32,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     public TransientMonitor( ) {
         initSinCosArrays();
         /**
-         * In the first time calculation of error occurs  
+         * In the first time, calculation of error occurs  
          * using last sample in the first window(n=23 starting from 0) and the first obtained phasor
          */
         n = cosArray.length-1;

@@ -27,11 +27,11 @@ import static org.junit.Assert.*;
  *
  * @author andrey_pushkarniy
  */
-public class RealSignalTests {
+public class RealSignalTest {
      final int    WINDOW_WIDTH = 24;      
      final String PATH_TO_FILE = "./realsine.txt"; 
       
-    public RealSignalTests() {
+    public RealSignalTest() {
     }
     
    @Test
