@@ -40,11 +40,8 @@ import org.junit.Ignore;
 public class PhasorTest {
       /* 
          WINDOW_WIDTH     - phasor`s window size 
-         NOMINAL_FREQUECY - nominal frequency
-         
-      */
+       */
       final int    WINDOW_WIDTH = 24;      
-      final double NOMINAL_FREQUENCY = 50.0;   
       final String PATH_TO_FILE = "./realsine.txt"; 
       
      @Test
@@ -54,12 +51,12 @@ public class PhasorTest {
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           
-          List<Complex> samples = launchPhasor(pathToFile,1,recursivePhasor);
+          List<Complex> phasors = launchPhasor(pathToFile,1,recursivePhasor);
           
           
-          assertTrue("The first spectrum sample, obtained from phasor,when buffer has just been filled,"
+          assertTrue("The first phasor, obtained from  recursivePhasor,when buffer has just been filled,"
                   + " must be equals 3272.18 -j 1630.63 ", 
-                  samples.get(0).equals(new Complex(3272.17832498552,-1630.6305607908655)));           
+                  phasors.get(0).equals(new Complex(3272.17832498552,-1630.6305607908655)));           
      }
      
      public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> recursivePhasor){

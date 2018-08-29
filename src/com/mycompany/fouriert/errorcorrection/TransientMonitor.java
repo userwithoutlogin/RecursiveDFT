@@ -23,20 +23,24 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * n                         - number of current time sample
      */
    
-    private int     n;
+    private int      n;
     private double[] cosArray ;
     private double[] sinArray ;
     
     public TransientMonitor( ) {
-        initSinCosArray();
+        initSinCosArrays();
+        /**
+         * In the first time calculation of error occurs  
+         * using last sample in the first window(n=23 starting from 0) and the first obtained phasor
+         */
         n = cosArray.length-1;
     }
    
         
     /**
-     * Function calculate error, being difference between timeSample and recalculated time sample, 
+     * Function calculate error, being difference between sample and recalculated sample, 
      * obtained from phasor representation.
-     * @param phasor     - estimate of phasor
+     * @param phasor     - estimation of phasor
      * @param sample     - sample from buffer of phasor
      * @return error , being difference between sample and recalculated sample 
      */ 
@@ -54,7 +58,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
            return calcuateError(data.gePhasor(), data.getSample());
     }
      
-    public void initSinCosArray(){
+    public void initSinCosArrays(){
         sinArray  = new double[24];
         cosArray = new double[24];
         for(int i=0;i<cosArray.length;i++){
@@ -65,7 +69,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     } 
     private void updateN(){
         ++n;
-        if(n == cosArray.length - 1 )
+        if(n == cosArray.length )
             n=0;
     }
 }

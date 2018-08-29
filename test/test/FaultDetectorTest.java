@@ -33,22 +33,23 @@ import static org.junit.Assert.*;
  * @author andrey_pushkarniy
  */
 public class FaultDetectorTest {
+    final String PATH_TO_FILE = "./realsine.txt"; 
+    final int    WINDOW_WIDTH = 24;
     
     public FaultDetectorTest() {
     }
     
      @Test
      public void applyTest(){
-           final String PATH_TO_FILE = "./realsine.txt"; 
-           final int    WINDOW_WIDTH = 24;
+            
            
          RecursivePhasor recursivePhasor = new RecursivePhasor(WINDOW_WIDTH);
          Function<TransientMonitorSource, Double> monitor = new TransientMonitor( );
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
 
-         double correctTimeSample   = 2118.0;
-         double incorrectTimeSample = 21118.0;
+         double correctSample   = 5273.0;
+         double incorrectSample = 21118.0;
       
         launchPhasor(pathToFile, 1, recursivePhasor);
 
@@ -56,8 +57,8 @@ public class FaultDetectorTest {
          faultDetection.setMonitor(monitor);
          faultDetection.setRecursivePhasor(recursivePhasor);
 
-         boolean noError  = faultDetection.apply(correctTimeSample);
-         boolean hasError = faultDetection.apply(incorrectTimeSample);
+         boolean noError  = faultDetection.apply(correctSample);
+         boolean hasError = faultDetection.apply(incorrectSample);
 
          assertFalse("fault has not been detected ", noError);
          assertTrue("fault has  been detected    ",  hasError);
