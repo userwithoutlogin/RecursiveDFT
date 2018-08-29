@@ -19,10 +19,10 @@ import java.util.function.Function;
  */
 public class RecursivePhasor implements Function<Double,Complex>{
     /**
-     * n                - number of current time sample
+     * n                - number of current sample
      * buffer           - phasor's window
      * windowWidth      - phasor's window width
-     * spectrumSample   - accumulated phasor's estimation
+     * phasor           - accumulated phasor's estimation
      * normingConstant  - normalizing multiplier of DFT
      * has been detected 
      */
@@ -30,7 +30,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      public  int n;
      private LinkedList<Double> buffer;
      private Integer windowWidth; 
-     private Complex spectrumSample = new Complex(0.0,0.0);
+     private Complex phasor = new Complex(0.0,0.0);
      private double  normingConstant ;
  
 
@@ -47,20 +47,20 @@ public class RecursivePhasor implements Function<Double,Complex>{
         
     
     // window is shifted by adding new value and deleting old one
-    private double shiftWindow(double newTimeSample){
-       double removedTimeSample = buffer.remove(0);
-       buffer.add(newTimeSample);
-       return removedTimeSample;          
+    private double shiftWindow(double newSample){
+       double removedSample = buffer.remove(0);
+       buffer.add(newSample);
+       return removedSample;          
     }  
     
     /**
-     * Function find DFT over difference between newTimeSample and oldTimeSample
-     * and adds it to spectrumSample 
-     * @param  oldTimeSample - first time sample of buffer before shift
+     * Function find DFT over difference between newSample and oldSample
+     * and adds it to phasor 
+     * @param  oldSample - first sample of buffer before shift
      */
-    private void updateSpectrumSample(double newTimeSample,double oldTimeSample){
-           Complex newSpectrumSample = getExp().multiply(newTimeSample-oldTimeSample).multiply(normingConstant); 
-           spectrumSample =  spectrumSample.add(newSpectrumSample) ;
+    private void updatePhasor(double newSample,double oldSample){
+           Complex newSpectrumSample = getExp().multiply(newSample-oldSample).multiply(normingConstant); 
+           phasor =  phasor.add(newSpectrumSample) ;
     }
     
     /**
@@ -70,31 +70,30 @@ public class RecursivePhasor implements Function<Double,Complex>{
         return Complex.initByEuler(1,-n*2.0*Math.PI/windowWidth );
     }
     
-    private void accumulateFirstSpectrumSample(double newTimeSample){
-           buffer.add(newTimeSample);
-//     forms the first spectrum sample while buffer fills
-             spectrumSample = spectrumSample.add(getExp().multiply(newTimeSample).multiply(normingConstant));     
+    private void accumulateFirstPhasor(double newSample){
+           buffer.add(newSample);
+//     forms the first phasor estimate while buffer fills
+             phasor = phasor.add(getExp().multiply(newSample).multiply(normingConstant));     
      }
  
-    
      /**
-     * Function accumulate the first spectrum sample while buffer fills 
-     * and then, with every window shift, a difference between a new coming time sample 
-     * and deleted sample is transformed by DFT and  added to spectrumSample. 
+     * Function accumulate the first phasor estimate while buffer fills 
+     * and then, with every window shift, a difference between a new coming sample 
+     * and deleted sample is transformed by DFT and  added to phasor. 
      */    
-    public void updatePhasorEstimate(double newTimeSample) {  
+    public void updatePhasorEstimate(double newSample) {  
           if(windowWidth > buffer.size())
-               accumulateFirstSpectrumSample(newTimeSample);
+               accumulateFirstPhasor(newSample);
           else{              
-               double deletedSample = shiftWindow(newTimeSample);                 
-               updateSpectrumSample(newTimeSample, deletedSample);  
+               double deletedSample = shiftWindow(newSample);                 
+               updatePhasor(newSample, deletedSample);  
           }             
           n++;
             
     }   
      
     public Complex getPhasor() {
-        return spectrumSample;
+        return phasor;
     }
     public int  getN() {
         return n;
@@ -103,7 +102,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
     @Override
     public Complex apply(Double timeSample) {
         updatePhasorEstimate(timeSample);
-        return windowWidth > buffer.size() ? null : spectrumSample;
+        return windowWidth > buffer.size() ? null : phasor;
 
     }
 
