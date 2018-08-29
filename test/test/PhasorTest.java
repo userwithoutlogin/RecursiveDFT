@@ -82,6 +82,35 @@ public class PhasorTest {
                   + "when buffer has just been filled, must be equals 2439.56",
                   compareFPNumbers(error, 2439.558965697799,precision));
      }
+     @Test
+     public void faultDetectionTest(){
+          
+         
+          double precision = 1e-10;
+          RecursivePhasor phasor = new RecursivePhasor(WINDOW_WIDTH );
+          Function<TransientMonitorSource,Double> monitor = new TransientMonitor(WINDOW_WIDTH);
+          Path pathToFile = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+          TransientMonitorSource source = new TransientMonitorSource();
+          
+          double correctTimeSample = 2118.0;
+          double incorrectTimeSample = 21118.0;
+          
+          List<Complex> samples = obtainSpectrumSampes(pathToFile,1,phasor);
+         
+            FaultDetection faultDetection = new FaultDetection();
+            faultDetection.setMonitor(monitor);
+            faultDetection.setPhasor(phasor);
+            
+            
+            boolean noError = faultDetection.apply(correctTimeSample);
+            boolean hasError = faultDetection.apply(incorrectTimeSample);
+            faultDetection.apply(incorrectTimeSample);
+
+          assertFalse("fault has not been detected ",noError);
+          assertTrue("fault has  been detected ",hasError);
+                   
+                  
+     }
      
      @Test
      public void findingFaultSampleInRealSignal(){
