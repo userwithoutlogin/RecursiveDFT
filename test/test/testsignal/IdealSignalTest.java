@@ -44,14 +44,11 @@ public class IdealSignalTest {
      @Test
      public void findNumberOfErroneousSample(){        
         /**
-          * precision          - if difference between two double values less than precision , this numbers are equals
           * frequencyDeviation - frequency deviation from nominal frequency
           * amplitude          - amplitude of tested signal
           * phase              - phase shift of tested signal
           * cosine             - creates samples of tsted signal 
-          * generator          - generates samples , performs to them recursiveDTF and calculates error of estimation
           * limitPointNumbers  - count points of sine  
-          * phasorsErrors      - list of errors being difference between actual  and recalculated samples
           * monitor            - it detects, when sine begins breaking
           * recursivePhasor    - it performa discrete Fourier transform(DFT) with recursive update of estimation
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
@@ -94,7 +91,7 @@ public class IdealSignalTest {
      }
      
      @Test
-     public void phasorRepresentationsOnNominalFrequency(){
+     public void phasorsOnNominalFrequency(){
         /**
           precision          - if difference between two double values less than precision , this numbers are equals
           frequencyDeviation - frequency deviation from nominal frequency
