@@ -40,7 +40,7 @@ public class IdealSignalTest {
       final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUECY = 50.0;   
       
-     @Ignore(value = "true")
+   
      @Test
      public void findNumberOfErroneousSample(){        
         /**

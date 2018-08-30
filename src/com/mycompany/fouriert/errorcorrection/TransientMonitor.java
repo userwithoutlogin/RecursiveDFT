@@ -25,23 +25,16 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * Because sine(cosine) function is periodic.
      */
     
-    private int      arrayIndex;
-    private double[] cosArray ;
-    private double[] sinArray ;
-  
-    
-    public TransientMonitor(double[] cosArray,double[] sinArray ) {
-        //initSinCosArrays();
-        /**
-         * In the first time, calculation of error occurs  
-         * using last sample in the first window(n=23 starting from 0) and the first obtained phasor
-         */
-        arrayIndex = cosArray.length-1;
+    private int arrayIndex;
+    private double[] cosArray;
+    private double[] sinArray;
+
+    public TransientMonitor(double[] cosArray, double[] sinArray) {
         this.cosArray = cosArray;
         this.sinArray = sinArray;
     }
-   
-        
+
+
     /**
      * Function calculate error, being difference between sample and recalculated sample, 
      * obtained from phasor representation.
@@ -49,24 +42,19 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      * @param sample     - sample from buffer of phasor
      * @return error , being difference between sample and recalculated sample 
      */ 
-    
-    private Double calcuateError(Complex phasor,double sample){
-        
-        double error = Math.abs(sample - Math.sqrt(2.0)* ( cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm())
-        );
-        updateArrayIndex();
-        return error;
+    private Double calcuateError(Complex phasor, double sample) {
+        if (phasor != null) {
+            return Math.abs(sample - Math.sqrt(2.0) * (cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm()));
+        }
+        return null;
     }
-    
+
     @Override
     public Double apply(TransientMonitorSource data) {
-           return calcuateError(data.gePhasor(), data.getSample());
-    }
-     
-    
-    private void updateArrayIndex(){
         ++arrayIndex;
-        if(arrayIndex == cosArray.length )
-            arrayIndex=0;
+        if (arrayIndex >= cosArray.length) {
+            arrayIndex = 0;
+        }
+        return calcuateError(data.getPhasor(), data.getSample());
     }
 }

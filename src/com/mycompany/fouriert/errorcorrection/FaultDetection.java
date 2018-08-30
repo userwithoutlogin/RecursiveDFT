@@ -14,13 +14,14 @@ import java.util.function.Function;
  *
  * @author andrey_pushkarniy
  */
-public class FaultDetection implements Function<Double,Boolean>{
-    private Function<Double,Complex>   recursiveDFT;
+public class FaultDetection implements Function<Double, Boolean> {
+
+    private Function<Double, Complex> recursiveDFT;
     private Function<TransientMonitorSource, Double> monitor;
     private final TransientMonitorSource monitorSourse = new TransientMonitorSource();
-    private double  allowableDeviationPercent = 115;
-   
-    
+    private double allowableDeviationPercent = 115;
+
+
     /**
      * @param  sample  - sample of analyzed signal
      * @return fault   - it is set to true , if error of estimation exceeds allowable limitation 
@@ -28,18 +29,14 @@ public class FaultDetection implements Function<Double,Boolean>{
     @Override
     public Boolean apply(Double sample) {
         Complex phasor = recursiveDFT.apply(sample);
-        
-        if (phasor == null) {
-            return null;
-        } else {
-            
-            monitorSourse.setPhasor(phasor);
-            monitorSourse.setSample(sample);
-            monitorSourse.setSample(sample);
-            double error = monitor.apply(monitorSourse);
-             
+        monitorSourse.setPhasor(phasor);
+        monitorSourse.setSample(sample);
+        monitorSourse.setSample(sample);
+        Double error = monitor.apply(monitorSourse);
+        if (error != null) {
             return isEstimateFault(error, phasor.getAmplitude() * Math.sqrt(2.0));
         }
+        return null;
     }
 
      /**
@@ -48,8 +45,8 @@ public class FaultDetection implements Function<Double,Boolean>{
      * @param  error         - error , being difference between sample and recalculated sample 
      * @return faultDetected - variable points out that estimate of phasor is fault
      */
-    private boolean isEstimateFault(double error,double actualAmplitude){
-        double percent = (error / actualAmplitude ) * 100;
+    private boolean isEstimateFault(double error, double actualAmplitude) {
+        double percent = (error / actualAmplitude) * 100;
         return percent > allowableDeviationPercent;
     }
 
@@ -60,8 +57,7 @@ public class FaultDetection implements Function<Double,Boolean>{
     public void setRecursiveDFT(Function<Double, Complex> recursiveDFT) {
         this.recursiveDFT = recursiveDFT;
     }
-     
-    
+
     /**
      * @return the monitor
      */
@@ -76,7 +72,4 @@ public class FaultDetection implements Function<Double,Boolean>{
         this.monitor = monitor;
     }
 
-    
-    
-    
 }

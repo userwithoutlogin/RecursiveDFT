@@ -29,77 +29,78 @@ public class RecursiveDFT implements Function<Double,Complex>{
      * Because sine(cosine) function is periodic.
      */
  
-     private  int arrayIndex;      
-     private LinkedList<Double> buffer;
-     private int windowWidth; 
-     private Complex phasor = new Complex(0.0,0.0);
-     private double  normingConstant ;
-     private double [] cosArray;
-     private double [] sinArray;
+    private int arrayIndex;
+    private LinkedList<Double> buffer;
+    private int windowWidth;
+    private Complex phasor = new Complex(0.0, 0.0);
+    private double normingConstant;
+    private double[] cosArray;
+    private double[] sinArray;
 
     public LinkedList<Double> getBuffer() {
         return buffer;
     }
-      
-    public RecursiveDFT(double[] cosArray,double[] sinArray ) {                  
+
+    public RecursiveDFT(double[] cosArray, double[] sinArray) {
         this.windowWidth = cosArray.length;
-        buffer = new LinkedList(); 
-        normingConstant = Math.sqrt(2)/windowWidth;
+        buffer = new LinkedList();
+        normingConstant = Math.sqrt(2) / windowWidth;
         this.cosArray = cosArray;
         this.sinArray = sinArray;
-        
+
     }
-        
-    
+
     // window is shifted by adding new value and deleting old one
-    private double shiftWindow(double newSample){
-       double removedSample = buffer.remove(0);
-       buffer.add(newSample);
-       return removedSample;          
-    }  
-    
+    private double shiftWindow(double newSample) {
+        double removedSample = buffer.remove(0);
+        buffer.add(newSample);
+        return removedSample;
+    }
+
     /**
      * Function find DFT over difference between newSample and oldSample
      * and adds it to phasor 
      * @param  oldSample - first sample of buffer before shift
      */
-    private void updatePhasor(double newSample,double oldSample){
-           Complex newPhasor = getExp().multiply(newSample-oldSample).multiply(normingConstant); 
-           phasor =  phasor.add(newPhasor) ;
+    private void updatePhasor(double newSample, double oldSample) {
+        Complex newPhasor = getExp().multiply(newSample - oldSample).multiply(normingConstant);
+        phasor = phasor.add(newPhasor);
     }
-    
+
     /**
-     * @return - Fourier's complex multiplyer 
+     * @return - Fourier's complex multiplyer
      */
-    private Complex getExp( ){
-         return new Complex(cosArray[arrayIndex],-sinArray[arrayIndex]);
+    private Complex getExp() {
+        return new Complex(cosArray[arrayIndex], -sinArray[arrayIndex]);
     }
-    
-    private void accumulateFirstPhasor(double newSample){
-           buffer.add(newSample);
+
+    private void accumulateFirstPhasor(double newSample) {
+        buffer.add(newSample);
 //     forms the first phasor estimate while buffer fills
-             phasor = phasor.add(getExp().multiply(newSample).multiply(normingConstant));     
-     }
+        phasor = phasor.add(getExp().multiply(newSample).multiply(normingConstant));
+    }
  
      /**
      * Function accumulate the first phasor estimate while buffer fills 
      * and then, with every window shift, a difference between a new coming sample 
      * and deleted sample is transformed by DFT and  added to phasor. 
      */    
-    public void performDirectTransform(double newSample) {  
-          if(windowWidth > buffer.size())
-               accumulateFirstPhasor(newSample);
-          else{              
-               double deletedSample = shiftWindow(newSample);                 
-               updatePhasor(newSample, deletedSample);  
-          }             
-          updateArrayIndex();
-      }   
-     
+    public void performDirectTransform(double newSample) {
+        if (windowWidth > buffer.size()) {
+            accumulateFirstPhasor(newSample);
+        } else {
+            double deletedSample = shiftWindow(newSample);
+            updatePhasor(newSample, deletedSample);
+        }
+        arrayIndex++;
+        if (arrayIndex >= cosArray.length) {
+            arrayIndex = 0;
+        }
+    }
+
     public Complex getPhasor() {
         return phasor;
     }
-    
 
     @Override
     public Complex apply(Double timeSample) {
@@ -108,11 +109,4 @@ public class RecursiveDFT implements Function<Double,Complex>{
 
     }
 
-    
-    private void updateArrayIndex(){
-        arrayIndex++;
-        if(arrayIndex == cosArray.length )
-            arrayIndex=0;
-    }
-    
 }

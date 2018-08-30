@@ -62,6 +62,15 @@ public class TransientMonitorTest {
           
           source.setSample(5273.0);
           source.setPhasor(samples.get(0));
+         
+          /**
+           * Calls the monitor with an empty phasor , 
+           * in order to set state of the  monitor to a last sample number,
+           * and then passes phasor, obtained from last sample of the first window,
+           * to the monitor
+           */
+          for(int i=0;i<22;i++)
+              monitor.apply(new TransientMonitorSource());
           double error = monitor.apply(source);
            
           assertTrue("The  error of phasor estimation, "

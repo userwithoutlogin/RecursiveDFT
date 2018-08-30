@@ -26,7 +26,7 @@ public class TransientMonitorSource {
         this.sample = sample;
     }
 
-    public Complex gePhasor() {
+    public Complex getPhasor() {
         return phasor;
     }
 
