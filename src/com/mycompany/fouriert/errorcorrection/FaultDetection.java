@@ -19,7 +19,7 @@ public class FaultDetection implements Function<Double,Boolean>{
     private Function<TransientMonitorSource, Double> monitor;
     private final TransientMonitorSource monitorSourse = new TransientMonitorSource();
     private double  allowableDeviationPercent = 115;
-    int n;
+   
     
     /**
      * @param  sample  - sample of analyzed signal
@@ -28,7 +28,7 @@ public class FaultDetection implements Function<Double,Boolean>{
     @Override
     public Boolean apply(Double sample) {
         Complex phasor = recursiveDFT.apply(sample);
-         n++;
+        
         if (phasor == null) {
             return null;
         } else {

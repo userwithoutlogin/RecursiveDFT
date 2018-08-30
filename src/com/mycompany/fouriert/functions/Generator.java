@@ -51,16 +51,18 @@ public class Generator {
          }).limit(limitPointNubers)
            .forEach(sample->{ 
               Complex phasor =  recursiveDFT.apply(sample);
-             spectrumSamples.add(phasor);
-//             System.out.println(sample);
-             timeSamples.add(sample);
+             
+              
              if(monitor!=null&&phasor!=null){
+             spectrumSamples.add(phasor);
                  TransientMonitorSource source = new TransientMonitorSource();
                  source.setPhasor(phasor);
                  source.setSample(sample);
                  double error = monitor.apply(source);
-             System.out.println(phasor.toString()+"   "+sample+"  "+error);
-                 errorEstimates.add(monitor.apply(source)); 
+             System.out.println((sample+"").replace(".", ","));
+             
+              timeSamples.add(sample);
+                 errorEstimates.add(error); 
              }
              //fourierTransform.phasorEstimateOffNominalF(df, fNom);
          });
