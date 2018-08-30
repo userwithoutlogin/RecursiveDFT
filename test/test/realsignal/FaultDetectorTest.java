@@ -9,7 +9,7 @@ import test.*;
 import com.mycompany.fouriert.errorcorrection.FaultDetection;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +54,7 @@ public class FaultDetectorTest {
             sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
         }
            
-         RecursivePhasor recursivePhasor = new RecursivePhasor(cosArray,sinArray);
+         RecursiveDFT recursivePhasor = new RecursiveDFT(cosArray,sinArray);
          Function<TransientMonitorSource, Double> monitor = new TransientMonitor(cosArray,sinArray );
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
@@ -66,7 +66,7 @@ public class FaultDetectorTest {
 
          FaultDetection faultDetection = new FaultDetection();
          faultDetection.setMonitor(monitor);
-         faultDetection.setRecursivePhasor(recursivePhasor);
+         faultDetection.setRecursiveDFT(recursivePhasor);
 
          boolean noError  = faultDetection.apply(correctSample);
          boolean hasError = faultDetection.apply(incorrectSample);

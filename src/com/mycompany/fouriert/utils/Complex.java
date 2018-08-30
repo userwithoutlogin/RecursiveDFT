@@ -16,7 +16,7 @@ public final class Complex  {
     private final double im;
     private   Double arg;
     private   Double amplitude;
-   private Double precision = 1e-13;
+    private Double precision = 1e-13;
    
     public Complex(double re, double im) {
         this.re = re;
@@ -76,9 +76,12 @@ public final class Complex  {
     
     @Override
     public String toString() {
+//        String sign = im<0? " - ":" + ";
+//        return     String.format("%."+precision+"f",re) + 
+//                sign +"j"+  String.format("%."+precision+"f",Math.abs(im))  ;
         String sign = im<0? " - ":" + ";
-        return     String.format("%."+precision+"f",re) + 
-                sign +"j"+  String.format("%."+precision+"f",Math.abs(im))  ;
+        return     re + 
+                sign +"j"+   Math.abs(im)  ;
     } 
 
  

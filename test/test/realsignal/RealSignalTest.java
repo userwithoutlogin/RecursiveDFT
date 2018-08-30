@@ -8,7 +8,7 @@ package test.realsignal;
 import test.*;
 import com.mycompany.fouriert.errorcorrection.FaultDetection;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,21 +61,21 @@ public class RealSignalTest {
          TransientMonitor monitor2 = new TransientMonitor(cosArray,sinArray);
          TransientMonitor monitor3 = new TransientMonitor(cosArray,sinArray);
 
-         RecursivePhasor recursivePhasor1 = new RecursivePhasor(cosArray,sinArray);
-         RecursivePhasor recursivePhasor2 = new RecursivePhasor(cosArray,sinArray );
-         RecursivePhasor recursivePhasor3 = new RecursivePhasor(cosArray,sinArray );
+         RecursiveDFT recursivePhasor1 = new RecursiveDFT(cosArray,sinArray);
+         RecursiveDFT recursivePhasor2 = new RecursiveDFT(cosArray,sinArray );
+         RecursiveDFT recursivePhasor3 = new RecursiveDFT(cosArray,sinArray );
          
          FaultDetection faultDetection1 = new FaultDetection();
          faultDetection1.setMonitor(monitor1);
-         faultDetection1.setRecursivePhasor(recursivePhasor1);
+         faultDetection1.setRecursiveDFT(recursivePhasor1);
          
          FaultDetection faultDetection2 = new FaultDetection();
          faultDetection2.setMonitor(monitor2);
-         faultDetection2.setRecursivePhasor(recursivePhasor2);
+         faultDetection2.setRecursiveDFT(recursivePhasor2);
          
          FaultDetection faultDetection3 = new FaultDetection();
          faultDetection3.setMonitor(monitor3);
-         faultDetection3.setRecursivePhasor(recursivePhasor3);
+         faultDetection3.setRecursiveDFT(recursivePhasor3);
          Integer faultSampleNumber1 = null;
          Integer faultSampleNumber2 = null;
          Integer faultSampleNumber3 = null;

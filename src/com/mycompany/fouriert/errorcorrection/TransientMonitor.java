@@ -6,7 +6,7 @@
 package com.mycompany.fouriert.errorcorrection;
 
  
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
 
 import java.util.List;
@@ -28,6 +28,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     private int      arrayIndex;
     private double[] cosArray ;
     private double[] sinArray ;
+  
     
     public TransientMonitor(double[] cosArray,double[] sinArray ) {
         //initSinCosArrays();

@@ -9,7 +9,7 @@ package test.realsignal;
 import test.*;
 import com.mycompany.fouriert.utils.Complex;
  
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
  
  
  
@@ -51,7 +51,7 @@ public class PhasorTest {
         }
          
          
-          Function<Double,Complex> recursivePhasor = new RecursivePhasor(cosArray,sinArray );
+          Function<Double,Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray );
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           

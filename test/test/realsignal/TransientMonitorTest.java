@@ -8,7 +8,7 @@ package test.realsignal;
 import test.*;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -56,7 +56,7 @@ public class TransientMonitorTest {
         }
          
           double precision = 1e-10;
-          Function<Double,Complex> recursivePhasor = new RecursivePhasor(cosArray,sinArray);
+          Function<Double,Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray);
           Function<TransientMonitorSource,Double> monitor = new TransientMonitor(cosArray,sinArray );
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           TransientMonitorSource source = new TransientMonitorSource();

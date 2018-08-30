@@ -5,7 +5,7 @@
  */
 package com.mycompany.fouriert.errorcorrection;
 
-import com.mycompany.fouriert.phasor.RecursivePhasor;
+import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
 import java.util.List;
 import java.util.function.Function;
@@ -15,11 +15,11 @@ import java.util.function.Function;
  * @author andrey_pushkarniy
  */
 public class FaultDetection implements Function<Double,Boolean>{
-    private Function<Double,Complex>   recursivePhasor;
+    private Function<Double,Complex>   recursiveDFT;
     private Function<TransientMonitorSource, Double> monitor;
     private final TransientMonitorSource monitorSourse = new TransientMonitorSource();
     private double  allowableDeviationPercent = 115;
-    
+    int n;
     
     /**
      * @param  sample  - sample of analyzed signal
@@ -27,15 +27,17 @@ public class FaultDetection implements Function<Double,Boolean>{
      */
     @Override
     public Boolean apply(Double sample) {
-        Complex phasor = recursivePhasor.apply(sample);
-        
+        Complex phasor = recursiveDFT.apply(sample);
+         n++;
         if (phasor == null) {
             return null;
         } else {
+            
             monitorSourse.setPhasor(phasor);
             monitorSourse.setSample(sample);
             monitorSourse.setSample(sample);
             double error = monitor.apply(monitorSourse);
+             
             return isEstimateFault(error, phasor.getAmplitude() * Math.sqrt(2.0));
         }
     }
@@ -51,12 +53,12 @@ public class FaultDetection implements Function<Double,Boolean>{
         return percent > allowableDeviationPercent;
     }
 
-    public Function<Double, Complex> getRecursivePhasor() {
-        return recursivePhasor;
+    public Function<Double, Complex> getRecursiveDFT() {
+        return recursiveDFT;
     }
 
-    public void setRecursivePhasor(Function<Double, Complex> recursivePhasor) {
-        this.recursivePhasor = recursivePhasor;
+    public void setRecursiveDFT(Function<Double, Complex> recursiveDFT) {
+        this.recursiveDFT = recursiveDFT;
     }
      
     

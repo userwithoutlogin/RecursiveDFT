@@ -17,7 +17,7 @@ import java.util.function.Function;
  * Phasor with recursive update estimation, extending discrete Fourier transform(DFT).
  * @author root
  */
-public class RecursivePhasor implements Function<Double,Complex>{
+public class RecursiveDFT implements Function<Double,Complex>{
     /**
      * arrayIndex       - index in the cosArray (sinArray)
      * buffer           - phasor's window
@@ -29,8 +29,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * Because sine(cosine) function is periodic.
      */
  
-     public  int arrayIndex;
-      
+     private  int arrayIndex;      
      private LinkedList<Double> buffer;
      private int windowWidth; 
      private Complex phasor = new Complex(0.0,0.0);
@@ -42,7 +41,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
         return buffer;
     }
       
-    public RecursivePhasor(double[] cosArray,double[] sinArray ) {                  
+    public RecursiveDFT(double[] cosArray,double[] sinArray ) {                  
         this.windowWidth = cosArray.length;
         buffer = new LinkedList(); 
         normingConstant = Math.sqrt(2)/windowWidth;
@@ -65,8 +64,8 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * @param  oldSample - first sample of buffer before shift
      */
     private void updatePhasor(double newSample,double oldSample){
-           Complex newSpectrumSample = getExp().multiply(newSample-oldSample).multiply(normingConstant); 
-           phasor =  phasor.add(newSpectrumSample) ;
+           Complex newPhasor = getExp().multiply(newSample-oldSample).multiply(normingConstant); 
+           phasor =  phasor.add(newPhasor) ;
     }
     
     /**
@@ -87,7 +86,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * and then, with every window shift, a difference between a new coming sample 
      * and deleted sample is transformed by DFT and  added to phasor. 
      */    
-    public void updatePhasorEstimate(double newSample) {  
+    public void performDirectTransform(double newSample) {  
           if(windowWidth > buffer.size())
                accumulateFirstPhasor(newSample);
           else{              
@@ -104,7 +103,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
 
     @Override
     public Complex apply(Double timeSample) {
-        updatePhasorEstimate(timeSample);
+        performDirectTransform(timeSample);
         return windowWidth > buffer.size() ? null : phasor;
 
     }
