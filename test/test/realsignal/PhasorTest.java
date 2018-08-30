@@ -3,14 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test;
+package test.realsignal;
 
  
-import com.mycompany.fouriert.errorcorrection.FaultDetection;
-import com.mycompany.fouriert.utils.PhaseShiftsBetweenPhasors;
+import test.*;
 import com.mycompany.fouriert.utils.Complex;
-import com.mycompany.fouriert.errorcorrection.TransientMonitor;
-import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
  
 import com.mycompany.fouriert.phasor.RecursivePhasor;
  
@@ -31,8 +28,7 @@ import java.util.stream.Collectors;
  
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
-
+import org.junit.Ignore; 
 /**
  *
  * @author andrey_pushkarniy
@@ -46,8 +42,16 @@ public class PhasorTest {
       
      @Test
      public  void applyTest(){
+          double[]  sinArray  = new double[WINDOW_WIDTH];
+        double[]  cosArray  = new double[WINDOW_WIDTH];
+        
+        for(int i=0;i<cosArray.length;i++){
+            cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
+            sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
+        }
          
-          Function<Double,Complex> recursivePhasor = new RecursivePhasor(WINDOW_WIDTH );
+         
+          Function<Double,Complex> recursivePhasor = new RecursivePhasor(cosArray,sinArray );
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           

@@ -51,7 +51,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     
     private Double calcuateError(Complex phasor,double sample){
         double error = Math.abs(
-                sample - phasor.getAmplitude() * Math.sqrt(2.0) * ( cosArray[n] * Math.cos(phasor.getArg()) - sinArray[n] * Math.sin(phasor.getArg()))
+            sample - Math.sqrt(2.0)* ( cosArray[n] * phasor.getRe() - sinArray[n] * phasor.getIm())
         );
         updateN();
         return error;

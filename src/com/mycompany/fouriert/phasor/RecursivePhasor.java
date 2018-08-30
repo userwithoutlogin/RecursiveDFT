@@ -25,12 +25,14 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * phasor           - accumulated phasor's estimation
      * normingConstant  - normalizing multiplier of DFT
      * has been detected 
+     * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+     * Because sine(cosine) function is periodic.
      */
  
      public  int n;
-     public  int k;
+      
      private LinkedList<Double> buffer;
-     private Integer windowWidth; 
+     private int windowWidth; 
      private Complex phasor = new Complex(0.0,0.0);
      private double  normingConstant ;
      private double [] cosArray;
@@ -46,6 +48,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
         normingConstant = Math.sqrt(2)/windowWidth;
         this.cosArray = cosArray;
         this.sinArray = sinArray;
+        
     }
         
     
@@ -70,8 +73,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * @return - Fourier's complex multiplyer 
      */
     private Complex getExp( ){
-//        return Complex.initByEuler(1,-k*2.0*Math.PI/windowWidth );
-        return new Complex(cosArray[k],-sinArray[k]);
+         return new Complex(cosArray[n],-sinArray[n]);
     }
     
     private void accumulateFirstPhasor(double newSample){
@@ -93,15 +95,12 @@ public class RecursivePhasor implements Function<Double,Complex>{
                updatePhasor(newSample, deletedSample);  
           }             
           updateN();
-            n++;
-    }   
+      }   
      
     public Complex getPhasor() {
         return phasor;
     }
-    public int  getN() {
-        return n;
-    }
+    
 
     @Override
     public Complex apply(Double timeSample) {
@@ -110,13 +109,11 @@ public class RecursivePhasor implements Function<Double,Complex>{
 
     }
 
-    public Integer getWindowWidth() {
-        return windowWidth;
-    }
+    
     private void updateN(){
-        k++;
-        if(k == cosArray.length )
-            k=0;
+        n++;
+        if(n == cosArray.length )
+            n=0;
     }
     
 }

@@ -23,10 +23,10 @@ public final class Complex  {
         this.im = im;
     }
 
-    public Double getArg(){
+    public synchronized Double getArg(){
         return arg == null ? calculateArgOnQuarter() : arg;
      }
-    public Double getAmplitude(){
+    public synchronized  Double getAmplitude(){
       return amplitude == null ? Math.sqrt(Math.pow(re,2)+Math.pow(im,2)) : amplitude;
     }
     public Complex multiply(double constant){
@@ -41,10 +41,7 @@ public final class Complex  {
     public Complex sub(Complex deleted){
         return new Complex(re-deleted.re,im-deleted.im);
     }
-    //инициализция и возврат комлексного числа по формуле Эйлера
-    public static Complex initByEuler(double module,double arg){
-        return new Complex(module*Math.cos(arg),module*Math.sin(arg));
-    }
+     
     public Complex conjugate(){
         return new Complex(re,-im);
     }
@@ -56,7 +53,7 @@ public final class Complex  {
         return im;
     }
     //подсчет аргумента компексного числа в зависимости от того,
-//    в какой четверти координатной плоскости находится комплексное число
+    //в какой четверти координатной плоскости находится комплексное число
     private Double calculateArgOnQuarter(){
         if (re > 0 && im == 0) 
             return 0.0;

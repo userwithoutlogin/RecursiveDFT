@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test;
+package test.realsignal;
 
+import test.*;
 import com.mycompany.fouriert.errorcorrection.FaultDetection;
 import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
@@ -41,13 +42,23 @@ public class FaultDetectorTest {
     
      @Test
      public void applyTest(){
-            
+         /**
+          * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+          * Because sine(cosine) function is periodic.
+          */
+              double[]  sinArray  = new double[WINDOW_WIDTH];
+        double[]  cosArray  = new double[WINDOW_WIDTH];
+        
+        for(int i=0;i<cosArray.length;i++){
+            cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
+            sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
+        }
            
-         RecursivePhasor recursivePhasor = new RecursivePhasor(WINDOW_WIDTH);
-         Function<TransientMonitorSource, Double> monitor = new TransientMonitor( );
+         RecursivePhasor recursivePhasor = new RecursivePhasor(cosArray,sinArray);
+         Function<TransientMonitorSource, Double> monitor = new TransientMonitor(cosArray,sinArray );
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
-
+         //correct last sample of the first window
          double correctSample   = 5273.0;
          double incorrectSample = 21118.0;
       
