@@ -42,7 +42,7 @@ public class IdealSignalTest {
       
      @Ignore(value = "true")
      @Test
-     public void findNumberOfErroneousPhasorRepresentation(){        
+     public void findNumberOfErroneousSample(){        
         /**
           * precision          - if difference between two double values less than precision , this numbers are equals
           * frequencyDeviation - frequency deviation from nominal frequency
