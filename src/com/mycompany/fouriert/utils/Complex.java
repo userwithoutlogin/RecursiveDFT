@@ -13,8 +13,8 @@ import com.mycompany.fouriert.utils.*;
  */
 public final class Complex {
 
-    private final  double re;
-    private final  double im;
+    private final double re;
+    private final double im;
     private Double arg;
     private Double amplitude;
     private Double precision = 1e-13;
@@ -67,11 +67,11 @@ public final class Complex {
     public Double getIm() {
         return im;
     }
-    
+
     @Override
     public String toString() {
         String sign = im < 0 ? " - " : " + ";
-        return re+ sign + "j" + Math.abs(im);
+        return re + sign + "j" + Math.abs(im);
     }
 
     @Override
@@ -79,5 +79,5 @@ public final class Complex {
         Complex complex = (Complex) obj;
         return (Math.abs(re - complex.re) < precision) && (Math.abs(im - complex.im) < precision);
     }
- 
+
 }

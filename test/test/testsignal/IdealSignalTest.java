@@ -10,7 +10,7 @@ import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
 import com.mycompany.fouriert.functions.CosineFunction;
  
-import com.mycompany.fouriert.functions.Generator;
+ 
 import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
 import java.util.ArrayList;

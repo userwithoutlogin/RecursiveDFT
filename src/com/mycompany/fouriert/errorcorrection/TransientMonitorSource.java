@@ -16,8 +16,6 @@ public class TransientMonitorSource {
     private double sample;
     private Complex phasor;
     
-
-   
     public double getSample() {
         return sample;
     }

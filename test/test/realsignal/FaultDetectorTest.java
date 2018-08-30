@@ -61,7 +61,7 @@ public class FaultDetectorTest {
          //correct last sample of the first window
          double correctSample   = 5273.0;
          double incorrectSample = 21118.0;
-       /**
+        /**
          * Calculate phasor for 24th sample
          */
         launchPhasor(pathToFile, 1, recursivePhasor);
@@ -80,7 +80,6 @@ public class FaultDetectorTest {
      }
      public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> recursivePhasor){
           List<Complex> samples = new ArrayList();
-          
           /**
            * It loads  first 24 samples, and applying phasor to them
            */

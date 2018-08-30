@@ -105,8 +105,10 @@ public class RecursiveDFT implements Function<Double,Complex>{
     @Override
     public Complex apply(Double timeSample) {
         performDirectTransform(timeSample);
-        return windowWidth > buffer.size() ? null : phasor;
-
+        if(windowWidth <= buffer.size() ){
+            return phasor;
+        }    
+        return null;
     }
 
 }
