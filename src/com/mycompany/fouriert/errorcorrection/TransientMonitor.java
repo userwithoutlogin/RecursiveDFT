@@ -54,7 +54,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
         
         double error = Math.abs(sample - Math.sqrt(2.0)* ( cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm())
         );
-        updateN();
+        updateArrayIndex();
         return error;
     }
     
@@ -64,7 +64,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
     }
      
     
-    private void updateN(){
+    private void updateArrayIndex(){
         ++arrayIndex;
         if(arrayIndex == cosArray.length )
             arrayIndex=0;

@@ -93,7 +93,7 @@ public class RecursiveDFT implements Function<Double,Complex>{
                double deletedSample = shiftWindow(newSample);                 
                updatePhasor(newSample, deletedSample);  
           }             
-          updateN();
+          updateArrayIndex();
       }   
      
     public Complex getPhasor() {
@@ -109,7 +109,7 @@ public class RecursiveDFT implements Function<Double,Complex>{
     }
 
     
-    private void updateN(){
+    private void updateArrayIndex(){
         arrayIndex++;
         if(arrayIndex == cosArray.length )
             arrayIndex=0;
