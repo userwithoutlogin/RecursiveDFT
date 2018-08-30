@@ -21,10 +21,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -62,7 +58,7 @@ public class TransientMonitorTest {
           TransientMonitorSource source = new TransientMonitorSource();
           
           
-          List<Complex> samples = launchPhasor(pathToFile,1,recursivePhasor );
+          List<Complex> samples = launchRecursiveDFT(pathToFile,1,recursivePhasor );
           
           source.setSample(5273.0);
           source.setPhasor(samples.get(0));
@@ -75,7 +71,7 @@ public class TransientMonitorTest {
                   compareFPNumbers(error, 1399.9734917936921,precision));
      }
      
-     public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> recursivePhasor ){
+     public List<Complex> launchRecursiveDFT(Path path,int signalIndex,Function<Double,Complex> recursivePhasor ){
           List<Complex> samples = new ArrayList();
           
           /**

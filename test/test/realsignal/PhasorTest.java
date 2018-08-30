@@ -55,7 +55,7 @@ public class PhasorTest {
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           
-          List<Complex> phasors = launchPhasor(pathToFile,1,recursivePhasor);
+          List<Complex> phasors = launchRecursiveDFT(pathToFile,1,recursivePhasor);
           
           
           assertTrue("The first phasor, obtained from  recursivePhasor,when buffer has just been filled,"
@@ -63,7 +63,7 @@ public class PhasorTest {
                   phasors.get(0).equals(new Complex(3272.17832498552,-1630.6305607908655)));           
      }
      
-     public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> recursivePhasor){
+     public List<Complex> launchRecursiveDFT(Path path,int signalIndex,Function<Double,Complex> recursivePhasor){
           List<Complex> samples = new ArrayList();
           
           /**

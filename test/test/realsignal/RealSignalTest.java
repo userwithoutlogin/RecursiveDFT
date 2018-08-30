@@ -76,6 +76,7 @@ public class RealSignalTest {
          FaultDetection faultDetection3 = new FaultDetection();
          faultDetection3.setMonitor(monitor3);
          faultDetection3.setRecursiveDFT(recursivePhasor3);
+         
          Integer faultSampleNumber1 = null;
          Integer faultSampleNumber2 = null;
          Integer faultSampleNumber3 = null;

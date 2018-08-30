@@ -46,7 +46,7 @@ public class FaultDetectorTest {
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.
           */
-              double[]  sinArray  = new double[WINDOW_WIDTH];
+        double[]  sinArray  = new double[WINDOW_WIDTH];
         double[]  cosArray  = new double[WINDOW_WIDTH];
         
         for(int i=0;i<cosArray.length;i++){
@@ -54,14 +54,16 @@ public class FaultDetectorTest {
             sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
         }
            
-         RecursiveDFT recursivePhasor = new RecursiveDFT(cosArray,sinArray);
+         Function<Double, Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray);
          Function<TransientMonitorSource, Double> monitor = new TransientMonitor(cosArray,sinArray );
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
          //correct last sample of the first window
          double correctSample   = 5273.0;
          double incorrectSample = 21118.0;
-      
+       /**
+         * Calculate phasor for 24th sample
+         */
         launchPhasor(pathToFile, 1, recursivePhasor);
 
          FaultDetection faultDetection = new FaultDetection();
