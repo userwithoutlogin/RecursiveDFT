@@ -20,12 +20,12 @@ import java.util.function.Function;
  */
 public class TransientMonitor  implements Function<TransientMonitorSource,Double>{
     /**
-     * n                  - number of current time sample
+     * arrayIndex         - index in the cosArray (sinArray)
      * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
      * Because sine(cosine) function is periodic.
      */
     
-    private int      n;
+    private int      arrayIndex;
     private double[] cosArray ;
     private double[] sinArray ;
     
@@ -35,7 +35,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
          * In the first time, calculation of error occurs  
          * using last sample in the first window(n=23 starting from 0) and the first obtained phasor
          */
-        n = cosArray.length-1;
+        arrayIndex = cosArray.length-1;
         this.cosArray = cosArray;
         this.sinArray = sinArray;
     }
@@ -50,8 +50,7 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      */ 
     
     private Double calcuateError(Complex phasor,double sample){
-        double error = Math.abs(
-            sample - Math.sqrt(2.0)* ( cosArray[n] * phasor.getRe() - sinArray[n] * phasor.getIm())
+        double error = Math.abs(sample - Math.sqrt(2.0)* ( cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm())
         );
         updateN();
         return error;
@@ -64,8 +63,8 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      
     
     private void updateN(){
-        ++n;
-        if(n == cosArray.length )
-            n=0;
+        ++arrayIndex;
+        if(arrayIndex == cosArray.length )
+            arrayIndex=0;
     }
 }

@@ -19,7 +19,7 @@ import java.util.function.Function;
  */
 public class RecursivePhasor implements Function<Double,Complex>{
     /**
-     * n                - number of current sample
+     * arrayIndex       - index in the cosArray (sinArray)
      * buffer           - phasor's window
      * windowWidth      - phasor's window width
      * phasor           - accumulated phasor's estimation
@@ -29,7 +29,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * Because sine(cosine) function is periodic.
      */
  
-     public  int n;
+     public  int arrayIndex;
       
      private LinkedList<Double> buffer;
      private int windowWidth; 
@@ -73,7 +73,7 @@ public class RecursivePhasor implements Function<Double,Complex>{
      * @return - Fourier's complex multiplyer 
      */
     private Complex getExp( ){
-         return new Complex(cosArray[n],-sinArray[n]);
+         return new Complex(cosArray[arrayIndex],-sinArray[arrayIndex]);
     }
     
     private void accumulateFirstPhasor(double newSample){
@@ -111,9 +111,9 @@ public class RecursivePhasor implements Function<Double,Complex>{
 
     
     private void updateN(){
-        n++;
-        if(n == cosArray.length )
-            n=0;
+        arrayIndex++;
+        if(arrayIndex == cosArray.length )
+            arrayIndex=0;
     }
     
 }
