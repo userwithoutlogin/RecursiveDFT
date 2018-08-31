@@ -38,13 +38,13 @@ public class TransientMonitorTest {
     
      
       @Test
-     public void applyTest(){
+     public void estimationErrorObtaining(){
          /**
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.
           */
-            double[]  sinArray  = new double[WINDOW_WIDTH];
-        double[]  cosArray  = new double[WINDOW_WIDTH];
+          double[]  sinArray  = new double[WINDOW_WIDTH];
+          double[]  cosArray  = new double[WINDOW_WIDTH];
         
         for(int i=0;i<cosArray.length;i++){
             cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
@@ -58,7 +58,7 @@ public class TransientMonitorTest {
           TransientMonitorSource source = new TransientMonitorSource();
           
           
-          List<Complex> samples = launchRecursiveDFT(pathToFile,1,recursivePhasor );
+          List<Complex> samples = generatePhasors(pathToFile,1,recursivePhasor,WINDOW_WIDTH );
           
           source.setSample(5273.0);
           source.setPhasor(samples.get(0));
@@ -80,7 +80,7 @@ public class TransientMonitorTest {
                   compareFPNumbers(error, 1399.9734917936921,precision));
      }
      
-     public List<Complex> launchRecursiveDFT(Path path,int signalIndex,Function<Double,Complex> recursivePhasor ){
+     public List<Complex> generatePhasors(Path path,int signalIndex,Function<Double,Complex> recursivePhasor,int limit ){
           List<Complex> samples = new ArrayList();
           
           /**
@@ -92,7 +92,7 @@ public class TransientMonitorTest {
                           return new Double( line.split(",")[1+signalIndex] );
                       })
                       .map(recursivePhasor )
-                      .limit(WINDOW_WIDTH)
+                      .limit(limit)
                       .filter(phasor->phasor!=null)
                       .collect(Collectors.toList());
                       

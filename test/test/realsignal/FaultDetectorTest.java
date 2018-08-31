@@ -41,7 +41,7 @@ public class FaultDetectorTest {
     }
     
      @Test
-     public void applyTest(){
+     public void errorDetection(){
          /**
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.

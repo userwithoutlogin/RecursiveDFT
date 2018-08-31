@@ -34,7 +34,7 @@ public class FaultDetection implements Function<Double, Boolean> {
         monitorSourse.setSample(sample);
         Double error = monitor.apply(monitorSourse);
         if (error != null) {
-            return isEstimateFault(error, phasor.getAmplitude() * Math.sqrt(2.0));
+             return isEstimateFault(error, phasor.getAmplitude() * Math.sqrt(2.0));
         }
         return null;
     }

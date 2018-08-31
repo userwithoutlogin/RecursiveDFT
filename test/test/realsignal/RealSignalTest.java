@@ -83,8 +83,8 @@ public class RealSignalTest {
          
          try {
            faultSampleNumber1 = findErroneousSampe(pathToFile,1, faultDetection1);
-           faultSampleNumber2 = findErroneousSampe(pathToFile,2, faultDetection2);
-           faultSampleNumber3 = findErroneousSampe(pathToFile,3, faultDetection3);
+            faultSampleNumber2 = findErroneousSampe(pathToFile,2, faultDetection2);
+            faultSampleNumber3 = findErroneousSampe(pathToFile,3, faultDetection3);
          } catch (IOException ex) {
              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
          }
@@ -94,6 +94,8 @@ public class RealSignalTest {
          assertTrue("fault sample of the third   sine  has number 80" , faultSampleNumber3  == 80);
               
      } 
+   
+   
    public int findErroneousSampe( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
            * Snippet chooses value belongs desirable  signal  (signal with number functionNumber), 

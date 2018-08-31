@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.fouriert.functions;
+package signal;
 
 /**
  *
@@ -31,8 +31,8 @@ public class CosineFunction  implements Function{
     
         @Override
     public Double calc(  double df) {    
-//        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi)  ;    
-        double cos  =  a * Math.cos(x*2.0*Math.PI/windowWidth + fi)  ;    
+        double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi)  ;    
+//        double cos  =  a * Math.cos(x*2.0*Math.PI/windowWidth + fi)  ;    
         x+= delta;
         return cos;
     }

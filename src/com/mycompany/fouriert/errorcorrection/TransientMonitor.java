@@ -44,6 +44,9 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
      */ 
     private Double calcuateError(Complex phasor, double sample) {
         if (phasor != null) {
+//            System.out.println((sample+"").replace(".", ","));
+            double r =  Math.sqrt(2.0) * (cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm());
+            System.out.println((r+"").replace(".", ","));
             return Math.abs(sample - Math.sqrt(2.0) * (cosArray[arrayIndex] * phasor.getRe() - sinArray[arrayIndex] * phasor.getIm()));
         }
         return null;
@@ -51,10 +54,11 @@ public class TransientMonitor  implements Function<TransientMonitorSource,Double
 
     @Override
     public Double apply(TransientMonitorSource data) {
+        Double error = calcuateError(data.getPhasor(), data.getSample());
         ++arrayIndex;
         if (arrayIndex >= cosArray.length) {
             arrayIndex = 0;
         }
-        return calcuateError(data.getPhasor(), data.getSample());
+        return error;
     }
 }
