@@ -41,11 +41,18 @@ public class PhasorTest {
          WINDOW_WIDTH     - phasor`s window size 
        */
       final int    WINDOW_WIDTH = 24;      
-      final String PATH_TO_FILE = "./realsine.txt"; 
-     
+       
       @Ignore(value = "true")
       @Test
       public  void phasorObtaining(){
+         /**
+          * recursiveDFT             - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray)       - sines(cosines) values which are calculated for 24 points of window in advance. 
+          * Because sine(cosine) function is periodic.
+          * resamplingFilter1(..2)   - performs recalculate time samples, changing distanse between them.
+          * samples                  - samples of real signal
+          * phasors                  - phasors of two signals
+         */
           double[]  sinArray  = new double[WINDOW_WIDTH];
           double[]  cosArray  = new double[WINDOW_WIDTH];
         
@@ -55,11 +62,11 @@ public class PhasorTest {
           }
          
          
-          Function<Double,Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray );
-          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
+          Function<Double,Complex> recursiveDFT = new RecursiveDFT(cosArray,sinArray );
+          Path pathToFile = Paths.get(Utils.PATH_TO_FILE).toAbsolutePath().normalize();
           
           List<Double> samples = Utils.getSamplesFromFile(pathToFile, 1, WINDOW_WIDTH);
-          List<Complex> phasors = Utils.getPhasors(samples, recursivePhasor);
+          List<Complex> phasors = Utils.getPhasors(samples, recursiveDFT);
           
           assertTrue("The first phasor, obtained from  recursivePhasor,when buffer has just been filled,"
                   + " must be equals 3272.18 -j 1630.63 ", 

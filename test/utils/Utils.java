@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -28,6 +29,11 @@ import test.realsignal.PhasorTest;
  * @author root
  */
 public class Utils {
+    /**
+     * PATH_TO_FILE - path to file where locates real signal samples 
+     */
+    public static final String PATH_TO_FILE = "test/resources/realsine.txt";
+    
      public static List<Complex> getPhasors(List<Double> samples,Function<Double,Complex> recursivePhasor){
           List<Complex> phasors = null;
          
@@ -45,7 +51,10 @@ public class Utils {
           
           /**
            * It loads  first 24 samples, and applying phasor to them
-           */
+           */ 
+          Path pathToFile = Paths.get("./test/resources/realsine.txt").toAbsolutePath().normalize();
+          
+          System.out.println(pathToFile);
           try {
               samples =  Files.lines(path , StandardCharsets.UTF_8)
                       .map(line->{

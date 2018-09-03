@@ -31,7 +31,9 @@ import utils.Utils;
  * @author andrey_pushkarniy
  */
 public class TransientMonitorTest {
-     final String PATH_TO_FILE = "./realsine.txt"; 
+     /**
+      * WINDOW_WIDTH - window width of phasor
+      */
      final int    WINDOW_WIDTH = 24; 
     
     public TransientMonitorTest() {
@@ -41,10 +43,15 @@ public class TransientMonitorTest {
      
      @Test
      public void estimationErrorObtaining(){
-         /**
+         
+          /**
+          * monitor            - it detects, when sine begins breaking
+          * recursiveDFT       - it performa discrete Fourier transform(DFT) with recursive update of estimation
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.
-          */
+          * error              - error of phasor estimation
+        */
+         
           double[]  sinArray  = new double[WINDOW_WIDTH];
           double[]  cosArray  = new double[WINDOW_WIDTH];
         
@@ -53,14 +60,14 @@ public class TransientMonitorTest {
             sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
         }
          
-          double precision = 1e-10;
-          Function<Double,Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray);
+         
+          Function<Double,Complex> recursiveDFT = new RecursiveDFT(cosArray,sinArray);
           Function<TransientMonitorSource,Double> monitor = new TransientMonitor(cosArray,sinArray );
-          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
+          Path pathToFile = Paths.get(Utils.PATH_TO_FILE).toAbsolutePath().normalize();
           TransientMonitorSource source = new TransientMonitorSource();
           
           List<Double> samples  = Utils.getSamplesFromFile(pathToFile, 1, WINDOW_WIDTH);
-          List<Complex> phasors = Utils.getPhasors(samples,  recursivePhasor);
+          List<Complex> phasors = Utils.getPhasors(samples,  recursiveDFT);
           
           for(int i=0;i<22;i++){
               source.setPhasor(phasors.get(i));

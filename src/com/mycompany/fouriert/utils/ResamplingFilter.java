@@ -21,6 +21,12 @@ public class ResamplingFilter implements Function<Double,Double>{
     private double gamma;
     private double deltaGamma ;
     private Double prevSample;
+    
+    /**
+     * @param windowWidth - phasors window width
+     * @param f           - off-nominal frequency
+     * @param f0          - nominal frequency
+     */
     public ResamplingFilter(int windowWidth,double f,double f0) {
         this.windowWidth = windowWidth;
         this.f = f;
@@ -30,7 +36,12 @@ public class ResamplingFilter implements Function<Double,Double>{
         deltaGamma = Math.abs(2*Math.PI*f/((double)windowWidth*f0) - gamma);
     }
  
-
+     /**
+     * Function which performs recalculate time samples, changing distanse between them, 
+     * thanks to it all of this samples will be place into a  period of off-nominal frequency
+     * @param sample      - actual sample
+     * @return recalculated  sample
+     */
     @Override
     public Double apply(Double sample) {
      double resampled = 0.0;

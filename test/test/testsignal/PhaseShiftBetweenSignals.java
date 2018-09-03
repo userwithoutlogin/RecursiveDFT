@@ -39,8 +39,18 @@ public class PhaseShiftBetweenSignals {
      
      @Test
      public void phaseShiftBetweenSignalsOnNominalFrequency(){
-        /* 
-           precision - two phase  are considered as equals, if their difference not greater than precision 
+          /**
+          * precision          - two double values considers equals, if their difference less than precision 
+          * frequencyDeviation - frequency deviation from nominal frequency
+          * amplitude1(..2)    - amplitude of tested signal
+          * phase1(..2)        - phase shift of tested signal
+          * cosine1(..2)       - creates samples of tsted signal 
+          * recursiveDFT1(..2) - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+          * Because sine(cosine) function is periodic.
+          * samples1(..2)            - samples of real signal
+          * phasors1(..2)            - phasors of two signals
+          * phaseShifts              - values of phase shift between two signals
         */
           double precision = 1e-13;   
           double frequencyDeviation = 0.0;
@@ -84,14 +94,20 @@ public class PhaseShiftBetweenSignals {
      }
      @Test
      public void phaseShiftBetweenSignalsOnOffNominalFrequency(){
-          /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 functions 
-            frequencyDeviation       - frequency deviation off nominal  frequency
-         */
+            /**
+          * frequencyDeviation - frequency deviation from nominal frequency
+          * amplitude1(..2)    - amplitude of tested signal
+          * phase1(..2)        - phase shift of tested signal
+          * cosine1(..2)       - creates samples of tsted signal 
+          * recursiveDFT1(..2) - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+          * Because sine(cosine) function is periodic.
+          * samples1(..2)            - samples of real signal
+          * phasors1(..2)            - phasors of two signals
+          * phaseShifts              - values of phase shift between two signals
+          * deviationFromPhaseShifts - deviation of phase shift between two signals from real value
+        */
           double frequencyDeviation = 1.8;
-            double precision = 1e-13;          
-
-         
           double amplitude1 = 100;
           double amplitude2 = 100;
           double phase1 = Math.PI/3;
@@ -121,12 +137,7 @@ public class PhaseShiftBetweenSignals {
                                         .filter(phasor->phasor!=null)
                                         .collect(Collectors.toList());
           
-          List<Double> arg1 = phasors1.stream()
-                              .map(phasor->Math.toDegrees(phasor.getArg()))
-                              .collect(Collectors.toList());
-          List<Double> arg2 = phasors2.stream()
-                              .map(phasor->Math.toDegrees(phasor.getArg()))
-                              .collect(Collectors.toList());
+          
           
           //it chooses entries of list where phasor estimate exists for calculate phase shift 
           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(phasors1,phasors2);
@@ -143,12 +154,23 @@ public class PhaseShiftBetweenSignals {
      }
      @Test 
      public void phaseShiftOnOffNominalFrequencyUsingResamplingFilter(){
-         /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
-            frequencyDeviation       - frequency deviation off nominal  frequency
-         */
+         /**
+          * frequencyDeviation - frequency deviation from nominal frequency
+          * amplitude1(..2)    - amplitude of tested signal
+          * phase1(..2)        - phase shift of tested signal
+          * cosine1(..2)       - creates samples of tsted signal 
+          * recursiveDFT1(..2) - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
+          * Because sine(cosine) function is periodic.
+          * samples1(..2)            - samples of real signal
+          * phasors1(..2)            - phasors of two signals
+          * phaseShifts              - values of phase shift between two signals
+          * deviationFromPhaseShifts - deviation of phase shift between two signals from real value
+          * resamplingFilter1(..2)   - performs recalculate time samples, changing distanse between them.
+          * recSamples1(..2)         - samples after resampling filter
+        */
           double frequencyDeviation = 1.8;
-          double precision = 1e-13;   
+       
           double amplitude1  = 100*Math.sqrt(2);
           double phase1  = Math.PI/3.0;
           double amplitude2  = 100*Math.sqrt(2);

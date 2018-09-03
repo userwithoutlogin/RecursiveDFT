@@ -32,8 +32,8 @@ import utils.Utils;
  */
 public class TransientMonitorTest {
       /* 
-         WINDOW_WIDTH     - размер окна фазора 
-         NOMINAL_FREQUECY - номинальная частота
+         WINDOW_WIDTH     - window width of phasor 
+         NOMINAL_FREQUECY - nominal frequency of signal
       */
       final int    WINDOW_WIDTH = 24;      
       final double NOMINAL_FREQUECY = 50.0;  
@@ -44,20 +44,21 @@ public class TransientMonitorTest {
      @Test
       public void findNumberOfErroneousSample(){        
         /**
+          * precision          - two double values considers equals, if their difference less than precision 
           * frequencyDeviation - frequency deviation from nominal frequency
           * amplitude          - amplitude of tested signal
           * phase              - phase shift of tested signal
           * cosine             - creates samples of tsted signal 
           * limitPointNumbers  - count points of sine  
           * monitor            - it detects, when sine begins breaking
-          * recursivePhasor    - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * recursiveDFT    - it performa discrete Fourier transform(DFT) with recursive update of estimation
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.
         */
         double precision = 1e-13;     
         double amplitude = 100.0;
         double phase = Math.PI/4;
-        double incorrectSample = 215.0 ;
+        double incorrectSample  = 215.0 ;
         double expectedSample   = 70.71067811865477 ;
         
          int limitPointNubers = 24;
@@ -76,9 +77,6 @@ public class TransientMonitorTest {
          RecursiveDFT recursiveDFT = new RecursiveDFT(cosArray, sinArray);
 
          
-         /**
-          * Generates correct samples
-          */
          List<Double> samples = Utils.generateSamples(cosine, limitPointNubers, frequencyDeviation);
          List<Complex> phasors = samples.stream()
                  .map(recursiveDFT)
@@ -102,15 +100,5 @@ public class TransientMonitorTest {
                  Utils.compareFPNumbers(errors.get(errors.size() - 1), incorrectSample - expectedSample, precision));
     
      }
-//      public List<Double> generateSamples(CosineFunction  cosine,int pointsCount,double df){
-//         List<Double> list= new ArrayList();
-//         IntStream.range(0, pointsCount).forEach(i->{
-//             list.add(cosine.calc(df));
-//         });
-//         return list;
-//     }
-//     public boolean compareFPNumbers(double n1,double n2,double precision){
-//      //Функция сравнения чисел с плавающей точкой   
-//       return Math.abs(n1-n2)<precision;
-//     }   
+ 
 }

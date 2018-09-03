@@ -34,24 +34,25 @@ import utils.Utils;
  * @author root
  */
 public class PhaseShiftBetweenSignalsTest {
-    final String PATH_TO_FILE = "./realsine.txt"; 
+    final String PATH_TO_FILE = "test/resources/realsine.txt"; 
     final int    WINDOW_WIDTH = 24;
     public PhaseShiftBetweenSignalsTest() {
     }
     
      @Test
      public void phaseShiftBetweenSignals(){
-        /* 
-           precision - two phase  are considered as equals, if their difference not greater than precision 
+        /**
+          * frequencyDeviation       - frequency deviation from nominal frequency
+          * recursiveDFT1(..2)       - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray)       - sines(cosines) values which are calculated for 24 points of window in advance. 
+          * Because sine(cosine) function is periodic.
+          * resamplingFilter1(..2)   - performs recalculate time samples, changing distanse between them.
+          * samples1(..2)            - samples of real signal
+          * phasors1(..2)            - phasors of two signals
+          * phaseShifts              - values of phase shift between two signals
         */
-          double precision = 1e-13;   
-          double frequencyDeviation = 0.0;
-          double amplitude1 = 100;
-          double amplitude2 = 100;
-          double phase1 = Math.PI/3;
-          double phase2 = Math.PI/6;
           
-          double[]  sinArray  = new double[WINDOW_WIDTH];
+        double[]  sinArray  = new double[WINDOW_WIDTH];
           double[]  cosArray  = new double[WINDOW_WIDTH];
         
           for (int i = 0; i < cosArray.length; i++) {
@@ -59,28 +60,21 @@ public class PhaseShiftBetweenSignalsTest {
              sinArray[i] = Math.sin(i * 2.0 * Math.PI / cosArray.length);
           }
           
-          Function<Double,Complex> recursivePhasor1 = new RecursiveDFT(cosArray,sinArray );
-          Function<Double,Complex> recursivePhasor2 = new RecursiveDFT(cosArray,sinArray );
+          Function<Double,Complex> recursiveDFT1 = new RecursiveDFT(cosArray,sinArray );
+          Function<Double,Complex> recursiveDFT2 = new RecursiveDFT(cosArray,sinArray );
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           
           List<Double> samples1 = Utils.getSamplesFromFile(pathToFile, 1, WINDOW_WIDTH);
           List<Double> samples2 = Utils.getSamplesFromFile(pathToFile, 2, WINDOW_WIDTH);
           
-          List<Complex> phasors1 =Utils.getPhasors(samples1, recursivePhasor1).stream()
+          List<Complex> phasors1 =Utils.getPhasors(samples1, recursiveDFT1).stream()
                                      .filter(phasor->phasor!=null)
                                      .collect(Collectors.toList());
           
-          List<Complex> phasors2 = Utils.getPhasors(samples2, recursivePhasor2).stream()
+          List<Complex> phasors2 = Utils.getPhasors(samples2, recursiveDFT2).stream()
                                      .filter(phasor->phasor!=null)
                                      .collect(Collectors.toList());
-          
-          List<Double> arg1 = phasors1.stream()
-                              .map(phasor->Math.toDegrees(phasor.getArg()))
-                              .collect(Collectors.toList());
-          List<Double> arg2 = phasors2.stream()
-                              .map(phasor->Math.toDegrees(phasor.getArg()))
-                              .collect(Collectors.toList());
-          
+        
           //it chooses entries of list where phasor estimate exists for calculate phase shift 
           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(phasors1 ,phasors2);       
           

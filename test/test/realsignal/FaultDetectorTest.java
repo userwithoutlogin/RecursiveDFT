@@ -32,13 +32,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+import utils.Utils;
 /**
  *
  * @author andrey_pushkarniy
  */
 public class FaultDetectorTest {
-    final String PATH_TO_FILE = "./realsine.txt"; 
+    
     final int    WINDOW_WIDTH = 24;
     
     public FaultDetectorTest() {
@@ -63,7 +63,7 @@ public class FaultDetectorTest {
             sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
         }
          
-         Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
+         Path pathToFile = Paths.get(Utils.PATH_TO_FILE).toAbsolutePath().normalize();
          TransientMonitor monitor1 = new TransientMonitor(cosArray,sinArray);
          TransientMonitor monitor2 = new TransientMonitor(cosArray,sinArray);
          TransientMonitor monitor3 = new TransientMonitor(cosArray,sinArray);

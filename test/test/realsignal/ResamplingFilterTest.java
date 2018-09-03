@@ -38,10 +38,12 @@ import utils.Utils;
 public class ResamplingFilterTest {
     /* 
      * WINDOW_WIDTH     - window width of phasor 
+     * NOMINAL_FREQUECY - nominal frequency of signal  
     */
     final int    WINDOW_WIDTH = 24;      
     final double NOMINAL_FREQUECY = 50.0;  
-    Path PATH_TO_FILE = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+     
+     
     
     public ResamplingFilterTest() {
     }
@@ -49,12 +51,18 @@ public class ResamplingFilterTest {
       
      @Test 
      public void phaseShiftOnOffNominalFrequency(){
-         /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
-            frequencyDeviation       - frequency deviation off nominal  frequency
-         */
+         /**
+          * frequencyDeviation       - frequency deviation from nominal frequency
+          * recursiveDFT1(..2)       - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray)       - sines(cosines) values which are calculated for 24 points of window in advance. 
+          * Because sine(cosine) function is periodic.
+          * resamplingFilter1(..2)   - performs recalculate time samples, changing distanse between them.
+          * recSamples               - samples after resampling filter
+          * phasors1(..2)            - phasors of two signals
+          * phaseShifts              - values f phase shift between two signals
+        */
           double frequencyDeviation = 1.8;
-           
+          Path pathToFile = Paths.get(Utils.PATH_TO_FILE).toAbsolutePath().normalize(); 
           double[]  sinArray  = new double[WINDOW_WIDTH];
           double[]  cosArray  = new double[WINDOW_WIDTH];
         
@@ -69,8 +77,8 @@ public class ResamplingFilterTest {
           Function<Double,Complex> recursiveDFT2 = new RecursiveDFT(cosArray, sinArray);
           Function<Double,Double>  resamplingFilter2 = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
           
-          List<Double> samples1 = Utils.getSamplesFromFile(PATH_TO_FILE, 1, WINDOW_WIDTH*2);
-          List<Double> samples2 = Utils.getSamplesFromFile(PATH_TO_FILE, 2, WINDOW_WIDTH*2);
+          List<Double> samples1 = Utils.getSamplesFromFile(pathToFile, 1, WINDOW_WIDTH*2);
+          List<Double> samples2 = Utils.getSamplesFromFile(pathToFile, 2, WINDOW_WIDTH*2);
           
             samples1 = Utils.resample(samples1,resamplingFilter1);
             samples2 = Utils.resample(samples2,resamplingFilter2);

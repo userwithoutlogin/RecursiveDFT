@@ -29,8 +29,8 @@ import utils.Utils;
  */
 public class ResamplingFilterTest {
     /* 
-     * WINDOW_WIDTH     - размер окна фазора 
-     * NOMINAL_FREQUECY - номинальная частота
+     * WINDOW_WIDTH     - window width of phasor 
+     * NOMINAL_FREQUECY - nominal frequency of signal
     */
     final int    WINDOW_WIDTH = 24;      
     final double NOMINAL_FREQUECY = 50.0;  
@@ -40,10 +40,20 @@ public class ResamplingFilterTest {
       
      @Test 
      public void resamplingTest(){
-         /*
-            deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
-            frequencyDeviation       - frequency deviation off nominal  frequency
-         */
+           /**
+          * precision          - two double values considers equals, if their difference less than precision 
+          * frequencyDeviation - frequency deviation from nominal frequency
+          * amplitude          - amplitude of tested signal
+          * phase              - phase shift of tested signal
+          * cosine             - creates samples of tsted signal 
+          * monitor            - it detects, when sine begins breaking
+          * recursiveDFT       - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points of window in advance. 
+          * Because sine(cosine) function is periodic.
+          * resamplingFilter   - performs recalculate time samples, changing distanse between them.
+          * recSamples         - samples after resampling filter
+        */
+         
           double frequencyDeviation = 0.5;
           double precision = 1e-10;   
           double amplitude = 100*Math.sqrt(2);
