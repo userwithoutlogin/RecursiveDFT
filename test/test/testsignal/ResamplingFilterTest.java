@@ -20,7 +20,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import signal.CosineFunction;
+import utils.CosineFunction;
+import utils.Utils;
 
 /**
  *
@@ -38,17 +39,16 @@ public class ResamplingFilterTest {
     
       
      @Test 
-     public void phaseShiftOnOffNominalFrequency(){
+     public void resamplingTest(){
          /*
             deviationFromPhaseShifts - deviation of values of phase shift  from 30 degrees  between 2 function
             frequencyDeviation       - frequency deviation off nominal  frequency
          */
-          double frequencyDeviation = 1.8;
-          double precision = 1e-13;   
-          double amplitude1  = 100*Math.sqrt(2);
-          double phase1  = Math.PI/3.0;
-          double amplitude2  = 100*Math.sqrt(2);
-          double phase2  = Math.PI/6.0;
+          double frequencyDeviation = 0.5;
+          double precision = 1e-10;   
+          double amplitude = 100*Math.sqrt(2);
+          double phase  = Math.PI/4.0;
+           
           
           
           double[]  sinArray  = new double[WINDOW_WIDTH];
@@ -59,49 +59,18 @@ public class ResamplingFilterTest {
              sinArray[i] = Math.sin(i * 2.0 * Math.PI / cosArray.length);
           }
           
-          Function<Double,Complex> recursiveDFT1 = new RecursiveDFT(cosArray, sinArray);
-          Function<Double,Double>  resamplingFilter1 = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
-          Function<Double,Complex> recursiveDFT2 = new RecursiveDFT(cosArray, sinArray);
-          Function<Double,Double>  resamplingFilter2 = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
-         
-          CosineFunction cosine1   = new CosineFunction(amplitude1 ,phase1 ,WINDOW_WIDTH,NOMINAL_FREQUECY);
-          CosineFunction cosine2   = new CosineFunction(amplitude2 ,phase2 ,WINDOW_WIDTH,NOMINAL_FREQUECY);
+          Function<Double,Complex> recursiveDFT = new RecursiveDFT(cosArray, sinArray);
+          Function<Double,Double>  resamplingFilter = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
           
-          List<Double> samples1    = generateSamples(cosine1 , 48,frequencyDeviation);
-          List<Double> recSamples1    = recalculateSamples(resamplingFilter1, samples1);
+          CosineFunction cosine   = new CosineFunction(amplitude ,phase ,WINDOW_WIDTH,NOMINAL_FREQUECY);
+          
+          List<Double> samples    = Utils.generateSamples(cosine , 25,frequencyDeviation);
+          List<Double> recSamples    = Utils.resample( samples,resamplingFilter);
      
-          List<Double> samples2    = generateSamples(cosine2 , 48,frequencyDeviation);
-          List<Double> recSamples2    = recalculateSamples(resamplingFilter2, samples2);
-       
-          List<Complex> phasors1   = getPhasors(recursiveDFT1 ,recSamples1 );
-          List<Complex> phasors2   = getPhasors(recursiveDFT2 ,recSamples2 );
-           
-          List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(phasors1 ,phasors2);  
-          List<Double> deviationPhaseShift = phaseShifts.stream()
-                  .map(shift->Math.abs(shift-30.0))
-                  .collect(Collectors.toList());
-          assertTrue("phase shift between two signals must be deviate from 30 degree not greater than 0.08 degree"
-                  + " on off-nominal frequency 51.8Hz",
-                  deviationPhaseShift.stream().allMatch(shift->shift<0.08)
+          
+          assertTrue("The first recalculated sample must be equals to this first original sample", 
+                  Utils.compareFPNumbers(samples.get(0), recSamples.get(0), precision)
           );
      }
     
-      public List<Complex> getPhasors(Function<Double,Complex> recursiveDFT,List<Double> samples){
-         return samples.stream()
-                 .map(recursiveDFT)
-                 .filter(phasor->phasor!=null)
-                 .collect(Collectors.toList());
-     }
-      public List<Double> generateSamples(CosineFunction  cosine,int pointsCount,double df){
-         List<Double> list= new ArrayList();
-         IntStream.range(0, pointsCount).forEach(i->{
-             list.add(cosine.calc(df));
-         });
-         return list;
-     }
-      public List<Double> recalculateSamples(Function<Double,Double> resamplingFilter,List<Double> originalSamples){
-          return originalSamples.stream()
-                  .map(resamplingFilter)
-                  .collect(Collectors.toList());
-      }
 }

@@ -23,7 +23,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import signal.CosineFunction;
+import utils.CosineFunction;
+import utils.Utils;
 
 /**
  *
@@ -59,62 +60,57 @@ public class TransientMonitorTest {
         double incorrectSample = 215.0 ;
         double expectedSample   = 70.71067811865477 ;
         
-        int limitPointNubers = 24;
-        double frequencyDeviation = 0.0;
-        double[]  sinArray  = new double[WINDOW_WIDTH];
-        double[]  cosArray  = new double[WINDOW_WIDTH];
-        
+         int limitPointNubers = 24;
+         double frequencyDeviation = 0.0;
+         double[] sinArray = new double[WINDOW_WIDTH];
+         double[] cosArray = new double[WINDOW_WIDTH];
+
          for (int i = 0; i < cosArray.length; i++) {
              cosArray[i] = Math.cos(i * 2.0 * Math.PI / cosArray.length);
              sinArray[i] = Math.sin(i * 2.0 * Math.PI / cosArray.length);
          }
-        
-         CosineFunction cosine = new CosineFunction(amplitude,phase  ,WINDOW_WIDTH ,NOMINAL_FREQUECY);        
- 
-         TransientMonitor monitor = new TransientMonitor( cosArray,sinArray);
-         RecursiveDFT  recursiveDFT =  new RecursiveDFT( cosArray,sinArray);
-        
-        // FaultDetection faultDetection = new FaultDetection();
-        // faultDetection.setMonitor(monitor);
-        // faultDetection.setRecursiveDFT(recursiveDFT);
+
+         CosineFunction cosine = new CosineFunction(amplitude, phase, WINDOW_WIDTH, NOMINAL_FREQUECY);
+
+         TransientMonitor monitor = new TransientMonitor(cosArray, sinArray);
+         RecursiveDFT recursiveDFT = new RecursiveDFT(cosArray, sinArray);
+
+         
          /**
           * Generates correct samples
           */
-         List<Double> samples =  generateSamples(cosine, limitPointNubers,frequencyDeviation);
+         List<Double> samples = Utils.generateSamples(cosine, limitPointNubers, frequencyDeviation);
          List<Complex> phasors = samples.stream()
                  .map(recursiveDFT)
                  .collect(Collectors.toList());
-         /**
-          * Adds incorrect 49th sample 
-          */
-         //86.60254037844383
-         //samples.add(incorrectSample);
+
          List<Double> errors = new ArrayList();
-        // Integer number = findNumberOFError(faultDetection, samples)+1;
-         for(int i=0;i<phasors.size();i++){
-            // Complex phasor = recursiveDFT.apply(samples.get(i));
+
+         for (int i = 0; i < phasors.size(); i++) {
              TransientMonitorSource source = new TransientMonitorSource();
              source.setPhasor(phasors.get(i));
              source.setSample(samples.get(i));
              errors.add(monitor.apply(source));
          }
+         
+         //Finds error for incorrect sample
          TransientMonitorSource source = new TransientMonitorSource();
-             source.setPhasor(phasors.get(phasors.size()-1));
-             source.setSample(215.0);
-        errors.add( monitor.apply(source));
-         assertTrue("48th sample is erroneous" ,
-                 compareFPNumbers(errors.get(errors.size() - 1), incorrectSample - expectedSample, precision));
+         source.setPhasor(phasors.get(phasors.size() - 1));
+         source.setSample(215.0);
+         errors.add(monitor.apply(source));
+         assertTrue("Error between incorrectSample and expectedSample equals to 144.3" ,
+                 Utils.compareFPNumbers(errors.get(errors.size() - 1), incorrectSample - expectedSample, precision));
     
      }
-      public List<Double> generateSamples(CosineFunction  cosine,int pointsCount,double df){
-         List<Double> list= new ArrayList();
-         IntStream.range(0, pointsCount).forEach(i->{
-             list.add(cosine.calc(df));
-         });
-         return list;
-     }
-     public boolean compareFPNumbers(double n1,double n2,double precision){
-      //Функция сравнения чисел с плавающей точкой   
-       return Math.abs(n1-n2)<precision;
-     }   
+//      public List<Double> generateSamples(CosineFunction  cosine,int pointsCount,double df){
+//         List<Double> list= new ArrayList();
+//         IntStream.range(0, pointsCount).forEach(i->{
+//             list.add(cosine.calc(df));
+//         });
+//         return list;
+//     }
+//     public boolean compareFPNumbers(double n1,double n2,double precision){
+//      //Функция сравнения чисел с плавающей точкой   
+//       return Math.abs(n1-n2)<precision;
+//     }   
 }

@@ -18,7 +18,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import signal.CosineFunction;
+import utils.CosineFunction;
+import utils.Utils;
 
 /**
  *
@@ -74,23 +75,17 @@ public class FaultDetectionTest {
          /**
           * Generates correct samples
           */
-         List<Double> samples =  generateSamples(cosine, limitPointNubers,frequencyDeviation);
+         List<Double> samples =  Utils.generateSamples(cosine,limitPointNubers, frequencyDeviation);
          /**
           * Adds incorrect 49th sample 
           */
          samples.add(incorrectSample);
          Integer number = findNumberOFError(faultDetection, samples)+1;
          
-         assertTrue("48th sample is erroneous",number == 49  );
+         assertTrue("49th sample is erroneous",number == 49  );
     
      }
-      public List<Double> generateSamples(CosineFunction  cosine,int pointsCount,double df){
-         List<Double> list= new ArrayList();
-         IntStream.range(0, pointsCount).forEach(i->{
-             list.add(cosine.calc(df));
-         });
-         return list;
-     }
+      
       public Integer findNumberOFError(Function<Double,Boolean> faultDetector,List<Double> samples){
          Integer errorNumber = null;
          for(int i=0;i<samples.size();i++ ){  

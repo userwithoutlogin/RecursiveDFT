@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package signal;
+package utils;
 
 /**
  *
  * @author andrey_pushkarniy
  */
-public class CosineFunction  implements Function{
+public class CosineFunction   {
     private final Double a;
         
         private final Double fi;
@@ -29,10 +29,9 @@ public class CosineFunction  implements Function{
       
     
     
-        @Override
+        
     public Double calc(  double df) {    
         double cos  =  a * Math.cos(x*2.0*Math.PI*((df+freqNom)/freqNom)/windowWidth + fi)  ;    
-//        double cos  =  a * Math.cos(x*2.0*Math.PI/windowWidth + fi)  ;    
         x+= delta;
         return cos;
     }

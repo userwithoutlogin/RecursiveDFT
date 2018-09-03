@@ -11,7 +11,11 @@ import com.mycompany.fouriert.errorcorrection.TransientMonitor;
 import com.mycompany.fouriert.errorcorrection.TransientMonitorSource;
 import com.mycompany.fouriert.phasor.RecursiveDFT;
 import com.mycompany.fouriert.utils.Complex;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,9 +44,14 @@ public class FaultDetectorTest {
     public FaultDetectorTest() {
     }
     
+      
+     
      @Test
-     public void errorDetection(){
+   public void findingFaultSampleInRealSignal(){
          /**
+          * monitor1(..2,..3)         - it detects, when sine begins breaking
+          * recursivePhasor1(..2,..3) - it performa discrete Fourier transform(DFT) with recursive update of estimation
+          * faultDetection1(..2,..3)  - it evaluates if the error exceeds allowable limitation
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
           * Because sine(cosine) function is periodic.
           */
@@ -53,49 +62,80 @@ public class FaultDetectorTest {
             cosArray[i] =  Math.cos( i  * 2.0 * Math.PI / cosArray.length );  
             sinArray[i] =  Math.sin( i  * 2.0 * Math.PI / cosArray.length );  
         }
-           
-         Function<Double, Complex> recursivePhasor = new RecursiveDFT(cosArray,sinArray);
-         Function<TransientMonitorSource, Double> monitor = new TransientMonitor(cosArray,sinArray );
+         
          Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
+         TransientMonitor monitor1 = new TransientMonitor(cosArray,sinArray);
+         TransientMonitor monitor2 = new TransientMonitor(cosArray,sinArray);
+         TransientMonitor monitor3 = new TransientMonitor(cosArray,sinArray);
+
+         RecursiveDFT recursivePhasor1 = new RecursiveDFT(cosArray,sinArray);
+         RecursiveDFT recursivePhasor2 = new RecursiveDFT(cosArray,sinArray );
+         RecursiveDFT recursivePhasor3 = new RecursiveDFT(cosArray,sinArray );
+         
+         FaultDetection faultDetection1 = new FaultDetection();
+         faultDetection1.setMonitor(monitor1);
+         faultDetection1.setRecursiveDFT(recursivePhasor1);
+         
+         FaultDetection faultDetection2 = new FaultDetection();
+         faultDetection2.setMonitor(monitor2);
+         faultDetection2.setRecursiveDFT(recursivePhasor2);
+         
+         FaultDetection faultDetection3 = new FaultDetection();
+         faultDetection3.setMonitor(monitor3);
+         faultDetection3.setRecursiveDFT(recursivePhasor3);
+         
+         Integer faultSampleNumber1 = null;
+         Integer faultSampleNumber2 = null;
+         Integer faultSampleNumber3 = null;
+         
+         try {
+           faultSampleNumber1 = findErroneousSampe(pathToFile,1, faultDetection1);
+            faultSampleNumber2 = findErroneousSampe(pathToFile,2, faultDetection2);
+            faultSampleNumber3 = findErroneousSampe(pathToFile,3, faultDetection3);
+         } catch (IOException ex) {
+             Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
+         }
           
-         //correct last sample of the first window
-         double correctSample   = 5273.0;
-         double incorrectSample = 21118.0;
-        /**
-         * Calculate phasor for 24th sample
-         */
-        launchPhasor(pathToFile, 1, recursivePhasor);
-
-         FaultDetection faultDetection = new FaultDetection();
-         faultDetection.setMonitor(monitor);
-         faultDetection.setRecursiveDFT(recursivePhasor);
-
-         boolean noError  = faultDetection.apply(correctSample);
-         boolean hasError = faultDetection.apply(incorrectSample);
-
-         assertFalse("fault has not been detected ", noError);
-         assertTrue("fault has  been detected    ",  hasError);
-                   
-                  
-     }
-     public List<Complex> launchPhasor(Path path,int signalIndex,Function<Double,Complex> recursivePhasor){
-          List<Complex> samples = new ArrayList();
+         assertTrue("fault sample of the first   sine  has number 81" , faultSampleNumber1  == 81);
+         assertTrue("fault sample of the second  sine  has number 80" , faultSampleNumber2  == 80);
+         assertTrue("fault sample of the third   sine  has number 80" , faultSampleNumber3  == 80);
+              
+     } 
+   
+   public int findErroneousSampe( Path pathToFile,int functionNumber,Function<Double,Boolean> faultDetection) throws IOException{
           /**
-           * It loads  first 24 samples, and applying phasor to them
-           */
-          try {
-              samples =  Files.lines(path , StandardCharsets.UTF_8)
-                      .map(line->{
-                          return new Double( line.split(",")[1+signalIndex] );
-                      })
-                      .map(recursivePhasor)
-                      .limit(24)
-                      .filter(phasor->phasor!=null)
-                      .collect(Collectors.toList());
-                      
-          } catch (IOException ex) {
-              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
-          }
-          return samples;
-      }
-}
+           * Snippet chooses value belongs desirable  signal  (signal with number functionNumber), 
+           * then  estimates of value, filters null values  and if fault is detected, stops the stream.
+           */  
+  
+
+        BufferedReader reader = null;
+        Integer count = 0;
+        try {
+            reader = new BufferedReader(
+                        new InputStreamReader(
+                            new FileInputStream(pathToFile.toFile()), Charset.forName("UTF-8")));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                 count++;
+                 double sample =  new Double( line.split(",")[functionNumber+1] );
+                 Boolean fault = faultDetection.apply(sample);
+                 if( fault!=null &&fault)
+                     break;
+                     
+            }
+        } catch (IOException e) {
+            count = null;
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    // log warning
+                }
+            }
+        }
+         return count;  
+     }
+     
+    }

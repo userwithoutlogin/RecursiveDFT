@@ -21,8 +21,10 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import utils.Utils;
 
 /**
  *
@@ -37,7 +39,7 @@ public class TransientMonitorTest {
     }
     
      
-      @Test
+     @Test
      public void estimationErrorObtaining(){
          /**
           * cosArray(sinArray) - sines(cosines) values which are calculated for 24 points in advance. 
@@ -57,52 +59,25 @@ public class TransientMonitorTest {
           Path pathToFile = Paths.get(PATH_TO_FILE).toAbsolutePath().normalize();
           TransientMonitorSource source = new TransientMonitorSource();
           
+          List<Double> samples  = Utils.getSamplesFromFile(pathToFile, 1, WINDOW_WIDTH);
+          List<Complex> phasors = Utils.getPhasors(samples,  recursivePhasor);
           
-          List<Complex> samples = generatePhasors(pathToFile,1,recursivePhasor,WINDOW_WIDTH );
+          for(int i=0;i<22;i++){
+              source.setPhasor(phasors.get(i));
+              source.setSample(samples.get(i));
+              monitor.apply(source);              
+          }
           
           source.setSample(5273.0);
-          source.setPhasor(samples.get(0));
-         
-          /**
-           * Calls the monitor with an empty phasor , 
-           * in order to set state of the  monitor to a last sample number,
-           * and then passes phasor, obtained from last sample of the first window,
-           * to the monitor
-           */
-          for(int i=0;i<22;i++)
-              monitor.apply(new TransientMonitorSource());
+          source.setPhasor(phasors.get(phasors.size()-1));
           double error = monitor.apply(source);
            
           assertTrue("The  error of phasor estimation, "
                   + "between the last sample in the window  and recalculated sample,"
                   + "when buffer has just been filled,"
-                  + "must be equals 1399.97",
-                  compareFPNumbers(error, 1399.9734917936921,precision));
+                  + "must be equals 2418.45",
+                  Utils.compareFPNumbers(error, 2418.45,1e-2));
      }
      
-     public List<Complex> generatePhasors(Path path,int signalIndex,Function<Double,Complex> recursivePhasor,int limit ){
-          List<Complex> samples = new ArrayList();
-          
-          /**
-           * It loads  first 24 samples, and applying phasor to them
-           */
-          try {
-              samples =  Files.lines(path , StandardCharsets.UTF_8)
-                      .map(line->{
-                          return new Double( line.split(",")[1+signalIndex] );
-                      })
-                      .map(recursivePhasor )
-                      .limit(limit)
-                      .filter(phasor->phasor!=null)
-                      .collect(Collectors.toList());
-                      
-          } catch (IOException ex) {
-              Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
-          }
-          return samples;
-      }
-      public boolean compareFPNumbers(double n1,double n2,double precision){
-      // function of comparison of two floating point numbers       
-       return Math.abs(n1-n2)<precision;
-     }
+     
 }

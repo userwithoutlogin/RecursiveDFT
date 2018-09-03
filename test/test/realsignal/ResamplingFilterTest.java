@@ -28,7 +28,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import signal.CosineFunction;
+import utils.CosineFunction;
+import utils.Utils;
 
 /**
  *
@@ -36,12 +37,12 @@ import signal.CosineFunction;
  */
 public class ResamplingFilterTest {
     /* 
-     * WINDOW_WIDTH     - размер окна фазора 
-     * NOMINAL_FREQUECY - номинальная частота
+     * WINDOW_WIDTH     - window width of phasor 
     */
     final int    WINDOW_WIDTH = 24;      
     final double NOMINAL_FREQUECY = 50.0;  
     Path PATH_TO_FILE = Paths.get("./realsine.txt").toAbsolutePath().normalize();
+    
     public ResamplingFilterTest() {
     }
     
@@ -54,8 +55,6 @@ public class ResamplingFilterTest {
          */
           double frequencyDeviation = 1.8;
            
-          
-          
           double[]  sinArray  = new double[WINDOW_WIDTH];
           double[]  cosArray  = new double[WINDOW_WIDTH];
         
@@ -66,12 +65,24 @@ public class ResamplingFilterTest {
           
           Function<Double,Complex> recursiveDFT1 = new RecursiveDFT(cosArray, sinArray);
           Function<Double,Double>  resamplingFilter1 = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
+          
           Function<Double,Complex> recursiveDFT2 = new RecursiveDFT(cosArray, sinArray);
           Function<Double,Double>  resamplingFilter2 = new ResamplingFilter(WINDOW_WIDTH,NOMINAL_FREQUECY+frequencyDeviation,NOMINAL_FREQUECY);
-           
-          List<Complex> phasors1   = generatePhasorsUsingResamplingFilter(PATH_TO_FILE, 1, recursiveDFT1, resamplingFilter1, 48) ;
-          List<Complex> phasors2   = generatePhasorsUsingResamplingFilter(PATH_TO_FILE, 2, recursiveDFT2, resamplingFilter2, 48) ;
-           
+          
+          List<Double> samples1 = Utils.getSamplesFromFile(PATH_TO_FILE, 1, WINDOW_WIDTH*2);
+          List<Double> samples2 = Utils.getSamplesFromFile(PATH_TO_FILE, 2, WINDOW_WIDTH*2);
+          
+            samples1 = Utils.resample(samples1,resamplingFilter1);
+            samples2 = Utils.resample(samples2,resamplingFilter2);
+          
+          
+          List<Complex> phasors1   = Utils.getPhasors(samples1,recursiveDFT1).stream()
+                                        .filter(phasor->phasor!=null)
+                                        .collect(Collectors.toList());
+          List<Complex> phasors2   = Utils.getPhasors(samples2,recursiveDFT2).stream()
+                                        .filter(phasor->phasor!=null)
+                                        .collect(Collectors.toList());
+          
           List<Double> phaseShifts = PhaseShiftsBetweenPhasors.calc(phasors1 ,phasors2);  
           
           assertTrue("phase shift between two signals must be locate in range"
@@ -80,60 +91,5 @@ public class ResamplingFilterTest {
           );
      }
     
-     
-      
-       
-       public List<Complex> generatePhasors(
-            Path path,
-            int signalIndex,
-            Function<Double, Complex> recursivePhasor,
-            int limit) 
-       {
-        List<Complex> samples = new ArrayList();
-
-        /**
-         * It loads first 24 samples, and applying phasor to them
-         */
-        try {
-            samples = Files.lines(path, StandardCharsets.UTF_8)
-                    .map(line -> {
-                        return new Double(line.split(",")[1 + signalIndex]);
-                    })
-                    .map(recursivePhasor)
-                    .limit(limit)
-                    .filter(phasor -> phasor != null)
-                    .collect(Collectors.toList());
-
-        } catch (IOException ex) {
-            Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return samples;
-    }
-      public List<Complex> generatePhasorsUsingResamplingFilter(
-            Path path,
-            int signalIndex,
-            Function<Double, Complex> recursivePhasor,
-            Function<Double, Double> resamplingFilter,
-            int limit) {
-        List<Complex> samples = new ArrayList();
-
-        /**
-         * It loads first 24 samples, and applying phasor to them
-         */
-        try {
-            samples = Files.lines(path, StandardCharsets.UTF_8)
-                    .map(line -> {
-                        return new Double(line.split(",")[1 + signalIndex]);
-                    })
-                    .map(resamplingFilter)
-                    .map(recursivePhasor)
-                    .limit(limit)
-                    .filter(phasor -> phasor != null)
-                    .collect(Collectors.toList());
-            
-        } catch (IOException ex) {
-            Logger.getLogger(PhasorTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return samples;
-    }
+        
 }
